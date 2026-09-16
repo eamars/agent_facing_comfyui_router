@@ -52,11 +52,13 @@ PROMPT_GRANULARITY_ALIASES = {
 
 
 class ApiError(Exception):
-    def __init__(self, status: int, message: str, details: Any = None):
+    def __init__(self, status: int, message: str, details: Any = None, *, route: str | None = None, expected: list[str] | None = None):
         super().__init__(message)
         self.status = status
         self.message = message
         self.details = details
+        self.route = route
+        self.expected = expected
 
 
 def _json_error(error: ApiError) -> web.Response:
@@ -64,6 +66,8 @@ def _json_error(error: ApiError) -> web.Response:
         "error": {
             "type": "project_workflow_api_error",
             "message": error.message,
+            "route": error.route,
+            "expected": error.expected or [],
         }
     }
     if error.details is not None:
@@ -111,7 +115,8 @@ def _find_workflow(workflow_id: str) -> dict[str, Any]:
     for entry in catalog["workflows"]:
         if isinstance(entry, dict) and entry.get("id") == workflow_id:
             return entry
-    raise ApiError(404, f"Unknown workflow: {workflow_id}")
+    raise ApiError(404, f"Unknown workflow: {workflow_id}", route=workflow_id,
+                   expected=[entry["id"] for entry in catalog["workflows"]])
 
 
 def _workflow_path(entry: dict[str, Any]) -> Path:
@@ -202,10 +207,19 @@ def _public_model(model: dict[str, Any]) -> dict[str, Any]:
         "required_file",
         "required_files",
         "route_roles",
+        "file_sizes",
     )
     result = {key: model[key] for key in public_keys if key in model}
     result["missing_files"] = _model_missing_files(model)
-    result["ready"] = bool(model.get("status") == "installed" and not result["missing_files"])
+    result["invalid_files"] = []
+    for name in model.get("required_files", [model.get("required_file")]):
+        if not isinstance(name, str) or name in result["missing_files"]:
+            continue
+        size = (COMFY_ROOT / name).stat().st_size
+        expected = model.get("file_sizes", {}).get(name)
+        if size == 0 or (expected is not None and size != expected):
+            result["invalid_files"].append({"file": name, "size_bytes": size, "expected_bytes": expected})
+    result["ready"] = bool(model.get("status") == "installed" and not result["missing_files"] and not result["invalid_files"])
     return result
 
 
@@ -234,6 +248,7 @@ def _public_entry(
         "lora_bindings",
         "defaults",
         "resource_limits",
+        "control_ports",
     )
     result = {key: entry[key] for key in public_keys if key in entry}
     result["file"] = entry.get("file")
@@ -288,12 +303,16 @@ def _public_entry(
 def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str, Any]:
     templates = _openapi_document()["components"]["schemas"]["WorkflowParameters"]["properties"]
     properties = {name: copy.deepcopy(templates[name]) for name in entry["bindings"] if name in templates}
-    required = ["prompt"]
+    if "subject" in templates:
+        properties["subject"] = copy.deepcopy(templates["subject"])
+    required = []
     for contract in entry.get("input_contract", {}).values():
+        if not isinstance(contract, dict):
+            continue
         name = contract.get("parameter")
         if name in templates:
             properties[name] = copy.deepcopy(templates[name])
-            if contract.get("required") and name not in required:
+            if contract.get("required") and name != "prompt" and name not in required:
                 required.append(name)
     for name, spec in properties.items():
         if name in entry["bindings"] and name not in {"prompt", "seed", "input_image", "mask_image", "face_image", "control_image"}:
@@ -305,7 +324,8 @@ def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str,
             name: {"type": "number", "minimum": -2, "maximum": 2, "default": spec["default"]}
             for name, spec in entry["lora_bindings"].items()
         }}
-    return {"type": "object", "additionalProperties": False, "required": required, "properties": properties}
+    return {"type": "object", "additionalProperties": False, "required": required, "properties": properties,
+            "anyOf": [{"required": ["prompt"]}, {"required": ["subject"]}]}
 
 
 def _node_input(graph: dict[str, Any], spec: dict[str, Any], name: str) -> tuple[dict[str, Any], str]:
@@ -381,7 +401,8 @@ def _safe_input_image(value: Any) -> str:
     normalised = image_name.replace("\\", "/")
     if (
         normalised.startswith("/")
-        or re.match(r"^[A-Za-z]:", normalised)
+        or ":" in normalised
+        or re.search(r"\[(?:input|output|temp)\]\s*$", normalised)
         or any(part in {"", ".", ".."} for part in normalised.split("/"))
     ):
         raise ApiError(400, "input_image must be a relative filename inside ComfyUI's input directory")
@@ -396,7 +417,8 @@ def _safe_input_file(value: Any, parameter_name: str) -> str:
     normalised = file_name.replace("\\", "/")
     if (
         normalised.startswith("/")
-        or re.match(r"^[A-Za-z]:", normalised)
+        or ":" in normalised
+        or re.search(r"\[(?:input|output|temp)\]\s*$", normalised)
         or any(part in {"", ".", ".."} for part in normalised.split("/"))
     ):
         raise ApiError(400, f"{parameter_name} must be a relative filename inside ComfyUI's input directory")
@@ -462,7 +484,22 @@ def _resource_request(graph: dict[str, Any], entry: dict[str, Any]) -> dict[str,
             "total_pixels": total, "max_total_pixels": limits["max_total_pixels"],
             "next_step": "Reduce dimensions or batch_size; deployment limits are configured in workflows/catalog.json.",
         })
-    return {"width": width, "height": height, "batch_size": batch, "total_pixels": total, "limits": limits}
+    inputs = {}
+    for node in graph.values():
+        if node.get("class_type") in {"LoadImage", "LoadImageMask"}:
+            name, path = _resolve_input_file(node["inputs"]["image"], "image input")
+            _image_info(path, "image input")
+            stat = path.stat()
+            inputs[name] = {"size_bytes": stat.st_size, "modified_ns": stat.st_mtime_ns}
+    return {"width": width, "height": height, "batch_size": batch, "total_pixels": total, "limits": limits, "input_files": inputs}
+
+
+def _validate_queued_inputs(resources: dict[str, Any]) -> None:
+    for name, expected in resources.get("input_files", {}).items():
+        _, path = _resolve_input_file(name, "image input")
+        stat = path.stat()
+        if {"size_bytes": stat.st_size, "modified_ns": stat.st_mtime_ns} != expected:
+            raise RuntimeError(f"Input file changed after submission: {name}; resubmit to validate the replacement")
 
 
 def _attach_dynamic_image_input(graph: dict[str, Any], entry: dict[str, Any], image_name: str) -> None:
@@ -531,6 +568,7 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
         raise ApiError(400, "parameters must be an object")
     result: dict[str, Any] = {}
     aliases = {
+        "subject": "prompt",
         "positive_prompt": "prompt",
         "negative": "negative_prompt",
         "negative_prompt_text": "negative_prompt",
@@ -605,9 +643,9 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
         allowed.add("input_image")
     unknown = set(parameters) - allowed
     if unknown:
-        raise ApiError(400, "Parameters are not supported by this workflow", sorted(unknown))
+        raise ApiError(400, "Workflow does not expose parameter: " + ", ".join(sorted(unknown)), sorted(unknown))
     if "prompt" not in parameters:
-        raise ApiError(400, "parameters.prompt is required; an empty string is allowed for unconditioned generation")
+        raise ApiError(422, "parameters.prompt (or its subject alias) is required; an empty string is allowed", expected=["prompt", "subject"])
     if "seed" not in parameters:
         parameters["seed"] = secrets.randbelow(2**63)
     image_info: dict[str, dict[str, Any]] = {}
@@ -687,9 +725,10 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
             contract = input_contract.get(contract_name)
             if isinstance(contract, dict) and contract.get("required") and parameter_name not in parameters:
                 raise ApiError(
-                    400,
+                    422,
                     f"Workflow {entry.get('id', '<unknown>')} requires parameters.{parameter_name}",
                     {"input_type": contract_name, "parameter": parameter_name},
+                    expected=[parameter_name],
                 )
     image_contract = input_contract.get("image") if isinstance(input_contract, dict) else None
     if "input_image" in parameters and "denoise" not in parameters and isinstance(image_contract, dict):
@@ -1019,8 +1058,8 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
         hint = _route_prompt_granularity(entry)
         accepted = hint["accepted"]
         if requested_granularity not in accepted:
-            return None
-        if requested_granularity == hint["recommended"]:
+            reasons.append("prompt granularity is outside this route's recommended range")
+        elif requested_granularity == hint["recommended"]:
             score += 25
             reasons.append(f"prompt granularity preferred: {requested_granularity}")
         else:
@@ -1117,6 +1156,12 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "protocol": "project-comfyui-agent/v1",
+        "api_version": "1.5.0",
+        "route_table": [{"id": entry["id"], "family": entry["family"],
+                         "control_ports": entry.get("control_ports", {}),
+                         "required_fields": entry.get("input_contract", {}).get("required_fields", []),
+                         "recommended": entry.get("agent_hints", {}).get("recommended", {}),
+                         "explicit_only": entry.get("routing", {}).get("explicit_only", False)} for entry in ready_workflows],
         "discovery": {
             "preferred_entrypoint": "/.well-known/agent-manifest.json",
             "alternate_entrypoints": ["/project/agent-manifest", "/project/openapi.json"],
@@ -1129,8 +1174,11 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "api_base": "/project",
             "native_comfyui_api": "available",
         },
+        "resources": {"endpoint": "/project/resources", "max_pending_jobs": MAX_PROJECT_QUEUE,
+                      "admission": "Each workflow exposes resource_limits; total pixels include batch and image inputs. These limits reduce OOM risk but cannot guarantee a fit alongside other processes."},
         "input_files": {
             "directory": "ComfyUI/input",
+            "lifecycle": "Persistent across restarts. No project TTL or automatic cleanup; only explicit DELETE or external/manual cleanup removes inputs. Keep referenced files unchanged until jobs finish.",
             "list": {
                 "method": "GET",
                 "path": "/project/inputs",
@@ -1158,15 +1206,18 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         },
         "instructions": [
             "Read /.well-known/agent-manifest.json first; the root path is the native ComfyUI UI, not the preferred agent entrypoint.",
-            "Call POST /project/resolve with domain, content_mode, style, input_type, input_mode and prompt_granularity when the route is not already known.",
+            "Call POST /project/resolve with domain, content_mode, style, input_type, input_mode, optional family and prompt_granularity when the route is not already known.",
             "Choose only an entry with ready=true and use the selected workflow's models, capabilities, routing and agent_hints together.",
             "Treat compatibility_notes, selection.not_for, model compatibility and prompting as constraints, not optional suggestions.",
             "Match the prompt dialect and granularity to the selected workflow; do not copy tag triggers from another model family.",
+            "Use parameter_schema for allowed fields, required inputs and actual defaults. The Asuna-specific workflow is explicit-only; do not use it for arbitrary Blue Archive characters. The Pony-trained Rapi adapter is disabled by default on Animagine.",
+            "Supply parameters.prompt explicitly (empty string is allowed); subject is a compatibility alias. Suggested subject/appearance details are prompt-writing advice, not separate required API fields. Seed is random when omitted.",
+            "Responses include identical prompt_id/job_id, applied_parameters, ignored_parameters (empty; unknown fields are rejected), effective_parameters, resource budgets and advisory sampling warnings. dry_run validates without executing.",
             "Check capabilities.input_types, capabilities.input_modes and input_contract before building parameters; never send input_image to a route that does not declare image support.",
             "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then use the returned relative name in the selected contract: input_image for latent image-to-image/inpaint, face_image for face reference, or control_image for OpenPose control.",
             "Use a unique basename for each new upload. With overwrite=false, the native ComfyUI endpoint may return an existing same-name file; delete only input names that this caller owns.",
             "GET /project/resources returns an advisory selected-device memory snapshot and configured queue/input limits; it is diagnostic information, not a reservation.",
-            "For inpaint, upload both the source image and an executable mask; white/red mask pixels are redrawn and black pixels are preserved. The route does not infer a clothing region from text.",
+            "For inpaint, upload a source image and a same-size mask. RGB white/red pixels are redrawn; alpha masks redraw transparent pixels. Unmasked original pixels are composited back after decode.",
             "For face-reference, use the face_image contract and the face-centric IPAdapter route; it controls face appearance more than outfit, pose or background and is not FaceID recognition.",
             "For openpose-control, use control_image with the OpenPose route; the route preprocesses the supplied source/control image before applying the SDXL ControlNet.",
             "After confirming a file is no longer needed, DELETE /project/inputs/{name}; only a single regular input file is removed.",
@@ -1186,6 +1237,8 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                 "prompting",
                 "agent_hints",
                 "defaults",
+                "parameter_schema",
+                "resource_limits",
             ],
             "matching_order": [
                 "honor routing.required_selectors for capability-specific routes such as inpaint, face-reference and openpose-control",
@@ -1245,9 +1298,11 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                 "failed_job": "Treat model residency as unknown after a failed job and establish a clean boundary before the next job.",
             },
             "job_phases": ["waiting_for_turn", "model_switch", "generation", "complete"],
-            "queue_scope": "Named /project/prompt jobs. Native ComfyUI endpoints remain available for full graph clients.",
+            "max_pending_jobs": MAX_PROJECT_QUEUE,
+            "queue_scope": "Named jobs enter the native serial worker. Model cleanup happens inside that worker, so it cannot unload a concurrently executing native job. Native graph sizes bypass project admission budgets.",
         },
         "operations": [
+            {"id": "resources", "method": "GET", "path": "/project/resources", "description": "Inspect the selected device, live memory estimates and launcher safeguards."},
             {
                 "id": "agent_manifest",
                 "method": "GET",
@@ -1351,7 +1406,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "request_shape": {
                 "workflow": "workflow id from /project/workflows",
                 "parameters": "object containing only bindings exposed by the selected workflow",
-                "prompt_granularity": "optional level from the selected workflow's accepted prompting.granularity values",
+                "prompt_granularity": "optional advisory level; does not restrict prompt content or reject otherwise valid prompts",
                 "client_id": "optional caller label",
                 "dry_run": "optional boolean; resolve without queueing",
             },
@@ -1367,7 +1422,8 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             },
         },
         "result_contract": {
-            "queue_response": "contains prompt_id and job_url",
+            "queue_response": "contains identical prompt_id and job_id, job_url, applied_parameters, ignored_parameters and warnings",
+            "timing": "Job queued_ms is time from acceptance until worker start. elapsed_ms includes model switching, generation and failure cleanup after worker start; it excludes queue time. Native-only jobs may report unknown (null) queue timing.",
             "job_states": ["queued", "running", "succeeded", "failed"],
             "job_phases": ["waiting_for_turn", "model_switch", "generation", "complete"],
             "queued_position": "queue_position is scoped to the named project queue and is zero-based",
@@ -1396,7 +1452,7 @@ def _openapi_document() -> dict[str, Any]:
         "openapi": "3.1.0",
         "info": {
             "title": "Project ComfyUI Agent API",
-        "version": "1.4.0",
+            "version": "1.5.0",
             "description": "Self-describing named-workflow API layered on ComfyUI.",
         },
         "paths": {
@@ -1550,6 +1606,7 @@ def _openapi_document() -> dict[str, Any]:
                         {"$ref": "#/components/parameters/InputTypeQuery"},
                         {"$ref": "#/components/parameters/InputModeQuery"},
                         {"$ref": "#/components/parameters/PromptGranularityQuery"},
+                        {"$ref": "#/components/parameters/FamilyQuery"},
                         {"$ref": "#/components/parameters/IncludeUnreadyQuery"},
                     ],
                     "responses": {"200": {"description": "Ranked workflow route table"}},
@@ -1771,6 +1828,7 @@ def _openapi_document() -> dict[str, Any]:
                     "type": "object",
                     "properties": {
                         "domain": {"type": "string", "maxLength": 256},
+                        "family": {"type": "string", "maxLength": 256, "description": "Exact workflow family from the catalog, e.g. sdxl-ipadapter or anima-ipadapter."},
                         "style": {"type": "string", "maxLength": 256},
                         "content_mode": {"type": "string", "maxLength": 256},
                         "input_type": {"type": "string", "enum": ["text", "image"]},
@@ -1787,7 +1845,7 @@ def _openapi_document() -> dict[str, Any]:
                 },
                 "NamedPromptRequest": {
                     "type": "object",
-                    "required": ["workflow"],
+                    "anyOf": [{"required": ["workflow"]}, {"required": ["workflow_id"]}],
                     "properties": {
                         "workflow": {"type": "string"},
                         "workflow_id": {"type": "string"},
@@ -1800,8 +1858,11 @@ def _openapi_document() -> dict[str, Any]:
                 },
                 "WorkflowParameters": {
                     "type": "object",
+                    "anyOf": [{"required": ["prompt"]}, {"required": ["subject"]}],
                     "properties": {
                         "prompt": {"type": "string", "maxLength": MAX_PROMPT_LENGTH},
+                        "subject": {"type": "string", "maxLength": MAX_PROMPT_LENGTH, "deprecated": True,
+                                    "description": "Compatibility alias for prompt. Applied verbatim as prompt; conflicting prompt and subject values are rejected."},
                         "negative_prompt": {"type": "string", "maxLength": MAX_PROMPT_LENGTH},
                         "seed": {"type": "integer", "minimum": 0, "maximum": 9223372036854775807},
                         "width": {"type": "integer", "minimum": 64, "maximum": 2048, "multipleOf": 8},
@@ -1927,6 +1988,21 @@ def _history_error(entry: dict[str, Any]) -> dict[str, Any] | None:
     return None
 
 
+def _job_response(payload: dict[str, Any], coordinator_state=None, history_entry=None) -> web.Response:
+    payload["job_id"] = payload["prompt_id"]
+    timing = (coordinator_state or {}).get("timing", {})
+    if not timing and history_entry:
+        prompt = history_entry.get("prompt", [])
+        if len(prompt) > 3 and isinstance(prompt[3], dict):
+            timing = prompt[3].get("project_timing", {})
+    now = time.monotonic()
+    queued_at = timing.get("submitted_monotonic")
+    started_at = timing.get("started_monotonic")
+    payload["queued_ms"] = timing.get("queued_ms", max(0, round((now - queued_at) * 1000)) if queued_at is not None else None)
+    payload["elapsed_ms"] = timing.get("elapsed_ms", max(0, round((now - started_at) * 1000)) if started_at is not None else 0)
+    return web.json_response(payload)
+
+
 async def get_project_job(request: web.Request) -> web.Response:
     try:
         prompt_id = _validated_prompt_id(request.match_info["prompt_id"])
@@ -1954,7 +2030,7 @@ async def get_project_job(request: web.Request) -> web.Response:
                 result["phase"] = "complete"
             if state == "failed":
                 result["error"] = _history_error(entry)
-            return web.json_response(result)
+            return _job_response(result, coordinator_state, entry)
 
         if isinstance(coordinator_state, dict):
             result = {
@@ -1968,14 +2044,14 @@ async def get_project_job(request: web.Request) -> web.Response:
             for key in ("phase", "queue_position", "queue_scope", "error"):
                 if key in coordinator_state:
                     result[key] = coordinator_state[key]
-            return web.json_response(result)
+            return _job_response(result, coordinator_state)
 
         running, pending = server.prompt_queue.get_current_queue()
         if any(isinstance(item, (list, tuple)) and len(item) > 1 and item[1] == prompt_id for item in running):
-            return web.json_response({"prompt_id": prompt_id, "state": "running", "completed": False, "outputs": []})
+            return _job_response({"prompt_id": prompt_id, "state": "running", "completed": False, "outputs": []})
         for position, item in enumerate(pending):
             if isinstance(item, (list, tuple)) and len(item) > 1 and item[1] == prompt_id:
-                return web.json_response(
+                return _job_response(
                     {
                         "prompt_id": prompt_id,
                         "state": "queued",
@@ -2043,6 +2119,7 @@ class ProjectWorkflowCoordinator:
             "phase": "waiting_for_turn",
             "outputs": [],
             "queue_scope": "project_workflow_api",
+            "timing": job.extra_data.get("project_timing", {}),
         }
         self._pending_ids.append(job.prompt_id)
         await self._queue.put(job)
@@ -2179,7 +2256,8 @@ async def _enqueue(server: PromptServer, graph: dict[str, Any], client_id: str, 
     prompt_id = str(uuid.uuid4())
 
     extra_data: dict[str, Any] = {"client_id": client_id, "create_time": int(time.time() * 1000),
-                                  "project_workflow": workflow_id, "project_resources": resources}
+                                  "project_workflow": workflow_id, "project_resources": resources,
+                                  "project_timing": {"submitted_monotonic": time.monotonic()}}
     sensitive: dict[str, Any] = {}
     for sensitive_key in execution.SENSITIVE_EXTRA_DATA_KEYS:
         if sensitive_key in extra_data:
@@ -2198,7 +2276,7 @@ async def _enqueue(server: PromptServer, graph: dict[str, Any], client_id: str, 
             sensitive=sensitive,
         )
     )
-    return {"prompt_id": prompt_id, "number": number, "node_errors": valid[3], "state": "queued"}
+    return {"prompt_id": prompt_id, "job_id": prompt_id, "number": number, "node_errors": valid[3], "state": "queued"}
 
 
 async def _read_json(request: web.Request) -> dict[str, Any]:
@@ -2260,6 +2338,8 @@ async def list_project_inputs(request: web.Request) -> web.Response:
                 "directory": "ComfyUI/input",
                 "directory_exists": directory_exists,
                 "count": len(files),
+                "total_bytes": sum(item["size_bytes"] for item in files),
+                "lifecycle": "Persistent across restarts; this project has no automatic TTL or cleanup. Files are removed only by explicit DELETE or external/manual filesystem actions.",
                 "files": files,
             }
         )
@@ -2285,11 +2365,13 @@ async def delete_project_input(request: web.Request) -> web.Response:
             raise ApiError(404, f"Input file was not found: {file_name}")
         size_bytes = input_path.stat().st_size
         input_path.unlink()
+        _, remaining_files = _project_input_files()
         return web.json_response(
             {
                 "deleted": True,
                 "name": file_name,
                 "size_bytes": size_bytes,
+                "remaining_bytes": sum(item["size_bytes"] for item in remaining_files),
             }
         )
     except ApiError as error:
@@ -2473,17 +2555,12 @@ def _validate_prompt_granularity(entry: dict[str, Any], body: dict[str, Any]) ->
     if requested is None:
         return None
     requested = _normalise_granularity(requested)
-    hint = _route_prompt_granularity(entry)
-    if requested not in hint["accepted"]:
-        raise ApiError(
-            400,
-            f"prompt_granularity {requested} is not accepted by workflow {entry.get('id')}",
-            {"accepted": hint["accepted"], "recommended": hint["recommended"]},
-        )
     return requested
 
 
 async def post_project_prompt(request: web.Request) -> web.Response:
+    entry = None
+    workflow_id = None
     try:
         body = await _read_json(request)
         workflow_id = body.get("workflow", body.get("workflow_id"))
@@ -2504,9 +2581,22 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         resources = _resource_request(graph, entry)
         effective = {name: _binding_value(graph, entry, name) for name in entry["bindings"]
                      if name in {"seed", "width", "height", "batch_size", "steps", "cfg", "denoise", "sampler_name", "scheduler"}}
+        parameter_schema = _parameter_schema(entry, graph)
+        applied = {name: _binding_value(graph, entry, name) for name in entry["bindings"] if name in parameter_schema["properties"]}
+        if "input_image" in _request_parameters(body) and "input_image" not in applied:
+            applied["input_image"] = _request_parameters(body)["input_image"]
+        if entry.get("lora_bindings"):
+            applied["loras"] = {name: _binding_value(graph, entry, spec["strength_model"]) for name, spec in entry["lora_bindings"].items()}
         warnings = []
         if effective.get("cfg") == 1 and "negative_prompt" in entry["bindings"]:
-            warnings.append("At CFG 1 the sampler skips negative conditioning; negative_prompt has no effect at this setting.")
+            warnings.append({"code": "negative_prompt_inactive", "parameter": "negative_prompt", "message": "At CFG 1 the sampler skips negative conditioning; negative_prompt has no effect at this setting."})
+        for name, interval in entry.get("agent_hints", {}).get("recommended", {}).items():
+            if name not in effective or not isinstance(interval, (list, tuple)) or len(interval) != 2:
+                continue
+            if not interval[0] <= effective[name] <= interval[1]:
+                warnings.append({"code": "outside_recommended_range", "parameter": name,
+                                 "value": effective[name], "recommended": interval,
+                                 "message": f"{name}={effective[name]} is outside the recommended range {interval} for {workflow_id}; the requested value was retained."})
         if dry_run:
             return web.json_response(
                 {
@@ -2515,6 +2605,8 @@ async def post_project_prompt(request: web.Request) -> web.Response:
                     "missing_files": public["missing_files"],
                     "validated": valid is not None,
                     "effective_parameters": effective,
+                    "applied_parameters": applied,
+                    "ignored_parameters": [],
                     "resources": resources,
                     "warnings": warnings,
                     "prompt_granularity": requested_granularity,
@@ -2528,14 +2620,20 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         result["prompt_granularity"] = requested_granularity
         result["job_url"] = f"/project/jobs/{result['prompt_id']}"
         result["effective_parameters"] = effective
+        result["applied_parameters"] = applied
+        result["ignored_parameters"] = []
         result["resources"] = resources
         result["warnings"] = warnings
         return web.json_response(result)
     except ApiError as error:
+        if error.route is None:
+            error.route = workflow_id if isinstance(workflow_id, str) else None
+        if error.expected is None and entry is not None:
+            error.expected = sorted(_parameter_schema(entry, _read_workflow(entry))["properties"])
         return _json_error(error)
     except Exception as exc:  # Keep unexpected details in the server log.
         logging.exception("Project workflow API request failed")
-        return _json_error(ApiError(500, "Project workflow API request failed", str(exc)))
+        return _json_error(ApiError(500, "Project workflow API request failed", str(exc), route=workflow_id))
 
 
 def _notify_worker_phase(prompt_id: str, phase: str) -> None:
@@ -2574,7 +2672,7 @@ def _register_routes() -> None:
     routes.post("/project/generate")(post_project_prompt)
     routes.get("/project/jobs/{prompt_id}")(get_project_job)
     from project_nodes.runtime_guard import install
-    install(execution, _notify_worker_phase)
+    install(execution, _notify_worker_phase, _validate_queued_inputs)
     logging.info(
         "Project workflow API enabled at /.well-known/agent-manifest.json, "
         "/project/agent-manifest, /project/openapi.json, /project/resources, /project/routes, "

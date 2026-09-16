@@ -116,9 +116,29 @@
     "inputs": {
       "filename_prefix": "moody_anima_inpaint",
       "images": [
-        "10",
+        "12",
         0
       ]
+    }
+  },
+  "12": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "6",
+        0
+      ],
+      "source": [
+        "10",
+        0
+      ],
+      "mask": [
+        "7",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false
     }
   }
 }

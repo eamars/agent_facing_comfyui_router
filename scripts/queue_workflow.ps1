@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$ServerUri = 'http://127.0.0.1:8191',
-    [string]$WorkflowName = 'moody-desire-v30',
+    [string]$WorkflowName = 'anima-turbo-v1-1',
     [string]$WorkflowPath,
     [string]$Prompt,
     [string]$NegativePrompt,
@@ -28,6 +28,10 @@ if ($PSBoundParameters.ContainsKey('WorkflowPath')) {
         throw "Workflow file not found: $WorkflowPath"
     }
     $workflow = Get-Content -LiteralPath $WorkflowPath -Raw | ConvertFrom-Json
+    if ($DryRun) {
+        $workflow | ConvertTo-Json -Depth 50
+        exit 0
+    }
     $body = @{ prompt = $workflow; client_id = $ClientId } | ConvertTo-Json -Depth 50
     $response = Invoke-RestMethod -Method Post -Uri ($ServerUri.TrimEnd('/') + '/prompt') -ContentType 'application/json' -Body $body
     $response | ConvertTo-Json -Depth 10

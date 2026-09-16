@@ -11,22 +11,34 @@
       "lora_name": "Asuna_Ichinose_IllustriousXL.safetensors",
       "strength_model": 1.0,
       "strength_clip": 1.0,
-      "model": ["1", 0],
-      "clip": ["1", 1]
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ]
     }
   },
   "3": {
     "class_type": "CLIPTextEncode",
     "inputs": {
       "text": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, 1chn, blue archive, asuna ichinose, blue halo, blue eyes, blonde hair, hair over one eye, very long hair, hair ribbon, blue ribbon, black choker, white collared shirt, shirt tucked in, blue loose bowtie, blue pleated skirt, black socks, loafers, standing, looking at viewer, upper body, simple background, soft lighting",
-      "clip": ["2", 1]
+      "clip": [
+        "2",
+        1
+      ]
     }
   },
   "4": {
     "class_type": "CLIPTextEncode",
     "inputs": {
-      "text": "worst quality, comic, multiple views, bad quality, low quality, lowres, displeasing, very displeasing, bad anatomy, bad hands, scan artifacts, monochrome, greyscale, signature, twitter username, jpeg artifacts, 2koma, 4koma, guro, extra digits, fewer digits",
-      "clip": ["2", 1]
+      "text": "worst quality, comic, multiple views, bad quality, low quality, lowres, displeasing, very displeasing, bad anatomy, bad hands, scan artifacts, monochrome, greyscale, signature, twitter username, jpeg artifacts, 2koma, 4koma, extra digits, fewer digits",
+      "clip": [
+        "2",
+        1
+      ]
     }
   },
   "5": {
@@ -46,24 +58,45 @@
       "sampler_name": "euler_ancestral",
       "scheduler": "normal",
       "denoise": 1.0,
-      "model": ["2", 0],
-      "positive": ["3", 0],
-      "negative": ["4", 0],
-      "latent_image": ["5", 0]
+      "model": [
+        "2",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
     }
   },
   "7": {
     "class_type": "VAEDecode",
     "inputs": {
-      "samples": ["6", 0],
-      "vae": ["1", 2]
+      "samples": [
+        "6",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
     }
   },
   "8": {
     "class_type": "SaveImage",
     "inputs": {
       "filename_prefix": "blue_archive_character_illustrious_xl",
-      "images": ["7", 0]
+      "images": [
+        "7",
+        0
+      ]
     }
   }
 }

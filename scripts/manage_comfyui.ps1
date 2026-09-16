@@ -53,14 +53,16 @@ if ($Action -eq 'status') {
 if ($Action -eq 'start') {
     if (Get-Listeners) { throw "Port $Port is already in use; refusing to start a second project server." }
     if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) { throw "Project venv missing at $Python; run setup_comfyui.ps1 first." }
+    if (-not $PSCmdlet.ShouldProcess("$BindHost`:$Port", 'Start project ComfyUI')) { exit 0 }
     New-Item -ItemType Directory -Force -Path $Runtime | Out-Null
     $arguments = @(
-        $Launcher,
+        ('"' + $Launcher + '"'),
         '--host', $BindHost,
         '--port', [string]$Port,
         '--',
         '--cpu-vae',
         '--vram-headroom', '1',
+        '--reserve-vram', '1',
         '--async-offload', '2'
     )
     $proc = Start-Process -FilePath $Python -ArgumentList $arguments -WorkingDirectory $Root -WindowStyle Hidden -RedirectStandardOutput $Stdout -RedirectStandardError $Stderr -PassThru
@@ -68,6 +70,7 @@ if ($Action -eq 'start') {
     $deadline = [DateTime]::UtcNow.AddSeconds(45)
     while ([DateTime]::UtcNow -lt $deadline) {
         if (Get-Listeners) { Show-Status; exit 0 }
+        $proc.Refresh()
         if ($proc.HasExited) { throw "ComfyUI failed to start; inspect $Stderr" }
         Start-Sleep -Milliseconds 500
     }

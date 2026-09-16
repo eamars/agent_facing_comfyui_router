@@ -38,11 +38,13 @@ if (-not (Test-Path -LiteralPath $Python)) {
 
 Write-Host '[3/5] Installing pinned CUDA 12.8 PyTorch and ComfyUI requirements...'
 & $Python -m pip install --upgrade pip wheel
+if ($LASTEXITCODE -ne 0) { throw "pip installation failed with exit code $LASTEXITCODE" }
 & $Python -m pip install `
     'torch==2.11.0+cu128' `
     'torchvision==0.26.0+cu128' `
     'torchaudio==2.11.0+cu128' `
     --index-url https://download.pytorch.org/whl/cu128
+if ($LASTEXITCODE -ne 0) { throw "PyTorch installation failed with exit code $LASTEXITCODE" }
 & $Python -m pip install -r (Join-Path $Comfy 'requirements.txt')
 if ($LASTEXITCODE -ne 0) { throw "Python dependency installation failed with exit code $LASTEXITCODE" }
 
@@ -121,8 +123,11 @@ Copy-Item -LiteralPath $ProjectApiSource -Destination $ProjectApiTarget -Force
 Write-Host '  Installed the project workflow catalog API custom-node shim.'
 
 Write-Host '[5/5] Creating isolated model and runtime directories...'
-foreach ($dir in @('diffusion_models', 'text_encoders', 'vae', 'checkpoints', 'loras', 'upscale_models', 'ipadapter', 'clip_vision', 'controlnet', 'siglip2', 'input', 'output', '.codex-runtime')) {
+foreach ($dir in @('diffusion_models', 'text_encoders', 'vae', 'checkpoints', 'loras', 'upscale_models', 'ipadapter', 'clip_vision', 'controlnet', 'siglip2')) {
     New-Item -ItemType Directory -Force -Path (Join-Path $Comfy "models\$dir") | Out-Null
+}
+foreach ($dir in @('input', 'output', '.codex-runtime')) {
+    New-Item -ItemType Directory -Force -Path (Join-Path $Comfy $dir) | Out-Null
 }
 
 & $Python -c "import sys,torch; print('Python',sys.version); print('Torch',torch.__version__); print('CUDA',torch.version.cuda); print('CUDA available',torch.cuda.is_available()); print('CUDA devices',torch.cuda.device_count()); [print(i,torch.cuda.get_device_name(i)) for i in range(torch.cuda.device_count())]"

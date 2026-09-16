@@ -9,7 +9,13 @@
       "description": "Fast Anima-based anime workflow for generic illustrations and portraits. It is the default anime fallback when the request does not require a Blue Archive, NIKKE or other model-specific identity/style route.",
       "family": "anima",
       "resident_group": "anima-moody-anima-mix",
-      "tags": ["anime", "anima", "fast", "fallback", "nsfw-capable"],
+      "tags": [
+        "anime",
+        "anima",
+        "fast",
+        "fallback",
+        "nsfw-capable"
+      ],
       "content_class": "anime-nsfw-capable",
       "file": "moody_anima_mix_minimal.json",
       "model_ids": [
@@ -19,16 +25,49 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
-        "aliases": ["Moody Anima Mix", "Anima", "general anime", "通用二次元", "二次元兜底", "动漫兜底"],
-        "styles": ["anime", "anime illustration", "anime portrait", "stylized", "anima"],
-        "content_modes": ["sfw", "nsfw", "general"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "Moody Anima Mix",
+          "Anima",
+          "general anime",
+          "通用二次元",
+          "二次元兜底",
+          "动漫兜底"
+        ],
+        "styles": [
+          "anime",
+          "anime illustration",
+          "anime portrait",
+          "stylized",
+          "anima"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
         "prompt_granularity": {
           "minimum": "minimal",
           "recommended": "minimal",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"]
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
         },
         "priority": 25,
         "fallback": true,
@@ -38,14 +77,40 @@
         ]
       },
       "capabilities": {
-        "modalities": ["text-to-image", "image-to-image"],
-        "input_types": ["text", "image"],
-        "input_modes": ["text-to-image", "image-to-image"],
-        "output_types": ["image"],
-        "architectures": ["anima"],
-        "styles": ["anime", "illustration", "stylized", "portrait", "anime portrait"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "portrait",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": false,
         "prompt_dialect": "natural-language-or-light-anime-tags",
@@ -59,7 +124,10 @@
         "style_control": "medium",
         "outfit_control": "medium",
         "composition_control": "medium",
-        "recommended_resolutions": ["960x1472", "1024x1024"],
+        "recommended_resolutions": [
+          "960x1472",
+          "1024x1024"
+        ],
         "performance": "very-fast-low-step"
       },
       "input_contract": {
@@ -73,7 +141,10 @@
           "required": false,
           "parameter": "input_image",
           "mode": "latent-img2img",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -85,33 +156,106 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
           "job_output_reference": false,
-  "processing": "API attaches LoadImage -> VAEEncode -> KSampler.latent_image",
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
           "default_denoise": 0.65
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API",
         "probes": [
-          {"mode": "text-to-image-named-API", "status": "success", "job_id": "b40a617e-7338-4d95-95cd-28e716f45f96", "prompt_class": "sfw"},
-          {"mode": "image-to-image-named-API", "status": "success", "job_id": "21c05ba4-8e0c-4fe2-9dff-827311d81024", "prompt_class": "sfw", "input_image": "example.png", "denoise": 0.65}
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "b40a617e-7338-4d95-95cd-28e716f45f96",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-named-API",
+            "status": "success",
+            "job_id": "21c05ba4-8e0c-4fe2-9dff-827311d81024",
+            "prompt_class": "sfw",
+            "input_image": "example.png",
+            "denoise": 0.65
+          }
         ],
-        "limitations": ["SFW probes validate graph execution and model loading, not character likeness, NSFW quality or prompt fidelity."]
+        "limitations": [
+          "SFW probes validate graph execution and model loading, not character likeness, NSFW quality or prompt fidelity."
+        ]
       },
       "selection": {
-        "best_for": ["generic anime illustration", "generic anime portrait", "fast low-step generation", "SFW or NSFW-capable anime prompts without a dedicated identity route"],
-        "not_for": ["exact Blue Archive character identity", "exact NIKKE character identity", "SDXL/Illustrious LoRA adapters", "high-resolution upscaling/detailing"],
-        "priority_signals": ["generic anime", "anime fallback", "fast", "Anima", "minimal prompt", "SFW/NSFW-capable"],
-        "specific_route_precedence": ["moody-anima-inpaint", "sdxl-face-reference-ipadapter", "sdxl-openpose-controlnet", "blue-archive-character-illustrious-xl", "blue-archive-style-sdxl", "animagine-xl-3.1-nsfw"]
+        "best_for": [
+          "generic anime illustration",
+          "generic anime portrait",
+          "fast low-step generation",
+          "SFW or NSFW-capable anime prompts without a dedicated identity route"
+        ],
+        "not_for": [
+          "exact Blue Archive character identity",
+          "exact NIKKE character identity",
+          "SDXL/Illustrious LoRA adapters",
+          "high-resolution upscaling/detailing"
+        ],
+        "priority_signals": [
+          "generic anime",
+          "anime fallback",
+          "fast",
+          "Anima",
+          "minimal prompt",
+          "SFW/NSFW-capable"
+        ],
+        "specific_route_precedence": [
+          "moody-anima-inpaint",
+          "sdxl-face-reference-ipadapter",
+          "sdxl-openpose-controlnet",
+          "blue-archive-character-illustrious-xl",
+          "blue-archive-style-sdxl",
+          "animagine-xl-3.1-nsfw"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "minimal",
         "prompt_scope": "Describe subject, action, composition, environment and lighting in natural language. Add concise anime style tags only when useful; do not invent an identity trigger because this route has no character adapter.",
-        "required_fields": ["subject"],
-        "optional_fields": ["character", "action", "composition", "environment", "outfit", "lighting", "style", "content_mode"],
+        "optional_fields": [
+          "character",
+          "action",
+          "composition",
+          "environment",
+          "outfit",
+          "lighting",
+          "style",
+          "content_mode"
+        ],
         "negative_prompt": "supported; use short quality/artifact exclusions rather than a long weighted tag chain",
         "input_image": "Optional reference image is accepted through input_image for latent image-to-image; use denoise to control adherence.",
-        "avoid": ["routing explicit Blue Archive or NIKKE identity requests here", "SDXL-specific LoRA trigger words", "assuming the base checkpoint alone guarantees a named character likeness", "requesting the optional reference-workflow upscale branch through this minimal route"]
+        "avoid": [
+          "routing explicit Blue Archive or NIKKE identity requests here",
+          "SDXL-specific LoRA trigger words",
+          "assuming the base checkpoint alone guarantees a named character likeness",
+          "requesting the optional reference-workflow upscale branch through this minimal route"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            4,
+            4
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "The named route is an API-format minimal core derived from Moody Anima Minimal Workflow; its optional UltimateSDUpscale and rgthree UI branches are intentionally not exposed as routing choices.",
@@ -120,13 +264,25 @@
       ],
       "prompting": {
         "style": "natural-language anime description with optional light tags",
-        "structure": ["subject", "action", "composition", "environment", "lighting", "style"],
+        "structure": [
+          "subject",
+          "action",
+          "composition",
+          "environment",
+          "lighting",
+          "style"
+        ],
         "granularity": {
           "minimum": "minimal",
           "recommended": "minimal",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"],
-          "selection_hint": "Use minimal for ordinary requests; use structured or detailed only when the user specifies composition, outfit, camera or lighting constraints."
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use minimal for ordinary requests; use structured or detailed only when the user specifies composition, outfit, camera or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "recommended": {
           "width": 960,
@@ -142,6 +298,10 @@
             "purpose": "generic anime portrait",
             "prompt": "A cheerful anime girl with short silver hair reading a book in a quiet sunlit library, three-quarter portrait, soft warm light, detailed shelves, clean line art"
           }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
         ]
       },
       "source": {
@@ -157,18 +317,54 @@
         "models/vae/qwen_image_vae.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "4", "input": "text"},
-        "negative_prompt": {"node": "5", "input": "text"},
-        "width": {"node": "6", "input": "width"},
-        "height": {"node": "6", "input": "height"},
-        "batch_size": {"node": "6", "input": "batch_size"},
-        "seed": {"node": "7", "input": "seed"},
-        "steps": {"node": "7", "input": "steps"},
-        "cfg": {"node": "7", "input": "cfg"},
-        "denoise": {"node": "7", "input": "denoise"},
-        "sampler_name": {"node": "7", "input": "sampler_name"},
-        "scheduler": {"node": "7", "input": "scheduler"},
-        "filename_prefix": {"node": "9", "input": "filename_prefix"}
+        "prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "width": {
+          "node": "6",
+          "input": "width"
+        },
+        "height": {
+          "node": "6",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "6",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "7",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "7",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "7",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "7",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "7",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "7",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "9",
+          "input": "filename_prefix"
+        }
       },
       "defaults": {
         "width": 960,
@@ -180,6 +376,18 @@
         "sampler_name": "er_sde",
         "scheduler": "simple",
         "filename_prefix": "moody_anima_mix"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
       }
     },
     {
@@ -188,7 +396,14 @@
       "description": "Core-node latent inpaint route for changing only the masked region while preserving the rest of an Anima reference image.",
       "family": "anima",
       "resident_group": "anima-moody-anima-inpaint",
-      "tags": ["anime", "anima", "inpaint", "masked-edit", "clothing-edit", "nsfw-capable"],
+      "tags": [
+        "anime",
+        "anima",
+        "inpaint",
+        "masked-edit",
+        "clothing-edit",
+        "nsfw-capable"
+      ],
       "content_class": "anime-nsfw-capable",
       "file": "moody_anima_inpaint.json",
       "model_ids": [
@@ -198,36 +413,99 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
-        "aliases": ["Anima inpaint", "masked inpaint", "局部重绘", "服装局部重绘", "改衣服"],
-        "styles": ["inpaint", "masked edit", "clothing edit", "wardrobe replacement", "局部重绘"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "input_types": ["image", "mask"],
-        "input_modes": ["inpaint"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "Anima inpaint",
+          "masked inpaint",
+          "局部重绘",
+          "服装局部重绘",
+          "改衣服"
+        ],
+        "styles": [
+          "inpaint",
+          "masked edit",
+          "clothing edit",
+          "wardrobe replacement",
+          "局部重绘"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "input_types": [
+          "image",
+          "mask"
+        ],
+        "input_modes": [
+          "inpaint"
+        ],
         "prompt_granularity": {
           "minimum": "minimal",
           "recommended": "minimal",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"]
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
         },
         "priority": 60,
         "fallback": false,
         "exclusive": false,
-        "required_selectors": ["input_mode"],
+        "required_selectors": [
+          "input_mode"
+        ],
         "exclusion_rules": [
           "Use a real mask for the region to redraw; do not use this route for whole-image style transfer or pose control."
         ]
       },
       "capabilities": {
-        "modalities": ["image-inpaint"],
-        "input_types": ["image", "mask", "text"],
-        "input_modes": ["inpaint"],
-        "output_types": ["image"],
-        "architectures": ["anima"],
-        "styles": ["anime", "illustration", "masked edit", "clothing edit"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "image-inpaint"
+        ],
+        "input_types": [
+          "image",
+          "mask",
+          "text"
+        ],
+        "input_modes": [
+          "inpaint"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "masked edit",
+          "clothing edit"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": false,
         "inpaint_support": true,
@@ -243,8 +521,12 @@
         "style_control": "medium",
         "outfit_control": "high inside the mask, low outside the mask",
         "composition_control": "low outside the mask",
-        "recommended_resolutions": ["960x1472", "1024x1024"],
-        "performance": "very-fast-low-step"
+        "recommended_resolutions": [
+          "960x1472",
+          "1024x1024"
+        ],
+        "performance": "very-fast-low-step",
+        "pixel_preservation": "Original pixels outside the supplied mask are restored after VAE decode."
       },
       "input_contract": {
         "text": {
@@ -257,8 +539,11 @@
           "required": true,
           "parameter": "input_image",
           "mode": "inpaint-source",
-          "accepted_sources": ["comfyui-input", "http-upload"],
-          "processing": "Source dimensions determine the output size; the mask is applied by the paired VAEEncodeForInpaint node.",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "processing": "Source dimensions (multiples of 8) determine output size. VAEEncodeForInpaint performs generic latent masked sampling; the result is composited onto the original image using the supplied mask so pixels outside it remain unchanged.",
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -269,15 +554,18 @@
             "list_endpoint": "/project/inputs",
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
-        "job_output_reference": false
-      },
-      "mask": {
+          "job_output_reference": false
+        },
+        "mask": {
           "supported": true,
           "required": true,
           "parameter": "mask_image",
           "mode": "mask-image",
-          "accepted_sources": ["comfyui-input", "http-upload"],
-          "format": "Use a white/red mask for the region to redraw and black for the region to preserve; select mask_channel=red for an RGB mask or alpha for an alpha mask.",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "format": "RGB: white/red pixels are redrawn, black pixels preserved. Alpha: transparent pixels are redrawn, opaque pixels preserved (ComfyUI inverse alpha). Mask and source must have identical dimensions.",
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -289,47 +577,121 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as parameters.mask_image."
           },
           "job_output_reference": false,
-        "processing": "LoadImageMask selects the configured channel; VAEEncodeForInpaint combines the source and mask and KSampler applies noise only to the masked region"
-      }
+          "processing": "LoadImageMask selects the configured channel; VAEEncodeForInpaint combines the source and mask and KSampler applies noise only to the masked region"
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt",
+          "input_image",
+          "mask_image"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API",
         "probes": [
-          {"mode": "masked-inpaint-named-API", "status": "success", "job_id": "49cfc4f4-007d-416b-8c12-41009c848526", "prompt_class": "sfw", "input_image": "example.png", "mask_image": "example.png", "denoise": 0.65}
+          {
+            "mode": "masked-inpaint-named-API",
+            "status": "success",
+            "job_id": "49cfc4f4-007d-416b-8c12-41009c848526",
+            "prompt_class": "sfw",
+            "input_image": "example.png",
+            "mask_image": "example.png",
+            "denoise": 0.65
+          }
         ],
-        "limitations": ["A SFW probe validates graph execution and mask plumbing, not clothing fidelity or prompt adherence."]
+        "limitations": [
+          "A SFW probe validates graph execution and mask plumbing, not clothing fidelity or prompt adherence."
+        ]
       },
       "selection": {
-        "best_for": ["local clothing replacement", "local accessory replacement", "masked repair", "preserving an unmasked character and background"],
-        "not_for": ["unmasked pose changes", "face-only identity transfer", "OpenPose or depth control", "whole-image generation without a source and mask"],
-        "priority_signals": ["inpaint", "masked edit", "change only the clothes", "局部改衣服", "preserve the background"],
+        "best_for": [
+          "local clothing replacement",
+          "local accessory replacement",
+          "masked repair",
+          "preserving an unmasked character and background"
+        ],
+        "not_for": [
+          "unmasked pose changes",
+          "face-only identity transfer",
+          "OpenPose or depth control",
+          "whole-image generation without a source and mask"
+        ],
+        "priority_signals": [
+          "inpaint",
+          "masked edit",
+          "change only the clothes",
+          "局部改衣服",
+          "preserve the background"
+        ],
         "specific_route_precedence": []
       },
       "agent_hints": {
         "recommended_prompt_granularity": "minimal",
         "prompt_scope": "Describe only the desired replacement in the masked region plus a short preservation cue. Keep the prompt short; explicitly add 1girl, solo when a reference sheet could induce multiple views.",
-        "required_fields": ["input_image", "mask_image", "prompt"],
-        "optional_fields": ["mask_channel", "grow_mask_by", "denoise", "seed", "steps", "cfg"],
+        "optional_fields": [
+          "mask_channel",
+          "grow_mask_by",
+          "denoise",
+          "seed",
+          "steps",
+          "cfg"
+        ],
         "mask_image": "The mask is executable, not a semantic region label. White/red means redraw and black means preserve; use mask_channel to select the channel.",
         "denoise": "For clothing replacement use 0.60-0.75 as a starting range; lower values preserve more source detail but may not change the garment.",
         "negative_prompt": "supported; keep it short and include duplicate, multiple views, text and watermark when the source is a character sheet",
-        "avoid": ["sending a character sheet without 1girl, solo", "expecting denoise alone to isolate clothing", "using an unmasked source when only a local edit is wanted", "requesting pose control without a ControlNet route"]
+        "avoid": [
+          "sending a character sheet without 1girl, solo",
+          "expecting denoise alone to isolate clothing",
+          "using an unmasked source when only a local edit is wanted",
+          "requesting pose control without a ControlNet route"
+        ],
+        "suggested_prompt_details": [
+          "input_image",
+          "mask_image",
+          "prompt"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            4,
+            4
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "This route uses ComfyUI's core VAEEncodeForInpaint node and KSampler noise_mask; no separate inpaint checkpoint is required.",
         "The route deliberately requires a source image and a mask so the API cannot silently fall back to full-image denoise.",
-        "The workflow is a minimal API graph and does not expose a segmentation model; callers provide the mask image."
+        "The workflow is a minimal API graph and does not expose a segmentation model; callers provide the mask image.",
+        "This is a generic noise-mask workflow using a base checkpoint, not a model trained specifically for inpainting. Masked-region coherence depends on prompt and denoise."
       ],
       "prompting": {
         "style": "short natural-language replacement instruction with optional light anime tags",
-        "structure": ["1girl, solo", "replacement garment or accessory", "color/material", "short preservation cue"],
+        "structure": [
+          "1girl, solo",
+          "replacement garment or accessory",
+          "color/material",
+          "short preservation cue"
+        ],
         "granularity": {
           "minimum": "minimal",
           "recommended": "minimal",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"],
-          "selection_hint": "Use minimal for clothing changes; add structured details only for material, color, fit or lighting constraints."
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use minimal for clothing changes; add structured details only for material, color, fit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "recommended": {
           "steps": 4,
@@ -346,6 +708,10 @@
             "purpose": "local clothing replacement",
             "prompt": "1girl, solo, a navy school uniform with a neat red ribbon, preserve the face, hair, pose and background"
           }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
         ]
       },
       "source": {
@@ -358,19 +724,58 @@
         "models/vae/qwen_image_vae.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "4", "input": "text"},
-        "negative_prompt": {"node": "5", "input": "text"},
-        "input_image": {"node": "6", "input": "image"},
-        "mask_image": {"node": "7", "input": "image"},
-        "mask_channel": {"node": "7", "input": "channel"},
-        "grow_mask_by": {"node": "8", "input": "grow_mask_by"},
-        "seed": {"node": "9", "input": "seed"},
-        "steps": {"node": "9", "input": "steps"},
-        "cfg": {"node": "9", "input": "cfg"},
-        "denoise": {"node": "9", "input": "denoise"},
-        "sampler_name": {"node": "9", "input": "sampler_name"},
-        "scheduler": {"node": "9", "input": "scheduler"},
-        "filename_prefix": {"node": "11", "input": "filename_prefix"}
+        "prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "input_image": {
+          "node": "6",
+          "input": "image"
+        },
+        "mask_image": {
+          "node": "7",
+          "input": "image"
+        },
+        "mask_channel": {
+          "node": "7",
+          "input": "channel"
+        },
+        "grow_mask_by": {
+          "node": "8",
+          "input": "grow_mask_by"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        }
       },
       "defaults": {
         "steps": 4,
@@ -381,6 +786,18 @@
         "grow_mask_by": 6,
         "mask_channel": "red",
         "filename_prefix": "moody_anima_inpaint"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": true,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": false
       }
     },
     {
@@ -389,7 +806,14 @@
       "description": "Face-centric reference workflow using Animagine XL 3.1 and the SDXL IPAdapter Plus Face preset. The agent still supplies the character, outfit, pose and scene prompt.",
       "family": "sdxl-ipadapter",
       "resident_group": "sdxl-animagine-ipadapter-face",
-      "tags": ["anime", "sdxl", "face-reference", "ipadapter", "portrait", "nsfw-capable"],
+      "tags": [
+        "anime",
+        "sdxl",
+        "face-reference",
+        "ipadapter",
+        "portrait",
+        "nsfw-capable"
+      ],
       "content_class": "anime-nsfw-capable",
       "file": "sdxl_face_reference_ipadapter.json",
       "model_ids": [
@@ -399,44 +823,116 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait", "blue-archive", "nikke", "character-illustration"],
-        "aliases": ["IPAdapter face", "face reference", "face-only reference", "人脸参考", "脸部参考", "面部参考"],
-        "styles": ["face-reference", "face reference", "face identity", "portrait identity", "portrait"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "input_types": ["image"],
-        "input_modes": ["face-reference"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "blue-archive",
+          "nikke",
+          "character-illustration"
+        ],
+        "aliases": [
+          "IPAdapter face",
+          "face reference",
+          "face-only reference",
+          "人脸参考",
+          "脸部参考",
+          "面部参考"
+        ],
+        "styles": [
+          "face-reference",
+          "face reference",
+          "face identity",
+          "portrait identity",
+          "portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "input_types": [
+          "image"
+        ],
+        "input_modes": [
+          "face-reference"
+        ],
         "prompt_granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"]
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
         },
         "priority": 70,
         "fallback": false,
         "exclusive": false,
-        "required_selectors": ["input_mode"],
+        "required_selectors": [
+          "input_mode"
+        ],
         "strict_style": false,
         "exclusion_rules": [
           "Use this route for a face-centric reference, not for exact pixel copying, pose transfer, clothing transfer or local edits."
         ]
       },
       "capabilities": {
-        "modalities": ["text-to-image-with-face-reference"],
-        "input_types": ["text", "image", "face"],
-        "input_modes": ["face-reference"],
-        "output_types": ["image"],
-        "architectures": ["sdxl"],
-        "styles": ["anime", "portrait", "face-reference", "gacha illustration"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image-with-face-reference"
+        ],
+        "input_types": [
+          "text",
+          "image",
+          "face"
+        ],
+        "input_modes": [
+          "face-reference"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "portrait",
+          "face-reference",
+          "gacha illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": false,
         "ipadapter_support": true,
         "face_only": true,
         "reference_scope": "face-centric; the prompt controls outfit, pose, background and scene",
-        "control_scope": ["facial appearance and portrait identity cues"],
-        "not_controlled": ["exact clothing", "exact body pose", "exact background", "pixel identity guarantee"],
+        "control_scope": [
+          "facial appearance and portrait identity cues"
+        ],
+        "not_controlled": [
+          "exact clothing",
+          "exact body pose",
+          "exact background",
+          "pixel identity guarantee"
+        ],
         "prompt_dialect": "danbooru-tags",
         "prompt_granularity": {
           "minimum": "structured",
@@ -448,7 +944,10 @@
         "style_control": "medium",
         "outfit_control": "prompt dependent",
         "composition_control": "prompt dependent",
-        "recommended_resolutions": ["832x1216", "1024x1024"],
+        "recommended_resolutions": [
+          "832x1216",
+          "1024x1024"
+        ],
         "performance": "medium"
       },
       "input_contract": {
@@ -462,7 +961,10 @@
           "required": true,
           "parameter": "face_image",
           "mode": "face-reference",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "format": "Prefer a clear single-person face or portrait reference. A character sheet or multi-view sheet is a weak face reference and can introduce duplicate subjects.",
           "upload": {
             "endpoint": "/upload/image",
@@ -475,30 +977,91 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as parameters.face_image."
           },
           "job_output_reference": false
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt",
+          "face_image"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API face-reference route",
         "probes": [
-          {"mode": "face-reference-named-API", "status": "success", "job_id": "b8f04679-0c13-4d12-b5e4-f196985d22a1", "prompt_class": "sfw", "face_image": "xiaoman_portrait.png", "steps": 2, "resolution": "512x768"}
+          {
+            "mode": "face-reference-named-API",
+            "status": "success",
+            "job_id": "b8f04679-0c13-4d12-b5e4-f196985d22a1",
+            "prompt_class": "sfw",
+            "face_image": "xiaoman_portrait.png",
+            "steps": 2,
+            "resolution": "512x768"
+          }
         ],
-        "limitations": ["An SFW execution probe validates model/node loading and face-image plumbing, not exact likeness or NSFW quality."]
+        "limitations": [
+          "An SFW execution probe validates model/node loading and face-image plumbing, not exact likeness or NSFW quality."
+        ]
       },
       "selection": {
-        "best_for": ["face-centric reference portraits", "keeping a supplied face while changing the scene or outfit", "SFW or NSFW-capable SDXL anime generation with a portrait reference"],
-        "not_for": ["local clothing edits", "pose transfer", "depth control", "exact character identity without a clear face reference", "FaceID-grade identity matching"],
-        "priority_signals": ["face reference", "face-only", "IPAdapter", "portrait identity", "keep the face"]
+        "best_for": [
+          "face-centric reference portraits",
+          "keeping a supplied face while changing the scene or outfit",
+          "SFW or NSFW-capable SDXL anime generation with a portrait reference"
+        ],
+        "not_for": [
+          "local clothing edits",
+          "pose transfer",
+          "depth control",
+          "exact character identity without a clear face reference",
+          "FaceID-grade identity matching"
+        ],
+        "priority_signals": [
+          "face reference",
+          "face-only",
+          "IPAdapter",
+          "portrait identity",
+          "keep the face"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered SDXL tags for subject count, character, series, appearance, outfit, pose, camera, scene and lighting. The face image supplies an additional face-centric cue.",
-        "required_fields": ["face_image", "prompt"],
-        "optional_fields": ["negative_prompt", "ipadapter_weight", "seed", "width", "height", "steps", "cfg"],
+        "optional_fields": [
+          "negative_prompt",
+          "ipadapter_weight",
+          "seed",
+          "width",
+          "height",
+          "steps",
+          "cfg"
+        ],
         "face_image": "Use a clear single-person face/portrait file. This input is not the same as input_image and is not copied from a previous job automatically.",
         "ipadapter_weight": "Start around 0.65-0.85. Higher values increase face-reference influence but can reduce prompt control; this is an IPAdapter Plus Face route, not FaceID.",
         "negative_prompt": "supported; keep it focused on duplicate subjects, multiple views, anatomy, text and watermark",
-        "avoid": ["using a three-view reference when a single portrait is available", "expecting the adapter to carry the outfit or pose", "using FaceID-only assumptions or InsightFace trigger syntax"]
+        "avoid": [
+          "using a three-view reference when a single portrait is available",
+          "expecting the adapter to carry the outfit or pose",
+          "using FaceID-only assumptions or InsightFace trigger syntax"
+        ],
+        "suggested_prompt_details": [
+          "face_image",
+          "prompt"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            20,
+            30
+          ],
+          "cfg": [
+            5,
+            7
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "The graph uses IPAdapter Unified Loader with the real PLUS FACE (portraits) preset and the matching SDXL ViT-H CLIP Vision encoder.",
@@ -507,13 +1070,28 @@
       ],
       "prompting": {
         "style": "comma-separated SDXL anime tags",
-        "structure": ["quality", "subject count", "character/series", "appearance", "outfit", "pose", "camera", "scene", "lighting"],
+        "structure": [
+          "quality",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
         "granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"],
-          "selection_hint": "Use detailed for a normal character request; keep the reference-image role face-centric and put outfit/pose/scene details in the prompt."
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for a normal character request; keep the reference-image role face-centric and put outfit/pose/scene details in the prompt.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
@@ -543,20 +1121,62 @@
         "models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "5", "input": "text"},
-        "negative_prompt": {"node": "6", "input": "text"},
-        "face_image": {"node": "3", "input": "image"},
-        "ipadapter_weight": {"node": "4", "input": "weight"},
-        "width": {"node": "7", "input": "width"},
-        "height": {"node": "7", "input": "height"},
-        "batch_size": {"node": "7", "input": "batch_size"},
-        "seed": {"node": "8", "input": "seed"},
-        "steps": {"node": "8", "input": "steps"},
-        "cfg": {"node": "8", "input": "cfg"},
-        "denoise": {"node": "8", "input": "denoise"},
-        "sampler_name": {"node": "8", "input": "sampler_name"},
-        "scheduler": {"node": "8", "input": "scheduler"},
-        "filename_prefix": {"node": "10", "input": "filename_prefix"}
+        "prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "face_image": {
+          "node": "3",
+          "input": "image"
+        },
+        "ipadapter_weight": {
+          "node": "4",
+          "input": "weight"
+        },
+        "width": {
+          "node": "7",
+          "input": "width"
+        },
+        "height": {
+          "node": "7",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "7",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "8",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "8",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "8",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "8",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "8",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "8",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "10",
+          "input": "filename_prefix"
+        }
       },
       "defaults": {
         "width": 832,
@@ -569,6 +1189,18 @@
         "sampler_name": "euler_ancestral",
         "scheduler": "normal",
         "filename_prefix": "sdxl_face_reference_ipadapter"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": true,
+        "controlnet": false,
+        "image_to_image": false
       }
     },
     {
@@ -577,7 +1209,14 @@
       "description": "Pose/orientation-controlled SDXL workflow. The API accepts a source control image, preprocesses it with OpenPose and applies Xinsir's SDXL OpenPose ControlNet; the agent keeps identity and outfit in the prompt.",
       "family": "sdxl-controlnet",
       "resident_group": "sdxl-animagine31-openpose",
-      "tags": ["anime", "sdxl", "controlnet", "openpose", "pose-control", "nsfw-capable"],
+      "tags": [
+        "anime",
+        "sdxl",
+        "controlnet",
+        "openpose",
+        "pose-control",
+        "nsfw-capable"
+      ],
       "content_class": "anime-nsfw-capable",
       "file": "sdxl_openpose_controlnet.json",
       "model_ids": [
@@ -587,44 +1226,119 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait", "blue-archive", "nikke", "character-illustration"],
-        "aliases": ["OpenPose", "pose control", "ControlNet pose", "姿势控制", "骨架控制", "动作控制"],
-        "styles": ["openpose", "pose control", "skeleton control", "composition control"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "input_types": ["image"],
-        "input_modes": ["openpose-control"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "blue-archive",
+          "nikke",
+          "character-illustration"
+        ],
+        "aliases": [
+          "OpenPose",
+          "pose control",
+          "ControlNet pose",
+          "姿势控制",
+          "骨架控制",
+          "动作控制"
+        ],
+        "styles": [
+          "openpose",
+          "pose control",
+          "skeleton control",
+          "composition control"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "input_types": [
+          "image"
+        ],
+        "input_modes": [
+          "openpose-control"
+        ],
         "prompt_granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"]
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
         },
         "priority": 70,
         "fallback": false,
         "exclusive": false,
-        "required_selectors": ["input_mode"],
+        "required_selectors": [
+          "input_mode"
+        ],
         "strict_style": false,
         "exclusion_rules": [
           "Use this route when pose/orientation is the primary control need; use inpaint for local edits and face-reference for a face-only reference."
         ]
       },
       "capabilities": {
-        "modalities": ["text-to-image-with-openpose-control"],
-        "input_types": ["text", "image", "control"],
-        "input_modes": ["openpose-control"],
-        "output_types": ["image"],
-        "architectures": ["sdxl"],
-        "styles": ["anime", "pose-controlled", "gacha illustration"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image-with-openpose-control"
+        ],
+        "input_types": [
+          "text",
+          "image",
+          "control"
+        ],
+        "input_modes": [
+          "openpose-control"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "pose-controlled",
+          "gacha illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": false,
         "controlnet_support": true,
-        "control_types": ["openpose"],
+        "control_types": [
+          "openpose"
+        ],
         "preprocessor": "OpenposePreprocessor",
-        "control_scope": ["human body pose", "orientation", "limb placement", "multi-person pose composition"],
-        "not_controlled": ["character identity", "exact face", "clothing details", "depth or lighting"],
+        "control_scope": [
+          "human body pose",
+          "orientation",
+          "limb placement",
+          "multi-person pose composition"
+        ],
+        "not_controlled": [
+          "character identity",
+          "exact face",
+          "clothing details",
+          "depth or lighting"
+        ],
         "prompt_dialect": "danbooru-tags",
         "prompt_granularity": {
           "minimum": "structured",
@@ -636,7 +1350,10 @@
         "style_control": "base checkpoint dependent",
         "outfit_control": "prompt dependent",
         "composition_control": "strong for pose and body orientation",
-        "recommended_resolutions": ["832x1216", "1024x1024"],
+        "recommended_resolutions": [
+          "832x1216",
+          "1024x1024"
+        ],
         "performance": "medium-to-slow; first use may download OpenPose annotator weights"
       },
       "input_contract": {
@@ -650,7 +1367,10 @@
           "required": true,
           "parameter": "control_image",
           "mode": "openpose-source-image",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "format": "A source image containing the desired human pose. The workflow runs OpenposePreprocessor internally; callers do not need to create a pre-rendered skeleton map.",
           "upload": {
             "endpoint": "/upload/image",
@@ -663,30 +1383,95 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass it as parameters.control_image."
           },
           "job_output_reference": false
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt",
+          "control_image"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API OpenPose route",
         "probes": [
-          {"mode": "openpose-control-named-API", "status": "success", "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b", "prompt_class": "sfw", "control_image": "asuna_src_up.png", "steps": 2, "resolution": "512x768"}
+          {
+            "mode": "openpose-control-named-API",
+            "status": "success",
+            "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b",
+            "prompt_class": "sfw",
+            "control_image": "asuna_src_up.png",
+            "steps": 2,
+            "resolution": "512x768"
+          }
         ],
-        "limitations": ["An SFW execution probe validates graph execution and pose-conditioning plumbing, not exact pose detection, character likeness or NSFW quality."]
+        "limitations": [
+          "An SFW execution probe validates graph execution and pose-conditioning plumbing, not exact pose detection, character likeness or NSFW quality."
+        ]
       },
       "selection": {
-        "best_for": ["盘腿坐, 背面 3/4 and other explicit body poses", "stabilizing orientation and limb placement", "SFW or NSFW-capable SDXL anime generation with a pose source image"],
-        "not_for": ["face-only identity transfer", "local clothing replacement", "depth control", "exact character identity without prompt/adapters"],
-        "priority_signals": ["OpenPose", "pose control", "skeleton", "body orientation", "姿势", "动作", "背面", "盘腿"]
+        "best_for": [
+          "盘腿坐, 背面 3/4 and other explicit body poses",
+          "stabilizing orientation and limb placement",
+          "SFW or NSFW-capable SDXL anime generation with a pose source image"
+        ],
+        "not_for": [
+          "face-only identity transfer",
+          "local clothing replacement",
+          "depth control",
+          "exact character identity without prompt/adapters"
+        ],
+        "priority_signals": [
+          "OpenPose",
+          "pose control",
+          "skeleton",
+          "body orientation",
+          "姿势",
+          "动作",
+          "背面",
+          "盘腿"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered SDXL tags for 1girl/solo, identity, appearance, outfit, expression, camera, scene and lighting. The control image supplies the body pose and orientation.",
-        "required_fields": ["control_image", "prompt"],
-        "optional_fields": ["negative_prompt", "control_strength", "control_start_percent", "control_end_percent", "seed", "width", "height", "steps", "cfg"],
+        "optional_fields": [
+          "negative_prompt",
+          "control_strength",
+          "control_start_percent",
+          "control_end_percent",
+          "seed",
+          "width",
+          "height",
+          "steps",
+          "cfg"
+        ],
         "control_image": "Use a clear human-pose source. OpenPose preprocessing is built into the route; the first call can be slower while annotator weights are cached.",
         "control_strength": "Start around 0.70-0.90. Higher values preserve the skeleton more strongly but may reduce prompt freedom.",
         "negative_prompt": "supported; keep it focused on duplicate subjects, multiple views, anatomy, text and watermark",
-        "avoid": ["expecting OpenPose to identify the character", "using a character sheet as a pose source when it has multiple unrelated views", "using denoise to solve a pose problem without a control image"]
+        "avoid": [
+          "expecting OpenPose to identify the character",
+          "using a character sheet as a pose source when it has multiple unrelated views",
+          "using denoise to solve a pose problem without a control image"
+        ],
+        "suggested_prompt_details": [
+          "control_image",
+          "prompt"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            20,
+            30
+          ],
+          "cfg": [
+            5,
+            7
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "The graph uses the real OpenposePreprocessor node from the pinned comfyui_controlnet_aux checkout and ControlNetApplyAdvanced from ComfyUI core.",
@@ -695,13 +1480,28 @@
       ],
       "prompting": {
         "style": "comma-separated SDXL anime tags",
-        "structure": ["quality", "subject count", "character/series", "appearance", "outfit", "expression", "camera", "scene", "lighting"],
+        "structure": [
+          "quality",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "expression",
+          "camera",
+          "scene",
+          "lighting"
+        ],
         "granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"],
-          "selection_hint": "Use detailed to describe the requested subject and scene; leave body pose/orientation to the OpenPose control image."
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed to describe the requested subject and scene; leave body pose/orientation to the OpenPose control image.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
@@ -732,22 +1532,70 @@
         "models/controlnet/xinsir-controlnet-openpose-sdxl-1.0.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "5", "input": "text"},
-        "negative_prompt": {"node": "6", "input": "text"},
-        "control_image": {"node": "2", "input": "image"},
-        "control_strength": {"node": "7", "input": "strength"},
-        "control_start_percent": {"node": "7", "input": "start_percent"},
-        "control_end_percent": {"node": "7", "input": "end_percent"},
-        "width": {"node": "8", "input": "width"},
-        "height": {"node": "8", "input": "height"},
-        "batch_size": {"node": "8", "input": "batch_size"},
-        "seed": {"node": "9", "input": "seed"},
-        "steps": {"node": "9", "input": "steps"},
-        "cfg": {"node": "9", "input": "cfg"},
-        "denoise": {"node": "9", "input": "denoise"},
-        "sampler_name": {"node": "9", "input": "sampler_name"},
-        "scheduler": {"node": "9", "input": "scheduler"},
-        "filename_prefix": {"node": "11", "input": "filename_prefix"}
+        "prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "control_image": {
+          "node": "2",
+          "input": "image"
+        },
+        "control_strength": {
+          "node": "7",
+          "input": "strength"
+        },
+        "control_start_percent": {
+          "node": "7",
+          "input": "start_percent"
+        },
+        "control_end_percent": {
+          "node": "7",
+          "input": "end_percent"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        }
       },
       "defaults": {
         "width": 832,
@@ -762,6 +1610,18 @@
         "sampler_name": "euler_ancestral",
         "scheduler": "normal",
         "filename_prefix": "sdxl_openpose_controlnet"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": true,
+        "image_to_image": false
       }
     },
     {
@@ -770,7 +1630,11 @@
       "description": "Flux.2/Klein-style low-step workflow for the installed Moody Desire checkpoint; the route is marked SFW/NSFW-capable and accepts concise natural-language prompts.",
       "family": "flux2-klein",
       "resident_group": "flux2-klein-moody-desire",
-      "tags": ["anime", "portrait", "moody"],
+      "tags": [
+        "anime",
+        "portrait",
+        "moody"
+      ],
       "content_class": "general-nsfw-capable",
       "file": "moody_desire_v30_minimal.json",
       "model_ids": [
@@ -780,30 +1644,81 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait"],
-        "aliases": ["general anime", "flux klein", "通用动漫", "动漫头像"],
-        "styles": ["anime", "portrait", "stylized", "moody"],
-        "content_modes": ["sfw", "nsfw", "general"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait"
+        ],
+        "aliases": [
+          "general anime",
+          "flux klein",
+          "通用动漫",
+          "动漫头像"
+        ],
+        "styles": [
+          "anime",
+          "portrait",
+          "stylized",
+          "moody"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
         "prompt_granularity": {
           "minimum": "minimal",
           "recommended": "minimal",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"]
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
         },
         "priority": 10,
         "fallback": true,
         "exclusive": false
       },
       "capabilities": {
-        "modalities": ["text-to-image", "image-to-image"],
-        "input_types": ["text", "image"],
-        "input_modes": ["text-to-image", "image-to-image"],
-        "architectures": ["flux2-klein"],
-        "styles": ["anime", "portrait", "stylized"],
-        "content_levels": ["general", "nsfw-capable"],
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "architectures": [
+          "flux2-klein"
+        ],
+        "styles": [
+          "anime",
+          "portrait",
+          "stylized"
+        ],
+        "content_levels": [
+          "general",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
-        "content_modes": ["sfw", "nsfw", "general"],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
         "lora_support": false,
         "prompt_dialect": "natural-language",
         "prompt_granularity": {
@@ -816,7 +1731,9 @@
         "style_control": "medium",
         "outfit_control": "medium",
         "composition_control": "medium",
-        "recommended_resolutions": ["512x512"],
+        "recommended_resolutions": [
+          "512x512"
+        ],
         "performance": "fast"
       },
       "input_contract": {
@@ -830,7 +1747,10 @@
           "required": false,
           "parameter": "input_image",
           "mode": "latent-img2img",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -842,45 +1762,121 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
           "job_output_reference": false,
-          "processing": "API attaches LoadImage -> VAEEncode -> KSampler.latent_image",
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
           "default_denoise": 0.65
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API-and-native-graph",
         "probes": [
-          {"mode": "text-to-image", "status": "success", "job_id": "f64d07d8-5ae9-4047-b0f5-8999538a3aa7", "prompt_class": "sfw"},
-          {"mode": "image-to-image-native-graph", "status": "success", "job_id": "25432311-cf08-47cc-a25b-b03449d40e56", "prompt_class": "sfw"},
-          {"mode": "image-to-image-named-API", "status": "success", "job_id": "7daaf9a8-751f-46c2-8622-eefd5c62d3c7", "prompt_class": "sfw"}
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "f64d07d8-5ae9-4047-b0f5-8999538a3aa7",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-native-graph",
+            "status": "success",
+            "job_id": "25432311-cf08-47cc-a25b-b03449d40e56",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-named-API",
+            "status": "success",
+            "job_id": "7daaf9a8-751f-46c2-8622-eefd5c62d3c7",
+            "prompt_class": "sfw"
+          }
         ],
-        "limitations": ["Low-step probes validate graph execution and model loading, not output quality."]
+        "limitations": [
+          "Low-step probes validate graph execution and model loading, not output quality."
+        ]
       },
       "selection": {
-        "best_for": ["fast general anime portraits", "low-step Flux.2/Klein generation", "general SFW/NSFW-capable anime or portrait prompts"],
-        "not_for": ["SDXL-specific LoRAs", "tag-heavy SDXL character workflows"],
-        "priority_signals": ["fast", "portrait", "Flux.2", "Klein", "NSFW-capable"]
+        "best_for": [
+          "fast general anime portraits",
+          "low-step Flux.2/Klein generation",
+          "general SFW/NSFW-capable anime or portrait prompts"
+        ],
+        "not_for": [
+          "SDXL-specific LoRAs",
+          "tag-heavy SDXL character workflows"
+        ],
+        "priority_signals": [
+          "fast",
+          "portrait",
+          "Flux.2",
+          "Klein",
+          "NSFW-capable"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "minimal",
         "prompt_scope": "Describe the main subject, action, composition, environment and lighting in short natural language.",
-        "required_fields": ["subject"],
-        "optional_fields": ["action", "composition", "environment", "lighting", "style"],
-        "avoid": ["SDXL-only LoRA trigger words", "long weighted tag chains"],
-        "negative_prompt": "unsupported"
+        "optional_fields": [
+          "action",
+          "composition",
+          "environment",
+          "lighting",
+          "style"
+        ],
+        "avoid": [
+          "SDXL-only LoRA trigger words",
+          "long weighted tag chains"
+        ],
+        "negative_prompt": "unsupported",
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            4,
+            8
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "prompting": {
         "style": "short natural-language or tag-like visual description",
-        "structure": ["subject", "action", "composition", "environment", "lighting", "style"],
+        "structure": [
+          "subject",
+          "action",
+          "composition",
+          "environment",
+          "lighting",
+          "style"
+        ],
         "granularity": {
           "minimum": "minimal",
           "recommended": "minimal",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"],
-          "selection_hint": "Use minimal for speed; add structured or detailed blocks only when composition needs them."
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use minimal for speed; add structured or detailed blocks only when composition needs them.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "negative_prompt_supported": false,
-        "notes": ["This graph exposes only a positive prompt; do not assume a negative_prompt binding."]
+        "notes": [
+          "This graph exposes only a positive prompt; do not assume a negative_prompt binding.",
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "negative_prompt_effective_at_default": false
       },
       "required_files": [
         "models/diffusion_models/moodyDesireMix_v30_2943512.safetensors",
@@ -888,17 +1884,50 @@
         "models/vae/flux2-vae.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "6", "input": "text"},
-        "seed": {"node": "9", "input": "seed"},
-        "width": {"node": "8", "input": "width"},
-        "height": {"node": "8", "input": "height"},
-        "batch_size": {"node": "8", "input": "batch_size"},
-        "steps": {"node": "9", "input": "steps"},
-        "cfg": {"node": "9", "input": "cfg"},
-        "denoise": {"node": "9", "input": "denoise"},
-        "sampler_name": {"node": "9", "input": "sampler_name"},
-        "scheduler": {"node": "9", "input": "scheduler"},
-        "filename_prefix": {"node": "11", "input": "filename_prefix"}
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        }
       },
       "defaults": {
         "width": 512,
@@ -910,15 +1939,33 @@
         "sampler_name": "euler",
         "scheduler": "simple",
         "filename_prefix": "moody_desire_v30"
+      },
+      "resource_limits": {
+        "max_total_pixels": 1048576,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
       }
     },
     {
       "id": "animagine-xl-3.1-nsfw",
-      "name": "Animagine XL 3.1 — NIKKE NSFW",
+      "name": "Animagine XL 3.1 - NIKKE (optional Rapi adapter)",
       "description": "Anime/NSFW-capable SDXL workflow using Animagine XL 3.1 with NIKKE profile and Rapi LoRAs.",
       "family": "sdxl",
       "resident_group": "sdxl-animagine31-nikke",
-      "tags": ["anime", "sdxl", "nikke", "rapi", "nsfw"],
+      "tags": [
+        "anime",
+        "sdxl",
+        "nikke",
+        "rapi",
+        "nsfw"
+      ],
       "content_class": "nsfw-capable",
       "file": "animagine_xl_3_1_nsfw.json",
       "model_ids": [
@@ -928,32 +1975,84 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["nikke", "goddess-of-victory-nikke"],
-        "aliases": ["NIKKE", "Goddess of Victory: NIKKE", "胜利女神妮姬", "妮姬", "ニケ"],
-        "styles": ["anime", "danbooru", "character illustration"],
-        "content_modes": ["sfw", "nsfw", "general"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "nikke",
+          "goddess-of-victory-nikke"
+        ],
+        "aliases": [
+          "NIKKE",
+          "Goddess of Victory: NIKKE",
+          "胜利女神妮姬",
+          "妮姬",
+          "ニケ"
+        ],
+        "styles": [
+          "anime",
+          "danbooru",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
         "prompt_granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"]
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
         },
         "priority": 100,
         "fallback": false,
         "exclusive": true
       },
       "capabilities": {
-        "modalities": ["text-to-image", "image-to-image"],
-        "input_types": ["text", "image"],
-        "input_modes": ["text-to-image", "image-to-image"],
-        "architectures": ["sdxl"],
-        "styles": ["anime", "danbooru", "character illustration"],
-        "subjects": ["NIKKE", "Rapi"],
-        "content_levels": ["general", "nsfw-capable"],
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "danbooru",
+          "character illustration"
+        ],
+        "subjects": [
+          "NIKKE",
+          "Rapi"
+        ],
+        "content_levels": [
+          "general",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": true,
-        "content_modes": ["sfw", "nsfw"],
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
         "prompt_dialect": "danbooru-tags",
         "prompt_granularity": {
           "minimum": "structured",
@@ -966,7 +2065,10 @@
         "outfit_control": "outfit-specific LoRA trigger plus tags",
         "composition_control": "tags",
         "weapon_control": "tags; not guaranteed by the current adapters",
-        "recommended_resolutions": ["832x1216", "1024x1024"],
+        "recommended_resolutions": [
+          "832x1216",
+          "1024x1024"
+        ],
         "performance": "medium"
       },
       "input_contract": {
@@ -980,7 +2082,10 @@
           "required": false,
           "parameter": "input_image",
           "mode": "latent-img2img",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -992,45 +2097,125 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
           "job_output_reference": false,
-          "processing": "API attaches LoadImage -> VAEEncode -> KSampler.latent_image",
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
           "default_denoise": 0.65
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API-and-native-latent-I2I-graph",
         "probes": [
-          {"mode": "text-to-image", "status": "success", "job_id": "279f3041-cc14-431e-a24d-357ddb4e3bcd", "prompt_class": "sfw"},
-          {"mode": "image-to-image-native-graph", "status": "success", "job_id": "7261d666-1199-43e0-a3b0-61976c54d48c", "prompt_class": "sfw"},
-          {"mode": "image-to-image-named-API", "status": "success", "job_id": "548c1c01-f453-4af1-a08b-17aa8703f6c2", "prompt_class": "sfw"}
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "279f3041-cc14-431e-a24d-357ddb4e3bcd",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-native-graph",
+            "status": "success",
+            "job_id": "7261d666-1199-43e0-a3b0-61976c54d48c",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-named-API",
+            "status": "success",
+            "job_id": "548c1c01-f453-4af1-a08b-17aa8703f6c2",
+            "prompt_class": "sfw"
+          }
         ],
-        "limitations": ["Low-step probes validate graph execution and adapter loading, not character fidelity or NSFW quality."]
+        "limitations": [
+          "Low-step probes validate graph execution and adapter loading, not character fidelity or NSFW quality."
+        ]
       },
       "selection": {
-        "best_for": ["anime character tags", "NIKKE/Rapi", "SDXL LoRA composition", "mature content where lawful and appropriate"],
-        "not_for": ["Flux.2/Klein graphs", "Pony-only or Illustrious-only LoRAs without compatibility testing"],
-        "priority_signals": ["anime", "SDXL", "NIKKE", "Rapi", "Danbooru tags"]
+        "best_for": [
+          "anime character tags",
+          "NIKKE/Rapi",
+          "SDXL LoRA composition",
+          "mature content where lawful and appropriate"
+        ],
+        "not_for": [
+          "Flux.2/Klein graphs",
+          "Pony-only or Illustrious-only LoRAs without compatibility testing"
+        ],
+        "priority_signals": [
+          "anime",
+          "SDXL",
+          "NIKKE",
+          "Rapi",
+          "Danbooru tags"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered comma-separated tags and include the series, character, appearance, outfit trigger, pose and camera/scene details.",
-        "required_fields": ["character", "series", "appearance", "pose"],
-        "optional_fields": ["outfit", "accessories", "weapon", "camera", "scene", "lighting"],
+        "optional_fields": [
+          "outfit",
+          "accessories",
+          "weapon",
+          "camera",
+          "scene",
+          "lighting"
+        ],
         "adapter_selection": {
           "concept": "Keep enabled for the NIKKE profile; use trigger IncrsNikkeProfile.",
-          "rapi": "Select exactly one outfit trigger when using the Rapi adapter: rapidef, rapiswim or rapirnd."
+          "rapi": "Disabled by default: this adapter was trained for Pony, not Animagine. Enable loras.rapi explicitly only for a Rapi experiment; visual compatibility is unverified."
         },
-        "avoid": ["natural-language paragraphs", "Pony-only triggers not listed by this route"]
+        "avoid": [
+          "natural-language paragraphs",
+          "Pony-only triggers not listed by this route"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            20,
+            30
+          ],
+          "cfg": [
+            5,
+            7
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "prompting": {
         "style": "comma-separated Danbooru-style tags",
-        "structure": ["quality", "subject count", "character", "series", "appearance", "pose", "camera", "scene", "lighting"],
+        "structure": [
+          "quality",
+          "subject count",
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
         "granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"],
-          "selection_hint": "Use expert only when supplying adapter triggers, weights and tuned sampler settings; detailed is the normal character request."
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use expert only when supplying adapter triggers, weights and tuned sampler settings; detailed is the normal character request.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
@@ -1043,8 +2228,18 @@
         },
         "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, missing fingers, deformed, blurry, text, watermark, logo, signature, censored, mosaic censorship",
         "lora_triggers": {
-          "concept": {"trigger": "IncrsNikkeProfile", "default_strength": 0.9},
-          "rapi": {"triggers": ["rapidef", "rapiswim", "rapirnd"], "default_strength": 0.8}
+          "concept": {
+            "trigger": "IncrsNikkeProfile",
+            "default_strength": 0.9
+          },
+          "rapi": {
+            "triggers": [
+              "rapidef",
+              "rapiswim",
+              "rapirnd"
+            ],
+            "default_strength": 0.0
+          }
         },
         "examples": [
           {
@@ -1062,25 +2257,73 @@
         "Animagine XL 3.1 is an SDXL checkpoint and expects SDXL/Danbooru-style tags.",
         "The profile LoRA is the Animagine/SDXL variant and uses IncrsNikkeProfile.",
         "The current Rapi asset is the Pony-XL/SDXL-shaped variant; it is not the legacy SD1.5 Rapi LoRA. Results are not guaranteed to match a native Animagine-trained Rapi LoRA.",
-        "Pass loras.rapi=0 to disable the Rapi adapter while retaining the profile adapter."
+        "The Rapi adapter is disabled by default. loras.rapi is an explicit experimental opt-in; loading success is not evidence of visual compatibility."
       ],
       "bindings": {
-        "prompt": {"node": "4", "input": "text"},
-        "negative_prompt": {"node": "5", "input": "text"},
-        "width": {"node": "6", "input": "width"},
-        "height": {"node": "6", "input": "height"},
-        "batch_size": {"node": "6", "input": "batch_size"},
-        "seed": {"node": "7", "input": "seed"},
-        "steps": {"node": "7", "input": "steps"},
-        "cfg": {"node": "7", "input": "cfg"},
-        "denoise": {"node": "7", "input": "denoise"},
-        "sampler_name": {"node": "7", "input": "sampler_name"},
-        "scheduler": {"node": "7", "input": "scheduler"},
-        "filename_prefix": {"node": "9", "input": "filename_prefix"},
-        "concept_strength_model": {"node": "2", "input": "strength_model"},
-        "concept_strength_clip": {"node": "2", "input": "strength_clip"},
-        "rapi_strength_model": {"node": "3", "input": "strength_model"},
-        "rapi_strength_clip": {"node": "3", "input": "strength_clip"}
+        "prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "width": {
+          "node": "6",
+          "input": "width"
+        },
+        "height": {
+          "node": "6",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "6",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "7",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "7",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "7",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "7",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "7",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "7",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "9",
+          "input": "filename_prefix"
+        },
+        "concept_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "concept_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        },
+        "rapi_strength_model": {
+          "node": "3",
+          "input": "strength_model"
+        },
+        "rapi_strength_clip": {
+          "node": "3",
+          "input": "strength_clip"
+        }
       },
       "lora_bindings": {
         "concept": {
@@ -1092,8 +2335,12 @@
         },
         "rapi": {
           "file": "NIKKES_Rapi.safetensors",
-          "triggers": ["rapidef", "rapiswim", "rapirnd"],
-          "default": 0.8,
+          "triggers": [
+            "rapidef",
+            "rapiswim",
+            "rapirnd"
+          ],
+          "default": 0.0,
           "strength_model": "rapi_strength_model",
           "strength_clip": "rapi_strength_clip"
         }
@@ -1108,7 +2355,22 @@
         "sampler_name": "euler_ancestral",
         "scheduler": "normal",
         "filename_prefix": "animagine_xl_3_1_nsfw",
-        "loras": {"concept": 0.9, "rapi": 0.8}
+        "loras": {
+          "concept": 0.9,
+          "rapi": 0.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
       }
     },
     {
@@ -1117,7 +2379,13 @@
       "description": "Blue Archive-inspired game-CG style workflow using Animagine XL 3.1 and a compatible SDXL LoCon; the route is marked SFW/NSFW-capable.",
       "family": "sdxl",
       "resident_group": "sdxl-animagine31-blue-archive-style",
-      "tags": ["anime", "sdxl", "blue-archive", "game-cg", "style"],
+      "tags": [
+        "anime",
+        "sdxl",
+        "blue-archive",
+        "game-cg",
+        "style"
+      ],
       "content_class": "blue-archive-style-nsfw-capable",
       "file": "blue_archive_style_sdxl.json",
       "model_ids": [
@@ -1126,32 +2394,89 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["blue-archive", "blue-archive-style"],
-        "aliases": ["Blue Archive", "BA", "碧蓝档案", "蔚蓝档案", "ブルーアーカイブ"],
-        "styles": ["blue-archive-game-cg", "game-cg", "flat-color", "gacha illustration", "anime"],
-        "content_modes": ["sfw", "nsfw", "non-explicit", "general"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "blue-archive",
+          "blue-archive-style"
+        ],
+        "aliases": [
+          "Blue Archive",
+          "BA",
+          "碧蓝档案",
+          "蔚蓝档案",
+          "ブルーアーカイブ"
+        ],
+        "styles": [
+          "blue-archive-game-cg",
+          "game-cg",
+          "flat-color",
+          "gacha illustration",
+          "anime"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "non-explicit",
+          "general"
+        ],
         "prompt_granularity": {
           "minimum": "structured",
           "recommended": "structured",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"]
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
         },
         "priority": 80,
         "fallback": false,
         "exclusive": true
       },
       "capabilities": {
-        "modalities": ["text-to-image", "image-to-image"],
-        "input_types": ["text", "image"],
-        "input_modes": ["text-to-image", "image-to-image"],
-        "architectures": ["sdxl"],
-        "styles": ["blue-archive-game-cg", "anime", "flat-color", "gacha illustration"],
-        "subjects": ["Blue Archive-inspired original characters", "anime characters"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "blue-archive-game-cg",
+          "anime",
+          "flat-color",
+          "gacha illustration"
+        ],
+        "subjects": [
+          "Blue Archive-inspired original characters",
+          "anime characters"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": true,
-        "content_modes": ["sfw", "nsfw", "non-explicit"],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "non-explicit"
+        ],
         "prompt_dialect": "danbooru-tags",
         "prompt_granularity": {
           "minimum": "structured",
@@ -1163,7 +2488,10 @@
         "style_control": "strong through the Blue Archive Game CG LoCon",
         "outfit_control": "tags; no outfit-specific adapter in this route",
         "composition_control": "tags",
-        "recommended_resolutions": ["832x1216", "960x1344"],
+        "recommended_resolutions": [
+          "832x1216",
+          "960x1344"
+        ],
         "performance": "medium"
       },
       "input_contract": {
@@ -1177,7 +2505,10 @@
           "required": false,
           "parameter": "input_image",
           "mode": "latent-img2img",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -1189,34 +2520,97 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
           "job_output_reference": false,
-          "processing": "API attaches LoadImage -> VAEEncode -> KSampler.latent_image",
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
           "default_denoise": 0.65
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API-and-native-latent-I2I-graph",
         "probes": [
-          {"mode": "text-to-image", "status": "success", "job_id": "3b4470ed-c45d-4ef1-8e1b-9edb7e17d2b9", "prompt_class": "sfw"},
-          {"mode": "image-to-image-native-graph", "status": "success", "job_id": "c3722d65-1868-42d8-9e43-307390368e4b", "prompt_class": "sfw"},
-          {"mode": "image-to-image-named-API", "status": "success", "job_id": "045e5159-d8fb-489b-b742-bb043034a442", "prompt_class": "sfw"}
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "3b4470ed-c45d-4ef1-8e1b-9edb7e17d2b9",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-native-graph",
+            "status": "success",
+            "job_id": "c3722d65-1868-42d8-9e43-307390368e4b",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-named-API",
+            "status": "success",
+            "job_id": "045e5159-d8fb-489b-b742-bb043034a442",
+            "prompt_class": "sfw"
+          }
         ],
-        "limitations": ["This route is style-only; low-step probes do not establish exact character identity."]
+        "limitations": [
+          "This route is style-only; low-step probes do not establish exact character identity."
+        ]
       },
       "selection": {
-        "best_for": ["Blue Archive-inspired game CG", "SFW or NSFW-capable anime character portraits", "bright flat-color gacha illustration"],
-        "not_for": ["Pony-only or Illustrious-only workflows"],
-        "priority_signals": ["Blue Archive", "game CG", "flat color", "gacha", "SFW", "NSFW-capable"]
+        "best_for": [
+          "Blue Archive-inspired game CG",
+          "SFW or NSFW-capable anime character portraits",
+          "bright flat-color gacha illustration"
+        ],
+        "not_for": [
+          "Pony-only or Illustrious-only workflows"
+        ],
+        "priority_signals": [
+          "Blue Archive",
+          "game CG",
+          "flat color",
+          "gacha",
+          "SFW",
+          "NSFW-capable"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "structured",
         "prompt_scope": "Use ordered anime tags for character count, character/series, halo, appearance, outfit, pose, background and lighting.",
-        "required_fields": ["character or original design", "appearance", "pose", "costume"],
-        "optional_fields": ["halo", "accessories", "background", "lighting", "camera"],
+        "optional_fields": [
+          "halo",
+          "accessories",
+          "background",
+          "lighting",
+          "camera"
+        ],
         "adapter_selection": {
           "blue_archive_style": "No trigger word is required; tune the LoCon strength instead."
         },
-        "avoid": ["expecting this style LoCon to reproduce an exact character identity", "Pony-only or Illustrious-only trigger syntax"]
+        "avoid": [
+          "expecting this style LoCon to reproduce an exact character identity",
+          "Pony-only or Illustrious-only trigger syntax"
+        ],
+        "suggested_prompt_details": [
+          "character or original design",
+          "appearance",
+          "pose",
+          "costume"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            28,
+            40
+          ],
+          "cfg": [
+            5,
+            7
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "The selected LoCon is the Animagine3.1/SDXL version of Blue Archive Game CG Style.",
@@ -1225,13 +2619,27 @@
       ],
       "prompting": {
         "style": "comma-separated anime/game-CG tags",
-        "structure": ["quality", "subject count", "character or original design", "appearance", "pose", "costume", "background", "lighting"],
+        "structure": [
+          "quality",
+          "subject count",
+          "character or original design",
+          "appearance",
+          "pose",
+          "costume",
+          "background",
+          "lighting"
+        ],
         "granularity": {
           "minimum": "structured",
           "recommended": "structured",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"],
-          "selection_hint": "Use structured tags for normal character requests; add detailed or expert blocks for costume, composition and adapter tuning."
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use structured tags for normal character requests; add detailed or expert blocks for costume, composition and adapter tuning.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
@@ -1244,7 +2652,10 @@
         },
         "negative_prompt": "worst quality, low quality, bad hands, bad face, mutated hands and fingers, extra legs, extra arms, cropped, text, bad anatomy, jpeg artifacts, signature, watermark, username, duplicate, multiple view, long body, malformed, disfigured, bad proportions, ugly, monochrome",
         "lora_triggers": {
-          "blue_archive_style": {"triggers": [], "default_strength": 0.8}
+          "blue_archive_style": {
+            "triggers": [],
+            "default_strength": 0.8
+          }
         },
         "examples": [
           {
@@ -1258,20 +2669,62 @@
         "models/loras/BlueArchive_GameCG_Style_Animagine31.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "3", "input": "text"},
-        "negative_prompt": {"node": "4", "input": "text"},
-        "width": {"node": "5", "input": "width"},
-        "height": {"node": "5", "input": "height"},
-        "batch_size": {"node": "5", "input": "batch_size"},
-        "seed": {"node": "6", "input": "seed"},
-        "steps": {"node": "6", "input": "steps"},
-        "cfg": {"node": "6", "input": "cfg"},
-        "denoise": {"node": "6", "input": "denoise"},
-        "sampler_name": {"node": "6", "input": "sampler_name"},
-        "scheduler": {"node": "6", "input": "scheduler"},
-        "filename_prefix": {"node": "8", "input": "filename_prefix"},
-        "blue_archive_style_strength_model": {"node": "2", "input": "strength_model"},
-        "blue_archive_style_strength_clip": {"node": "2", "input": "strength_clip"}
+        "prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "width": {
+          "node": "5",
+          "input": "width"
+        },
+        "height": {
+          "node": "5",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "5",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "6",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "6",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "6",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "6",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "6",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "6",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "8",
+          "input": "filename_prefix"
+        },
+        "blue_archive_style_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "blue_archive_style_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        }
       },
       "lora_bindings": {
         "blue_archive_style": {
@@ -1292,7 +2745,21 @@
         "sampler_name": "dpmpp_2m_sde",
         "scheduler": "karras",
         "filename_prefix": "blue_archive_style_sdxl",
-        "loras": {"blue_archive_style": 0.8}
+        "loras": {
+          "blue_archive_style": 0.8
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
       }
     },
     {
@@ -1301,7 +2768,14 @@
       "description": "Character-identity workflow for Asuna Ichinose using the compatible Illustrious XL base and a four-outfit adapter.",
       "family": "sdxl-illustrious",
       "resident_group": "sdxl-illustrious-asuna",
-      "tags": ["anime", "sdxl", "illustrious", "blue-archive", "character-identity", "asuna"],
+      "tags": [
+        "anime",
+        "sdxl",
+        "illustrious",
+        "blue-archive",
+        "character-identity",
+        "asuna"
+      ],
       "content_class": "blue-archive-character-identity-nsfw-capable",
       "file": "blue_archive_character_illustrious_xl.json",
       "model_ids": [
@@ -1310,36 +2784,107 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["blue-archive"],
-        "aliases": ["Blue Archive", "BA", "碧蓝档案", "蔚蓝档案", "ブルーアーカイブ"],
-        "characters": ["Asuna Ichinose", "一之瀬アスナ", "一之濑明日奈"],
-        "outfits": ["maid", "bunny", "school", "sports"],
-        "styles": ["character-identity", "character identity", "outfit identity", "illustrious"],
-        "content_modes": ["sfw", "nsfw", "general"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "blue-archive"
+        ],
+        "aliases": [
+          "Blue Archive",
+          "BA",
+          "碧蓝档案",
+          "蔚蓝档案",
+          "ブルーアーカイブ"
+        ],
+        "characters": [
+          "Asuna Ichinose",
+          "一之瀬アスナ",
+          "一之濑明日奈"
+        ],
+        "outfits": [
+          "maid",
+          "bunny",
+          "school",
+          "sports"
+        ],
+        "styles": [
+          "character-identity",
+          "character identity",
+          "outfit identity",
+          "illustrious"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
         "prompt_granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"]
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
         },
         "priority": 120,
         "fallback": false,
         "exclusive": true,
-        "strict_style": true
+        "strict_style": true,
+        "explicit_only": true
       },
       "capabilities": {
-        "modalities": ["text-to-image", "image-to-image"],
-        "input_types": ["text", "image"],
-        "input_modes": ["text-to-image", "image-to-image"],
-        "architectures": ["sdxl"],
-        "styles": ["anime", "illustration", "gacha", "illustrious", "character illustration"],
-        "subjects": ["Asuna Ichinose", "一之瀬アスナ", "一之濑明日奈", "Blue Archive"],
-        "outfits": ["maid", "bunny", "school", "sports"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "gacha",
+          "illustrious",
+          "character illustration"
+        ],
+        "subjects": [
+          "Asuna Ichinose",
+          "一之瀬アスナ",
+          "一之濑明日奈",
+          "Blue Archive"
+        ],
+        "outfits": [
+          "maid",
+          "bunny",
+          "school",
+          "sports"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": true,
-        "content_modes": ["sfw", "nsfw"],
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
         "prompt_dialect": "illustrious-danbooru-tags",
         "prompt_granularity": {
           "minimum": "structured",
@@ -1351,7 +2896,10 @@
         "style_control": "Illustrious XL base plus character adapter",
         "outfit_control": "strong through the documented outfit tag blocks",
         "composition_control": "medium through tags",
-        "recommended_resolutions": ["832x1216", "1024x1024"],
+        "recommended_resolutions": [
+          "832x1216",
+          "1024x1024"
+        ],
         "performance": "medium"
       },
       "input_contract": {
@@ -1365,7 +2913,10 @@
           "required": false,
           "parameter": "input_image",
           "mode": "latent-img2img",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -1377,34 +2928,103 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
           "job_output_reference": false,
-          "processing": "API attaches LoadImage -> VAEEncode -> KSampler.latent_image",
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
           "default_denoise": 0.65
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
         "scope": "named-API-and-native-latent-I2I-graph",
         "probes": [
-          {"mode": "text-to-image", "status": "success", "job_id": "d364dcee-70d3-44ad-a1e5-ac483dafabf7", "prompt_class": "sfw"},
-          {"mode": "image-to-image-native-graph", "status": "success", "job_id": "a7a0f143-120f-4e36-be14-8827f4476cc5", "prompt_class": "sfw"},
-          {"mode": "image-to-image-named-API", "status": "success", "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4", "prompt_class": "sfw"}
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "d364dcee-70d3-44ad-a1e5-ac483dafabf7",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-native-graph",
+            "status": "success",
+            "job_id": "a7a0f143-120f-4e36-be14-8827f4476cc5",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "image-to-image-named-API",
+            "status": "success",
+            "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4",
+            "prompt_class": "sfw"
+          }
         ],
-        "limitations": ["The identity probe used the documented Asuna token; low-step image probing validates execution, not final likeness."]
+        "limitations": [
+          "The identity probe used the documented Asuna token; low-step image probing validates execution, not final likeness."
+        ]
       },
       "selection": {
-        "best_for": ["Asuna Ichinose identity", "Blue Archive character illustration", "four documented Asuna outfit groups", "SFW or NSFW-capable Illustrious XL generation"],
-        "not_for": ["characters not covered by the adapter", "Animagine-only or Pony-only adapters", "generic Blue Archive game-CG style without a character-identity requirement"],
-        "priority_signals": ["Asuna Ichinose", "一之濑明日奈", "character identity", "outfit identity", "Illustrious", "four outfits"]
+        "best_for": [
+          "Asuna Ichinose identity",
+          "Blue Archive character illustration",
+          "four documented Asuna outfit groups",
+          "SFW or NSFW-capable Illustrious XL generation"
+        ],
+        "not_for": [
+          "characters not covered by the adapter",
+          "Animagine-only or Pony-only adapters",
+          "generic Blue Archive game-CG style without a character-identity requirement",
+          "Automatic selection for arbitrary Blue Archive characters: select this workflow explicitly only when its Asuna adapter is wanted."
+        ],
+        "priority_signals": [
+          "Asuna Ichinose",
+          "一之濑明日奈",
+          "character identity",
+          "outfit identity",
+          "Illustrious",
+          "four outfits"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered Illustrious tags: quality, subject count, 1chn identity token, series, appearance, one outfit block, pose, camera, scene and lighting.",
-        "required_fields": ["character", "series", "appearance", "pose"],
-        "optional_fields": ["outfit", "accessories", "camera", "scene", "lighting"],
+        "optional_fields": [
+          "outfit",
+          "accessories",
+          "camera",
+          "scene",
+          "lighting"
+        ],
         "adapter_selection": {
           "asuna": "Include 1chn once, then choose exactly one documented outfit tag block: maid, bunny, school or sports."
         },
-        "avoid": ["loading this LoRA into Animagine or Pony routes", "combining multiple outfit blocks", "inventing a named trigger token for an outfit", "using the generic Blue Archive style route when exact Asuna identity is the requirement"]
+        "avoid": [
+          "loading this LoRA into Animagine or Pony routes",
+          "combining multiple outfit blocks",
+          "inventing a named trigger token for an outfit",
+          "using the generic Blue Archive style route when exact Asuna identity is the requirement"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            20,
+            30
+          ],
+          "cfg": [
+            5,
+            7
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "The Asuna adapter model card declares Illustrious as its base model and demonstrates loading it with Illustrious-xl-early-release-v0.",
@@ -1413,13 +3033,29 @@
       ],
       "prompting": {
         "style": "comma-separated Illustrious XL Danbooru-style tags",
-        "structure": ["quality", "subject count", "identity trigger", "series", "appearance", "outfit", "pose", "camera", "scene", "lighting"],
+        "structure": [
+          "quality",
+          "subject count",
+          "identity trigger",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
         "granularity": {
           "minimum": "structured",
           "recommended": "detailed",
           "maximum": "expert",
-          "accepted": ["structured", "detailed", "expert"],
-          "selection_hint": "Use detailed for normal character requests; use expert when explicitly tuning tag weights, adapter strength or composition."
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal character requests; use expert when explicitly tuning tag weights, adapter strength or composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
@@ -1430,16 +3066,67 @@
           "sampler_name": "euler_ancestral",
           "scheduler": "normal"
         },
-        "negative_prompt": "worst quality, comic, multiple views, bad quality, low quality, lowres, displeasing, very displeasing, bad anatomy, bad hands, scan artifacts, monochrome, greyscale, signature, twitter username, jpeg artifacts, 2koma, 4koma, guro, extra digits, fewer digits",
+        "negative_prompt": "worst quality, comic, multiple views, bad quality, low quality, lowres, displeasing, very displeasing, bad anatomy, bad hands, scan artifacts, monochrome, greyscale, signature, twitter username, jpeg artifacts, 2koma, 4koma, extra digits, fewer digits",
         "lora_triggers": {
           "asuna": {
-            "identity": ["1chn"],
+            "identity": [
+              "1chn"
+            ],
             "default_strength": 1.0,
             "outfit_blocks": {
-              "maid": ["maid headdress", "white headdress", "headphones", "black dress", "pleated dress", "frilled dress", "white apron", "waist apron", "white thighhighs", "mary janes", "white elbow gloves"],
-              "bunny": ["fake animal ears", "playboy bunny", "blue leotard", "highleg leotard", "detached collar", "blue traditional bowtie", "thighband pantyhose", "black pantyhose", "high heels"],
-              "school": ["white collared shirt", "shirt tucked in", "button gap", "sleeves rolled up", "blue loose bowtie", "blue pleated skirt", "blue wrist scrunchie", "black socks", "kneehighs", "loafers", "high ponytail", "sticker on face", "star sticker", "white detached collar"],
-              "sports": ["two-tone sports bra", "blue sports bra", "white sports bra", "halterneck", "bare shoulders", "midriff", "miniskirt", "two-tone skirt", "blue skirt", "white skirt", "white sneakers"]
+              "maid": [
+                "maid headdress",
+                "white headdress",
+                "headphones",
+                "black dress",
+                "pleated dress",
+                "frilled dress",
+                "white apron",
+                "waist apron",
+                "white thighhighs",
+                "mary janes",
+                "white elbow gloves"
+              ],
+              "bunny": [
+                "fake animal ears",
+                "playboy bunny",
+                "blue leotard",
+                "highleg leotard",
+                "detached collar",
+                "blue traditional bowtie",
+                "thighband pantyhose",
+                "black pantyhose",
+                "high heels"
+              ],
+              "school": [
+                "white collared shirt",
+                "shirt tucked in",
+                "button gap",
+                "sleeves rolled up",
+                "blue loose bowtie",
+                "blue pleated skirt",
+                "blue wrist scrunchie",
+                "black socks",
+                "kneehighs",
+                "loafers",
+                "high ponytail",
+                "sticker on face",
+                "star sticker",
+                "white detached collar"
+              ],
+              "sports": [
+                "two-tone sports bra",
+                "blue sports bra",
+                "white sports bra",
+                "halterneck",
+                "bare shoulders",
+                "midriff",
+                "miniskirt",
+                "two-tone skirt",
+                "blue skirt",
+                "white skirt",
+                "white sneakers"
+              ]
             }
           }
         },
@@ -1455,25 +3142,69 @@
         "models/loras/Asuna_Ichinose_IllustriousXL.safetensors"
       ],
       "bindings": {
-        "prompt": {"node": "3", "input": "text"},
-        "negative_prompt": {"node": "4", "input": "text"},
-        "width": {"node": "5", "input": "width"},
-        "height": {"node": "5", "input": "height"},
-        "batch_size": {"node": "5", "input": "batch_size"},
-        "seed": {"node": "6", "input": "seed"},
-        "steps": {"node": "6", "input": "steps"},
-        "cfg": {"node": "6", "input": "cfg"},
-        "denoise": {"node": "6", "input": "denoise"},
-        "sampler_name": {"node": "6", "input": "sampler_name"},
-        "scheduler": {"node": "6", "input": "scheduler"},
-        "filename_prefix": {"node": "8", "input": "filename_prefix"},
-        "asuna_strength_model": {"node": "2", "input": "strength_model"},
-        "asuna_strength_clip": {"node": "2", "input": "strength_clip"}
+        "prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "width": {
+          "node": "5",
+          "input": "width"
+        },
+        "height": {
+          "node": "5",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "5",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "6",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "6",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "6",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "6",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "6",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "6",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "8",
+          "input": "filename_prefix"
+        },
+        "asuna_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "asuna_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        }
       },
       "lora_bindings": {
         "asuna": {
           "file": "Asuna_Ichinose_IllustriousXL.safetensors",
-          "triggers": ["1chn"],
+          "triggers": [
+            "1chn"
+          ],
           "default": 1.0,
           "strength_model": "asuna_strength_model",
           "strength_clip": "asuna_strength_clip"
@@ -1489,7 +3220,21 @@
         "sampler_name": "euler_ancestral",
         "scheduler": "normal",
         "filename_prefix": "blue_archive_asuna_illustrious_xl",
-        "loras": {"asuna": 1.0}
+        "loras": {
+          "asuna": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
       }
     },
     {
@@ -1498,7 +3243,14 @@
       "description": "The official Anima Turbo v1.1 BF16 diffusion model for general anime and illustration generation. It is preferred over the retained Moody Anima fallback for generic Anima requests, while Moody remains available for side-by-side comparison.",
       "family": "anima-turbo",
       "resident_group": "anima-turbo-v1-1",
-      "tags": ["anime", "anima", "turbo", "official", "bf16", "nsfw-capable"],
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "official",
+        "bf16",
+        "nsfw-capable"
+      ],
       "content_class": "anime-nsfw-capable",
       "file": "anima_turbo_v1_1.json",
       "model_ids": [
@@ -1513,16 +3265,50 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
-        "aliases": ["Official Anima Turbo", "Anima Turbo", "Anima Turbo v1.1", "官方 Anima Turbo", "通用二次元 Turbo"],
-        "styles": ["anime", "anime illustration", "illustration", "portrait", "stylized", "anima", "turbo"],
-        "content_modes": ["sfw", "nsfw", "general"],
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "Official Anima Turbo",
+          "Anima Turbo",
+          "Anima Turbo v1.1",
+          "官方 Anima Turbo",
+          "通用二次元 Turbo"
+        ],
+        "styles": [
+          "anime",
+          "anime illustration",
+          "illustration",
+          "portrait",
+          "stylized",
+          "anima",
+          "turbo"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
         "prompt_granularity": {
           "minimum": "minimal",
           "recommended": "structured",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"]
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
         },
         "priority": 40,
         "fallback": true,
@@ -1533,25 +3319,58 @@
         ]
       },
       "capabilities": {
-        "modalities": ["text-to-image", "image-to-image"],
-        "input_types": ["text", "image"],
-        "input_modes": ["text-to-image", "image-to-image"],
-        "output_types": ["image"],
-        "architectures": ["anima"],
-        "styles": ["anime", "illustration", "stylized", "anime portrait"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": false,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {"minimum": "minimal", "recommended": "structured", "maximum": "detailed"},
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "weak-to-medium from prompt; no character-specific adapter is bundled",
         "style_control": "medium-to-strong",
         "outfit_control": "medium through prompt",
         "composition_control": "medium through prompt",
-        "recommended_resolutions": ["896x1152", "1024x1024", "960x1472"],
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
         "performance": "turbo-low-step"
       },
       "input_contract": {
@@ -1565,7 +3384,10 @@
           "required": false,
           "parameter": "input_image",
           "mode": "latent-img2img",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -1577,9 +3399,16 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
           "job_output_reference": false,
-          "processing": "API attaches LoadImage -> VAEEncode -> KSampler.latent_image",
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
           "default_denoise": 0.65
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
@@ -1595,24 +3424,80 @@
             "output": "probe_anima_turbo_base_00001_.png"
           }
         ],
-        "limitations": ["Validation prompts are SFW-only and establish graph/model execution, not character likeness or prompt fidelity."]
+        "limitations": [
+          "Validation prompts are SFW-only and establish graph/model execution, not character likeness or prompt fidelity."
+        ]
       },
       "selection": {
-        "best_for": ["generic anime illustration", "generic anime portrait", "official Anima comparison against Moody", "SFW or NSFW-capable anime prompts without a dedicated identity route"],
-        "not_for": ["exact Blue Archive character identity", "exact NIKKE character identity", "face-reference conditioning", "SDXL or Illustrious LoRAs"],
-        "priority_signals": ["official Anima", "Anima Turbo", "generic anime", "anime fallback", "high precision", "BF16"],
-        "specific_route_precedence": ["anima-turbo-face-reference-ipadapter", "moody-anima-inpaint", "sdxl-face-reference-ipadapter", "sdxl-openpose-controlnet", "blue-archive-character-illustrious-xl", "blue-archive-style-sdxl", "animagine-xl-3.1-nsfw"]
+        "best_for": [
+          "generic anime illustration",
+          "generic anime portrait",
+          "official Anima comparison against Moody",
+          "SFW or NSFW-capable anime prompts without a dedicated identity route"
+        ],
+        "not_for": [
+          "exact Blue Archive character identity",
+          "exact NIKKE character identity",
+          "face-reference conditioning",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "official Anima",
+          "Anima Turbo",
+          "generic anime",
+          "anime fallback",
+          "high precision",
+          "BF16"
+        ],
+        "specific_route_precedence": [
+          "anima-turbo-face-reference-ipadapter",
+          "moody-anima-inpaint",
+          "sdxl-face-reference-ipadapter",
+          "sdxl-openpose-controlnet",
+          "blue-archive-character-illustrious-xl",
+          "blue-archive-style-sdxl",
+          "animagine-xl-3.1-nsfw"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "structured",
         "prompt_scope": "Use a concise ordered prompt: quality/meta tags, subject count, character or subject, series, appearance, outfit, pose, composition, environment and lighting. The model accepts both natural language and Danbooru-style tags.",
-        "required_fields": ["subject"],
-        "optional_fields": ["character", "series", "action", "appearance", "outfit", "pose", "composition", "environment", "lighting", "content_mode"],
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "supported; start with worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
         "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
         "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
-        "avoid": ["long unstructured prompt essays", "SDXL-only LoRA trigger syntax", "assuming the generic checkpoint guarantees a named character identity"]
+        "avoid": [
+          "long unstructured prompt essays",
+          "SDXL-only LoRA trigger syntax",
+          "assuming the generic checkpoint guarantees a named character identity"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "The official Turbo v1.1 file is the current published Turbo revision and is used at its published BF16 precision.",
@@ -1621,18 +3506,49 @@
       ],
       "prompting": {
         "style": "ordered natural-language description with optional Danbooru-style tags",
-        "structure": ["quality/meta", "subject count", "character/series", "appearance", "outfit", "pose", "composition", "environment", "lighting"],
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
         "granularity": {
           "minimum": "minimal",
           "recommended": "structured",
           "maximum": "detailed",
-          "accepted": ["minimal", "structured", "detailed"],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints."
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
         },
         "quality_prefix": "masterpiece, best quality",
-        "recommended": {"width": 896, "height": 1152, "steps": 12, "cfg": 1.0, "sampler_name": "er_sde", "scheduler": "simple"},
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
         "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
-        "examples": [{"purpose": "official Turbo SFW comparison prompt", "prompt": "masterpiece, best quality, 1girl, solo, a cheerful anime student reading beside a sunlit window, blue cardigan, pleated skirt, three-quarter view, warm afternoon light, detailed library background"}]
+        "examples": [
+          {
+            "purpose": "official Turbo SFW comparison prompt",
+            "prompt": "masterpiece, best quality, 1girl, solo, a cheerful anime student reading beside a sunlit window, blue cardigan, pleated skirt, three-quarter view, warm afternoon light, detailed library background"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ]
       },
       "source": {
         "model_url": "https://huggingface.co/circlestone-labs/Anima",
@@ -1642,20 +3558,78 @@
         "sha256": "FBA11953276B57EDF59D1DC4F1857AC05AA079C56F982B4D7C20298D57D3F7EB"
       },
       "bindings": {
-        "prompt": {"node": "5", "input": "text"},
-        "negative_prompt": {"node": "6", "input": "text"},
-        "width": {"node": "7", "input": "width"},
-        "height": {"node": "7", "input": "height"},
-        "batch_size": {"node": "7", "input": "batch_size"},
-        "seed": {"node": "8", "input": "seed"},
-        "steps": {"node": "8", "input": "steps"},
-        "cfg": {"node": "8", "input": "cfg"},
-        "denoise": {"node": "8", "input": "denoise"},
-        "sampler_name": {"node": "8", "input": "sampler_name"},
-        "scheduler": {"node": "8", "input": "scheduler"},
-        "filename_prefix": {"node": "10", "input": "filename_prefix"}
+        "prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "width": {
+          "node": "7",
+          "input": "width"
+        },
+        "height": {
+          "node": "7",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "7",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "8",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "8",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "8",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "8",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "8",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "8",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "10",
+          "input": "filename_prefix"
+        }
       },
-      "defaults": {"width": 896, "height": 1152, "batch_size": 1, "steps": 12, "cfg": 1.0, "denoise": 1.0, "sampler_name": "er_sde", "scheduler": "simple", "filename_prefix": "anima_turbo_v1_1"}
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "anima_turbo_v1_1"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      }
     },
     {
       "id": "anima-turbo-face-reference-ipadapter",
@@ -1663,7 +3637,15 @@
       "description": "Anima-specific IPAdapter route using the official Turbo checkpoint plus a SigLIP2 reference encoder. It accepts a clear single-face portrait as face_image, while the caller keeps outfit, pose, scene and content details in the prompt.",
       "family": "anima-ipadapter",
       "resident_group": "anima-turbo-v1-1-ipadapter-face",
-      "tags": ["anime", "anima", "turbo", "ipadapter", "face-reference", "character-reference", "nsfw-capable"],
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "ipadapter",
+        "face-reference",
+        "character-reference",
+        "nsfw-capable"
+      ],
       "content_class": "anime-nsfw-capable",
       "file": "anima_turbo_face_reference_ipadapter.json",
       "model_ids": [
@@ -1685,56 +3667,153 @@
       ],
       "routing": {
         "selector_scope": "workflow-model",
-        "selector_fields": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-        "domains": ["general", "anime", "anime-portrait", "blue-archive", "nikke", "character-illustration"],
-        "aliases": ["Anima IPAdapter", "Anima face reference", "Anima face-only reference", "Anima character reference", "Anima 人脸参考", "Anima 面部参考"],
-        "styles": ["face-reference", "face reference", "face identity", "portrait identity", "portrait", "anima"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "input_types": ["image"],
-        "input_modes": ["face-reference"],
-        "prompt_granularity": {"minimum": "structured", "recommended": "detailed", "maximum": "expert", "accepted": ["structured", "detailed", "expert"]},
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "blue-archive",
+          "nikke",
+          "character-illustration"
+        ],
+        "aliases": [
+          "Anima IPAdapter",
+          "Anima face reference",
+          "Anima face-only reference",
+          "Anima character reference",
+          "Anima 人脸参考",
+          "Anima 面部参考"
+        ],
+        "styles": [
+          "face-reference",
+          "face reference",
+          "face identity",
+          "portrait identity",
+          "portrait",
+          "anima"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "input_types": [
+          "image"
+        ],
+        "input_modes": [
+          "face-reference"
+        ],
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
         "priority": 85,
         "fallback": false,
         "exclusive": false,
-        "required_selectors": ["input_mode"],
+        "required_selectors": [
+          "input_mode"
+        ],
         "strict_style": false,
-        "exclusion_rules": ["Use a clear single-face portrait. This Anima IPAdapter is face/character-centric but is not FaceID and does not provide a pixel-locked identity guarantee."]
+        "exclusion_rules": [
+          "Use a clear single-face portrait. This Anima IPAdapter is face/character-centric but is not FaceID and does not provide a pixel-locked identity guarantee."
+        ]
       },
       "capabilities": {
-        "modalities": ["text-to-image-with-face-reference"],
-        "input_types": ["text", "image", "face"],
-        "input_modes": ["face-reference"],
-        "output_types": ["image"],
-        "architectures": ["anima"],
-        "styles": ["anime", "illustration", "portrait", "face-reference"],
-        "content_modes": ["sfw", "nsfw", "general"],
-        "content_levels": ["sfw", "nsfw-capable"],
+        "modalities": [
+          "text-to-image-with-face-reference"
+        ],
+        "input_types": [
+          "text",
+          "image",
+          "face"
+        ],
+        "input_modes": [
+          "face-reference"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "portrait",
+          "face-reference"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
         "nsfw_capable": true,
         "lora_support": false,
         "ipadapter_support": true,
         "face_reference": true,
         "face_only": false,
         "reference_scope": "face/character portrait conditioning via Anima-specific IPAdapter and SigLIP2; use a tightly framed single-face image",
-        "control_scope": ["facial appearance cues", "character reference cues", "some visual identity and style cues"],
-        "not_controlled": ["exact clothing", "exact body pose", "exact background", "pixel identity guarantee", "FaceID embedding identity"],
+        "control_scope": [
+          "facial appearance cues",
+          "character reference cues",
+          "some visual identity and style cues"
+        ],
+        "not_controlled": [
+          "exact clothing",
+          "exact body pose",
+          "exact background",
+          "pixel identity guarantee",
+          "FaceID embedding identity"
+        ],
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {"minimum": "structured", "recommended": "detailed", "maximum": "expert"},
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
         "natural_language": true,
         "character_identity": "medium; experimental Anima IPAdapter reference conditioning, not FaceID recognition",
         "style_control": "medium",
         "outfit_control": "prompt dependent",
         "composition_control": "prompt dependent",
-        "recommended_resolutions": ["896x1152", "1024x1024"],
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024"
+        ],
         "performance": "medium-to-slow; SigLIP2 encoder is loaded for the reference pass"
       },
       "input_contract": {
-        "text": {"required": true, "parameter": "prompt", "format": "Detailed Anima-compatible natural language or ordered tags; describe character, outfit, pose, scene and lighting here."},
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Detailed Anima-compatible natural language or ordered tags; describe character, outfit, pose, scene and lighting here."
+        },
         "face": {
           "supported": true,
           "required": true,
           "parameter": "face_image",
           "mode": "face-reference",
-          "accepted_sources": ["comfyui-input", "http-upload"],
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
           "format": "Prefer a tightly framed, clear single-person face or portrait. The implementation encodes the supplied image as a whole reference; it does not automatically crop a face or run FaceID.",
           "upload": {
             "endpoint": "/upload/image",
@@ -1748,7 +3827,15 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> AnimaIPAdapterApply(ref_image) -> patched Anima DiT cross-attention"
-        }
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt",
+          "face_image"
+        ],
+        "required_fields_apply_after_aliases": true
       },
       "validation": {
         "status": "verified-by-runtime-probe",
@@ -1765,23 +3852,69 @@
             "output": "probe_anima_turbo_face_00001_.png"
           }
         ],
-        "limitations": ["An SFW probe validates custom-node loading, reference-image plumbing and graph completion; it does not benchmark face likeness or NSFW quality."]
+        "limitations": [
+          "An SFW probe validates custom-node loading, reference-image plumbing and graph completion; it does not benchmark face likeness or NSFW quality."
+        ]
       },
       "selection": {
-        "best_for": ["Anima-native face or character reference", "keeping facial cues while changing outfit, pose or scene", "SFW or NSFW-capable prompts with a supplied portrait reference"],
-        "not_for": ["local clothing edits", "pose transfer", "exact pixel copying", "FaceID-grade identity matching", "reference sheets with multiple people or multiple views"],
-        "priority_signals": ["Anima IPAdapter", "Anima face reference", "face-only reference", "character reference", "keep the face"]
+        "best_for": [
+          "Anima-native face or character reference",
+          "keeping facial cues while changing outfit, pose or scene",
+          "SFW or NSFW-capable prompts with a supplied portrait reference"
+        ],
+        "not_for": [
+          "local clothing edits",
+          "pose transfer",
+          "exact pixel copying",
+          "FaceID-grade identity matching",
+          "reference sheets with multiple people or multiple views"
+        ],
+        "priority_signals": [
+          "Anima IPAdapter",
+          "Anima face reference",
+          "face-only reference",
+          "character reference",
+          "keep the face"
+        ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered Anima tags or concise prose for subject count, character/series, appearance, outfit, pose, camera, scene and lighting. The face_image is an additional reference, not a replacement for the prompt.",
-        "required_fields": ["face_image", "prompt"],
-        "optional_fields": ["negative_prompt", "ipadapter_weight", "seed", "width", "height", "steps", "cfg"],
+        "optional_fields": [
+          "negative_prompt",
+          "ipadapter_weight",
+          "seed",
+          "width",
+          "height",
+          "steps",
+          "cfg"
+        ],
         "face_image": "Upload a clear single-person portrait and pass its returned relative filename as face_image. Do not pass input_image for this route.",
         "ipadapter_weight": "Start at 1.0. Higher values increase reference influence but can reduce prompt control; the route's node also uses fixed SigLIP2/IP CFG defaults validated for this adapter.",
         "negative_prompt": "supported; keep it focused on duplicate subjects, multiple views, anatomy, text and watermark",
         "strict_face_only_alternative": "For a stricter SDXL face-centric IPAdapter route, use sdxl-face-reference-ipadapter explicitly; it is a separate architecture and is retained alongside this Anima route.",
-        "avoid": ["using a three-view sheet when a single portrait is available", "expecting the adapter to carry outfit or pose", "using SDXL IPAdapter loader nodes with Anima", "assuming FaceID or InsightFace semantics"]
+        "avoid": [
+          "using a three-view sheet when a single portrait is available",
+          "expecting the adapter to carry outfit or pose",
+          "using SDXL IPAdapter loader nodes with Anima",
+          "assuming FaceID or InsightFace semantics"
+        ],
+        "suggested_prompt_details": [
+          "face_image",
+          "prompt"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true
       },
       "compatibility_notes": [
         "This route uses the Anima-specific SigLIP2 IPAdapter custom node pinned by the setup script, not the SDXL ComfyUI_IPAdapter_plus node.",
@@ -1790,12 +3923,50 @@
       ],
       "prompting": {
         "style": "detailed Anima-compatible natural language or ordered anime tags",
-        "structure": ["quality/meta", "subject count", "character/series", "appearance", "outfit", "pose", "camera", "scene", "lighting"],
-        "granularity": {"minimum": "structured", "recommended": "detailed", "maximum": "expert", "accepted": ["structured", "detailed", "expert"], "selection_hint": "Use detailed for ordinary face-reference requests; use expert only when tuning adapter weight, sampling or tag emphasis."},
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for ordinary face-reference requests; use expert only when tuning adapter weight, sampling or tag emphasis.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
         "quality_prefix": "masterpiece, best quality",
-        "recommended": {"width": 896, "height": 1152, "steps": 12, "cfg": 1.0, "ipadapter_weight": 1.0, "sampler_name": "er_sde", "scheduler": "simple"},
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "ipadapter_weight": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
         "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, duplicate, multiple views, text, watermark",
-        "examples": [{"purpose": "Anima face reference while changing scene", "prompt": "masterpiece, best quality, 1girl, solo, anime character portrait, preserve the facial appearance from the reference, long hair, elegant evening outfit, standing, looking at viewer, outdoor cafe, soft evening light"}]
+        "examples": [
+          {
+            "purpose": "Anima face reference while changing scene",
+            "prompt": "masterpiece, best quality, 1girl, solo, anime character portrait, preserve the facial appearance from the reference, long hair, elegant evening outfit, standing, looking at viewer, outdoor cafe, soft evening light"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ]
       },
       "source": {
         "model_url": "https://huggingface.co/circlestone-labs/Anima",
@@ -1806,22 +3977,494 @@
         "ipadapter_sha256": "DC9612CC28B55F00BA39F6169BFE4871130BE028A55682AB54DD51360ACB8232"
       },
       "bindings": {
-        "prompt": {"node": "5", "input": "text"},
-        "negative_prompt": {"node": "6", "input": "text"},
-        "face_image": {"node": "9", "input": "image"},
-        "ipadapter_weight": {"node": "10", "input": "strength"},
-        "width": {"node": "7", "input": "width"},
-        "height": {"node": "7", "input": "height"},
-        "batch_size": {"node": "7", "input": "batch_size"},
-        "seed": {"node": "11", "input": "seed"},
-        "steps": {"node": "11", "input": "steps"},
-        "cfg": {"node": "11", "input": "cfg"},
-        "denoise": {"node": "11", "input": "denoise"},
-        "sampler_name": {"node": "11", "input": "sampler_name"},
-        "scheduler": {"node": "11", "input": "scheduler"},
-        "filename_prefix": {"node": "13", "input": "filename_prefix"}
+        "prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "face_image": {
+          "node": "9",
+          "input": "image"
+        },
+        "ipadapter_weight": {
+          "node": "10",
+          "input": "strength"
+        },
+        "width": {
+          "node": "7",
+          "input": "width"
+        },
+        "height": {
+          "node": "7",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "7",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "11",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "11",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "11",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "11",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "11",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "11",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "13",
+          "input": "filename_prefix"
+        }
       },
-      "defaults": {"width": 896, "height": 1152, "batch_size": 1, "steps": 12, "cfg": 1.0, "denoise": 1.0, "ipadapter_weight": 1.0, "sampler_name": "er_sde", "scheduler": "simple", "filename_prefix": "anima_turbo_face_reference"}
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "ipadapter_weight": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "anima_turbo_face_reference"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": true,
+        "controlnet": false,
+        "image_to_image": false
+      }
+    },
+    {
+      "id": "anima-turbo-inpaint",
+      "name": "Anima Turbo v1.1 - Masked Inpaint",
+      "description": "Generic masked latent inpainting using official Anima Turbo v1.1, followed by pixel compositing to preserve the unmasked source. This is not a dedicated inpaint-trained checkpoint.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1-inpaint",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "inpaint",
+        "masked-edit",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-nsfw-capable",
+      "file": "anima_turbo_inpaint.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "general",
+          "anime",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "Anima Turbo inpaint",
+          "Turbo masked edit"
+        ],
+        "styles": [
+          "inpaint",
+          "masked edit",
+          "clothing edit",
+          "wardrobe replacement",
+          "局部重绘"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "input_types": [
+          "image",
+          "mask"
+        ],
+        "input_modes": [
+          "inpaint"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "minimal",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 90,
+        "fallback": false,
+        "exclusive": false,
+        "required_selectors": [
+          "input_mode"
+        ],
+        "exclusion_rules": [
+          "Use a real mask for the region to redraw; do not use this route for whole-image style transfer or pose control."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "image-inpaint"
+        ],
+        "input_types": [
+          "image",
+          "mask",
+          "text"
+        ],
+        "input_modes": [
+          "inpaint"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "masked edit",
+          "clothing edit"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": false,
+        "inpaint_support": true,
+        "mask_support": true,
+        "prompt_dialect": "short-natural-language-or-light-anime-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "minimal",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "character_identity": "weak; no character-specific adapter is bundled",
+        "style_control": "medium",
+        "outfit_control": "high inside the mask, low outside the mask",
+        "composition_control": "low outside the mask",
+        "recommended_resolutions": [
+          "960x1472",
+          "1024x1024"
+        ],
+        "performance": "very-fast-low-step",
+        "pixel_preservation": "Original pixels outside the supplied mask are restored after VAE decode."
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Short description of the replacement content; start with 1girl, solo when the source is a character sheet or multi-view reference."
+        },
+        "image": {
+          "supported": true,
+          "required": true,
+          "parameter": "input_image",
+          "mode": "inpaint-source",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "processing": "Source dimensions (multiples of 8) determine output size. VAEEncodeForInpaint performs generic latent masked sampling; the result is composited onto the original image using the supplied mask so pixels outside it remain unchanged.",
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false
+        },
+        "mask": {
+          "supported": true,
+          "required": true,
+          "parameter": "mask_image",
+          "mode": "mask-image",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "format": "RGB: white/red pixels are redrawn, black pixels preserved. Alpha: transparent pixels are redrawn, opaque pixels preserved (ComfyUI inverse alpha). Mask and source must have identical dimensions.",
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as parameters.mask_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImageMask selects the configured channel; VAEEncodeForInpaint combines the source and mask and KSampler applies noise only to the masked region"
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt",
+          "input_image",
+          "mask_image"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "generic masked sampling and original-pixel compositing",
+        "probes": [
+          {
+            "mode": "inpaint-named-API",
+            "status": "success",
+            "job_id": "bcc03665-bf4b-4fe9-8232-531fd958755b",
+            "prompt_class": "sfw",
+            "input_image": "interface_audit_source.png",
+            "mask_image": "interface_audit_mask.png",
+            "steps": 8,
+            "cfg": 1.0
+          }
+        ],
+        "limitations": [
+          "No dedicated inpaint training; region quality is not guaranteed by graph completion."
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Anima Turbo masked image edits",
+          "Local edits with unchanged pixels outside the mask"
+        ],
+        "not_for": [
+          "Exact masked-region identity guarantees",
+          "Pose skeleton control"
+        ],
+        "priority_signals": [
+          "inpaint",
+          "anima turbo"
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Use a concise ordered prompt: quality/meta tags, subject count, character or subject, series, appearance, outfit, pose, composition, environment and lighting. The model accepts both natural language and Danbooru-style tags.",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "supported; start with worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "long unstructured prompt essays",
+          "SDXL-only LoRA trigger syntax",
+          "assuming the generic checkpoint guarantees a named character identity"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true
+      },
+      "compatibility_notes": [
+        "This route uses ComfyUI's core VAEEncodeForInpaint node and KSampler noise_mask; no separate inpaint checkpoint is required.",
+        "The route deliberately requires a source image and a mask so the API cannot silently fall back to full-image denoise.",
+        "The workflow is a minimal API graph and does not expose a segmentation model; callers provide the mask image.",
+        "This is a generic noise-mask workflow using a base checkpoint, not a model trained specifically for inpainting. Masked-region coherence depends on prompt and denoise."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "official Turbo SFW comparison prompt",
+            "prompt": "masterpiece, best quality, 1girl, solo, a cheerful anime student reading beside a sunlit window, blue cardigan, pleated skirt, three-quarter view, warm afternoon light, detailed library background"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ]
+      },
+      "source": {
+        "model_url": "https://civitai.com/models/2700077/moody-anima-mix",
+        "workflow_url": "https://civitai.com/models/2700120/moody-anima-minimal-workflow"
+      },
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors"
+      ],
+      "bindings": {
+        "prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "input_image": {
+          "node": "6",
+          "input": "image"
+        },
+        "mask_image": {
+          "node": "7",
+          "input": "image"
+        },
+        "mask_channel": {
+          "node": "7",
+          "input": "channel"
+        },
+        "grow_mask_by": {
+          "node": "8",
+          "input": "grow_mask_by"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        }
+      },
+      "defaults": {
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 0.65,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "grow_mask_by": 6,
+        "mask_channel": "red",
+        "filename_prefix": "anima_turbo_inpaint"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": true,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": false
+      }
     }
   ]
 }

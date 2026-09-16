@@ -10,12 +10,21 @@ The original Moody Desire Mix workflow remains available alongside the
 official Anima Turbo v1.1 routes, the retained Moody Anima Mix comparison
 route, Animagine XL 3.1 and Blue Archive routes.
 
+The agent API is version **1.5.0**. See the
+[interface audit and verification notes](docs/interface-audit-2026-09-17.md)
+for the current contract, routing and memory fixes.
+
 ## Runtime policy
 
 - ComfyUI chooses the default CUDA device. The launcher does not pass a GPU
   name or `--cuda-device`, so the deployment is not tied to an RTX 4090.
-- The managed launcher passes `--vram-headroom 1`, which asks ComfyUI to keep
-  1 GiB available, plus `--cpu-vae` and two async offload streams.
+- The managed launcher passes `--vram-headroom 1` for dynamic weight loading,
+  `--reserve-vram 1` for the standard memory manager, `--cpu-vae` and two
+  async offload streams. These safeguards do not guarantee an OOM-free run.
+- `GET /project/resources` reports the selected CUDA device and memory estimates.
+  NVIDIA physical memory is matched by UUID because CUDA and `nvidia-smi` GPU
+  indices can differ. Each route publishes its configurable pixel/RAM/VRAM
+  admission budgets in `resource_limits`; total pixels include batch size.
 - The default bind is `0.0.0.0:8191` and there is no authentication layer.
   Treat this as a trusted-LAN service; do not expose it directly to the
   internet. Use `-BindHost 127.0.0.1` for local-only access.
@@ -62,6 +71,7 @@ same ComfyUI port:
 GET  /.well-known/agent-manifest.json
 GET  /project/agent-manifest
 GET  /project/openapi.json
+GET  /project/resources
 GET  /project/resources
 GET  /project/routes
 GET  /project/inputs
@@ -110,8 +120,9 @@ hint layers:
 
 The model registry is stored in `workflows\models.json`. It includes the
 checkpoint, text encoder, VAE and adapter profiles used by each installed
-route. Every model referenced by a selectable workflow is installed and
-verified before it is marked `ready` and exposed to the default manifest.
+route. `ready` checks file presence and recorded sizes, registry eligibility and
+registered graph node classes. The downloader performs SHA-256 verification;
+discovery does not rehash weights or promise runtime fit or visual quality.
 The full `qwen_3_8b.safetensors` text encoder is also installed as a
 non-routeable high-precision asset; the generic Moody route intentionally keeps
 the verified FP8-mixed encoder because the full encoder plus checkpoint may not
@@ -141,9 +152,10 @@ The preferred route-selection call is:
 the complete route metadata and the prompt/model hints needed to construct the
 final request. It does not load a model or queue a generation. The resolver
 selects the workflow/model combination; character, outfit, pose and appearance
-remain inputs to the agent's final prompt. The current Blue Archive route is a
-style route rather than a character route, and its `character_identity` hint
-makes that limitation explicit.
+remain inputs to the agent's final prompt. Generic Blue Archive requests select
+the style route. The Asuna identity route requires an explicit `workflow`
+choice so it cannot impose Asuna on other characters. Optional `family`
+selects an exact catalog family, such as `sdxl-ipadapter` for SDXL face reference.
 
 Capability-specific routes declare `routing.required_selectors`. In particular,
 inpaint, face-reference and OpenPose routes require the resolver request to
@@ -200,19 +212,32 @@ DELETE /project/inputs/xiaoman_ref.png
 
 The delete operation removes one regular file below `ComfyUI/input`; it does
 not accept absolute paths, traversal segments or directories.
+Its response includes `remaining_bytes`, a snapshot of the remaining input
+files' combined size. Inputs persist across restarts: this project has no
+automatic TTL or cleanup. Files disappear only through explicit deletion or
+external/manual filesystem actions. Keep references unchanged until their jobs finish.
 
 ### Masked inpaint
 
-`moody-anima-inpaint` requires two input files: the original image in
+`anima-turbo-inpaint` is the preferred Anima masked-edit route;
+`moody-anima-inpaint` remains available for comparison. Both require the original image in
 `parameters.input_image` and a mask in `parameters.mask_image`. Upload both
 through `/upload/image`, or use names already listed by `/project/inputs`.
 The red channel is used by default: white/red pixels are redrawn and black
 pixels are preserved. Use `mask_channel: "alpha"` for an alpha mask. A mask is
-an executable image region, not a text label such as `clothing`.
+an executable image region, not a text label such as `clothing`. For alpha masks,
+transparent pixels are redrawn and opaque pixels are preserved. Source and mask
+must have identical dimensions, with both dimensions multiples of 8.
+
+`anima-turbo-inpaint` exposes the same contract on the official Anima Turbo
+base and is the preferred masked-edit route when the request is already using
+the Anima family. It is still generic masked sampling rather than a dedicated
+inpaint-trained checkpoint; choose it with `input_mode: "inpaint"` when
+resolving the route.
 
 ```json
 {
-  "workflow": "moody-anima-inpaint",
+  "workflow": "anima-turbo-inpaint",
   "parameters": {
     "input_image": "character.png",
     "mask_image": "clothing_mask.png",
@@ -226,8 +251,11 @@ an executable image region, not a text label such as `clothing`.
 }
 ```
 
-The route uses ComfyUI's core `VAEEncodeForInpaint` path and keeps the
-unmasked area constrained by the latent noise mask. For clothing replacement,
+The routes use ComfyUI's core `VAEEncodeForInpaint` path, then composite the
+result onto the original image through the supplied mask to preserve unmasked
+pixels exactly. These are generic masked workflows, not specially trained
+inpaint checkpoints. Turbo defaults to 12 steps and CFG 1; Moody defaults to
+4 steps and CFG 1. For clothing replacement,
 start with denoise `0.60`–`0.75`; prompts should remain short and should begin
 with `1girl, solo` when the source is a character sheet or multi-view image.
 
@@ -333,8 +361,13 @@ the existing SDXL face-reference route remains available when its separate
 architecture is explicitly preferred.
 
 `POST /project/generate` and `POST /project/prompt` accept the same body. The
-optional top-level `prompt_granularity` is checked against the selected
-workflow's accepted levels and is echoed in the response. The final positive
+optional top-level `prompt_granularity` is advisory and echoed in the response.
+`parameters.prompt` is required, with `subject` accepted as a compatibility
+alias; an empty string is allowed. Suggested subject/appearance details in
+`agent_hints` describe prompt writing, not additional required API fields.
+Unknown fields return 400, missing required inputs return 422, and unknown
+workflows return 404. Errors consistently include `message`, `route`, and
+`expected`. The final positive
 and negative prompt text remains caller-provided; the API only exposes the
 route-specific prompting contract and does not synthesize prompt content.
 Passing `character` or `outfit` to `/project/resolve` is rejected deliberately;
@@ -350,24 +383,48 @@ simulation with:
 .\scripts\simulate_agent_routes.ps1
 ```
 
-The API returns a `prompt_id` and `job_url`; poll `/project/jobs/{prompt_id}`
+For a public HTTP contract audit, run the fast non-generating probe with the
+ComfyUI virtual environment:
+
+```powershell
+.\ComfyUI\.venv\Scripts\python.exe .\scripts\verify_agent_api.py
+```
+
+It checks discovery, route selection, parameter validation, every ready
+workflow's dry-run graph, input lifecycle and resource reporting. The optional
+`--generate` flag runs the same SFW teapot probes through the named queue.
+
+The API returns identical `prompt_id` and `job_id` plus `job_url`; poll `/project/jobs/{prompt_id}`
 until it reports `succeeded` or `failed`, then use the returned `/view` URL for
 the output. During execution, the job response also exposes `phase` values such
-as `waiting_for_turn`, `model_switch` and `generation`, plus a project queue
-position where applicable. `dry_run: true` returns the resolved graph and
-missing model files without queueing.
+as `waiting_for_turn`, `waiting_for_comfyui`, `model_switch` and `generation`,
+plus queue position where applicable. `queued_ms` measures acceptance to worker
+start; `elapsed_ms` includes model switching and generation after worker start.
+`dry_run: true` validates the resolved graph without queueing it.
+
+Each workflow publishes `parameter_schema`, `control_ports`, `resource_limits`
+and `agent_hints.recommended` sampling ranges. Responses include
+`applied_parameters`, `ignored_parameters` (empty, since unknown fields are
+rejected), `effective_parameters`, and advisory `warnings`. Values outside a
+recommended sampling range are retained. Official Anima Turbo recommends
+8–12 steps at CFG 1; negative prompts have no effect at CFG 1.
+Omitted seeds are random; the selected seed is returned for reproducibility.
+Img2img honors size and batch: two explicit dimensions resize to that size,
+one preserves aspect ratio, and neither uses source size rounded down to 8.
 
 Named `/project/prompt` requests are admitted to a FIFO project queue guarded by
 one mutex. Only one named workflow is handed to ComfyUI at a time. Consecutive
 jobs for the same workflow keep its model set resident; switching to another
-workflow releases ComfyUI's loaded models and CUDA cache before the next job
-starts. A failed job clears the residency assumption, so the next job also gets
+workflow clears executor caches and releases models inside ComfyUI's serial
+worker before the next job starts. Native/project transitions use the same
+boundary; cleanup cannot unload a concurrently executing native job.
+A failed job clears the residency assumption, so the next job also gets
 a clean model boundary. The native ComfyUI `POST /prompt` and `/history`
 endpoints remain available for clients that already build complete API-format
-graphs, but those native calls are outside the named-workflow scheduler.
-Because the managed launcher uses `--cpu-vae`, a CPU-resident VAE may remain
-after a switch; the GPU-resident checkpoint, text encoder and LoRA set are the
-objects released for VRAM protection.
+graphs. Raw native graphs bypass project size and input admission budgets.
+The project queue allows 32 pending jobs (overflow returns 429), retains 1,000
+job states, and detects native queue removals without waiting a day. Queue and
+job state are in memory; restarting the service does not preserve pending jobs.
 
 For PowerShell callers, the helper supports both named workflows and the
 legacy raw workflow path:
@@ -390,6 +447,7 @@ workflow description.
 | --- | --- | --- | --- |
 | `moody-anima-mix` | Anima | Generic fast anime fallback; SFW/NSFW-capable | Moody Anima Mix v1.0, Qwen 3 0.6B encoder, Qwen image VAE |
 | `anima-turbo-v1-1` | Anima Turbo | Official high-precision generic anime route; SFW/NSFW-capable | Official Anima Turbo v1.1 BF16, Qwen 3 0.6B encoder, Qwen image VAE |
+| `anima-turbo-inpaint` | Anima Turbo | Masked edits with unmasked original pixels preserved | Official Anima Turbo v1.1 BF16, Qwen encoder and VAE |
 | `anima-turbo-face-reference-ipadapter` | Anima Turbo + IPAdapter | Anima face/character reference route; SFW/NSFW-capable | Official Anima Turbo v1.1 BF16, Anima IPAdapter Character Reference v10, SigLIP2 |
 | `moody-desire-v30` | Flux.2/Klein | General anime/portrait workflow; SFW/NSFW-capable | Moody checkpoint, Qwen3 text encoder, Flux.2 VAE |
 | `animagine-xl-3.1-nsfw` | SDXL | Anime/NIKKE workflow that can produce NSFW content | Animagine XL 3.1, profile LoRA, Rapi LoRA |
@@ -401,8 +459,7 @@ Every workflow and every model/component profile in the registry now declares
 capability declaration for agent routing; the existing validation probes remain
 SFW-only.
 
-All ten current named routes are now runtime-probed for their declared named
-API graph behavior with SFW test prompts. A successful probe proves that the
+The runtime probes and their scope are recorded in the linked audit. A successful probe proves that the
 graph/model stack loaded and completed; it is not a benchmark of character
 likeness, NSFW quality or prompt fidelity. Individual model profiles in
 `workflows\models.json` retain the probe IDs and scope. The two Anima Turbo
@@ -447,13 +504,13 @@ The downloaded assets are stored under stable project filenames:
 - `NIKKES_GoddessOfVictory_Concept.safetensors` — the Animagine/SDXL profile
   LoRA; trigger `IncrsNikkeProfile`, default strength `0.9`.
 - `NIKKES_Rapi.safetensors` — the selected current Pony-XL/SDXL-shaped Rapi
-  candidate; triggers `rapidef`, `rapiswim` and `rapirnd`, default strength
-  `0.8`.
+  candidate; triggers `rapidef`, `rapiswim` and `rapirnd`, disabled by default
+  (`0.0`) and available through an explicit `loras.rapi` value.
 
 The Rapi candidate is not a legacy SD 1.5 LoRA, but it was trained for Pony
 family models rather than specifically for Animagine. It loaded and generated
 successfully with the included Animagine graph, but visual fidelity is not
-guaranteed. Set `loras.rapi` to `0` to disable it, or replace the aliased file
+guaranteed. Enable `loras.rapi` only for an intentional experiment, or replace the aliased file
 and update the catalog metadata when a native Animagine-trained Rapi LoRA is
 preferred.
 
