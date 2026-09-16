@@ -1,0 +1,8 @@
+ComfyUI/
+input/
+output/
+models/
+*.log
+__pycache__/
+hf_*_header.bin
+.tmp-*/

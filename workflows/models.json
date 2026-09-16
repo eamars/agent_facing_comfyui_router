@@ -1,0 +1,1144 @@
+{
+  "schema_version": 1,
+  "description": "Capability and prompting profiles for checkpoints, text encoders, VAEs and adapters referenced by workflow routes.",
+  "models": [
+    {
+      "id": "moody-anima-mix-checkpoint",
+      "name": "Moody Anima Mix v1.0",
+      "kind": "diffusion-model",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima",
+      "architecture": "anima",
+      "base_model": "Anima",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Civitai Moody Anima Mix v1.0 checkpoint. The model metadata describes a merged fast-generation/high-resolution Anima mix and marks it as NSFW-capable.",
+      "capabilities": {
+        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
+        "input_types": ["text", "image"],
+        "input_modes": ["text-to-image", "image-to-image"],
+        "output_types": ["image"],
+        "styles": ["anime", "illustration", "stylized", "portrait", "anime portrait"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "natural-language-or-light-anime-tags",
+        "prompt_granularity": {"minimum": "minimal", "recommended": "minimal", "maximum": "detailed"},
+        "natural_language": true,
+        "identity_strength": "weak without a character LoRA",
+        "style_strength": "medium",
+        "composition_strength": "medium"
+      },
+      "compatibility": {
+        "workflow_families": ["anima"],
+        "base_models": ["Anima"],
+        "known_limits": ["No dedicated Blue Archive or NIKKE identity adapter is bundled; route those explicit domains to their specialized workflows."]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2700077/moody-anima-mix",
+        "metadata_api": "https://civitai.com/api/v1/models/2700077",
+        "type": "Civitai",
+        "model_version_id": 3032115,
+        "file_id": 2911005,
+        "file_name": "moodyAnimaMix_v10.safetensors",
+        "sha256": "5368C9B1318C783D7215492002CD1BCA94895D1DCA8C780EF24F75536FD341F8",
+        "mirror_url": "https://huggingface.co/minyan243/lotc/resolve/main/moodyAnimaMix_v10.safetensors"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Anima checkpoint in named API graph",
+        "probes": [
+          {"mode": "text-to-image-named-API", "status": "success", "job_id": "b40a617e-7338-4d95-95cd-28e716f45f96", "prompt_class": "sfw"},
+          {"mode": "image-to-image-named-API", "status": "success", "job_id": "21c05ba4-8e0c-4fe2-9dff-827311d81024", "prompt_class": "sfw"}
+        ]
+      },
+      "required_file": "models/diffusion_models/moodyAnimaMix_v10.safetensors",
+      "route_roles": ["anime-generic-fallback"]
+    },
+    {
+      "id": "qwen-3-0-6b-anima-text-encoder",
+      "name": "Qwen 3 0.6B Anima text encoder",
+      "kind": "text-encoder",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima",
+      "architecture": "qwen3",
+      "base_model": "Qwen3 0.6B",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Official Anima Qwen 3 0.6B text encoder dependency shared by the retained Moody Anima Mix comparison route and the official Anima Turbo routes.",
+      "capabilities": {
+        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
+        "input_types": ["text", "conditioning"],
+        "input_modes": ["text-encoding", "conditioning"],
+        "output_types": ["conditioning"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "natural-language-or-light-anime-tags",
+        "natural_language": true,
+        "prompt_granularity": {"minimum": "minimal", "recommended": "minimal", "maximum": "detailed"}
+      },
+      "compatibility": {
+        "workflow_families": ["anima", "anima-turbo", "anima-ipadapter"],
+        "base_models": ["Anima"]
+      },
+      "source": {
+        "url": "https://huggingface.co/circlestone-labs/Anima",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Anima CLIPLoader dependency",
+        "probes": [
+          {"mode": "text-encoding-in-named-API", "status": "success", "job_id": "b40a617e-7338-4d95-95cd-28e716f45f96", "prompt_class": "sfw"}
+        ]
+      },
+      "required_file": "models/text_encoders/qwen_3_06b_base.safetensors",
+      "route_roles": ["anime-generic-fallback-dependency", "anime-official-turbo-dependency", "anima-face-reference-dependency"]
+    },
+    {
+      "id": "qwen-image-vae-anima",
+      "name": "Qwen image VAE for Anima",
+      "kind": "vae",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima",
+      "architecture": "qwen-image-vae",
+      "base_model": "Anima",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Official Qwen image VAE dependency for Anima model graphs.",
+      "capabilities": {
+        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
+        "input_types": ["latent", "image"],
+        "input_modes": ["latent-decode", "image-encode"],
+        "output_types": ["image", "latent"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "styles": ["anime", "illustration"]
+      },
+      "compatibility": {
+        "workflow_families": ["anima", "anima-turbo", "anima-ipadapter"],
+        "base_models": ["Anima"]
+      },
+      "source": {
+        "url": "https://huggingface.co/circlestone-labs/Anima",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Anima VAELoader dependency",
+        "probes": [
+          {"mode": "decode-named-API", "status": "success", "job_id": "b40a617e-7338-4d95-95cd-28e716f45f96", "prompt_class": "sfw"},
+          {"mode": "encode-decode-named-API", "status": "success", "job_id": "21c05ba4-8e0c-4fe2-9dff-827311d81024", "prompt_class": "sfw"}
+        ]
+      },
+      "required_file": "models/vae/qwen_image_vae.safetensors",
+      "route_roles": ["anime-generic-fallback-dependency", "anime-official-turbo-dependency", "anima-face-reference-dependency"]
+    },
+    {
+      "id": "moody-desire-v30-checkpoint",
+      "name": "Moody Desire Mix v3.0",
+      "kind": "checkpoint",
+      "status": "installed",
+      "routeable": true,
+      "family": "flux2-klein",
+      "architecture": "flux2-klein",
+      "base_model": "Flux.2/Klein",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Installed general anime/portrait checkpoint for a low-step Flux.2/Klein graph.",
+      "required_file": "models/diffusion_models/moodyDesireMix_v30_2943512.safetensors",
+      "capabilities": {
+        "domains": ["general", "anime", "anime-portrait"],
+        "input_types": ["text", "image"],
+        "input_modes": ["text-to-image", "image-to-image"],
+        "output_types": ["image", "latent"],
+        "styles": ["anime", "portrait", "stylized", "moody"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "natural-language",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "minimal",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "character_identity": "low; no character-specific adapter",
+        "style_strength": "medium",
+        "composition_strength": "medium",
+        "reference_control": "latent img2img only when paired with LoadImage and VAEEncode"
+      },
+      "prompting": {
+        "dialect": "short natural-language description",
+        "trigger_words": [],
+        "negative_prompt_supported": false,
+        "recommended_structure": ["subject", "action", "composition", "environment", "lighting", "style"],
+        "recommended_granularity": "minimal",
+        "notes": ["This checkpoint is intended for concise visual descriptions rather than SDXL tag recipes."]
+      },
+      "compatibility": {
+        "workflow_families": ["flux2-klein"],
+        "adapter_families": [],
+        "known_limits": ["Do not route SDXL/Pony/Illustrious LoRAs to this checkpoint."]
+      },
+      "source": {
+        "type": "local-project-asset"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "stacked-with-FP8-Qwen-and-Flux2-VAE",
+        "probes": [
+          {"mode": "text-to-image", "status": "success", "job_id": "f64d07d8-5ae9-4047-b0f5-8999538a3aa7", "prompt_class": "sfw"},
+          {"mode": "image-to-image-native-graph", "status": "success", "job_id": "25432311-cf08-47cc-a25-b03449d40e56", "prompt_class": "sfw"},
+          {"mode": "image-to-image-named-API", "status": "success", "job_id": "7daaf9a8-751f-46c2-8622-eefd5c62d3c7", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "not benchmarked as a general identity or style metric"
+      },
+      "route_roles": ["general-anime-fallback"]
+    },
+    {
+      "id": "qwen-3-8b-fp8mixed-text-encoder",
+      "name": "Qwen 3 8B FP8 mixed text encoder",
+      "kind": "text_encoder",
+      "status": "installed",
+      "routeable": true,
+      "family": "flux2-klein",
+      "architecture": "qwen3",
+      "base_model": "Flux.2/Klein text-conditioning stack",
+      "precision": "fp8-mixed",
+      "tensor_dtypes": ["BF16", "F8_E4M3", "F32", "U8"],
+      "higher_precision_alternative": "qwen-3-8b-full-text-encoder",
+      "description": "Text encoder paired with the installed Moody Desire Flux.2/Klein workflow.",
+      "required_file": "models/text_encoders/qwen_3_8b_fp8mixed.safetensors",
+      "capabilities": {
+        "domains": ["general", "anime"],
+        "input_types": ["text"],
+        "input_modes": ["text-conditioning"],
+        "output_types": ["conditioning"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "natural-language",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "character_identity": "conditioning support only; not a character adapter"
+      },
+      "prompting": {
+        "dialect": "natural-language or lightly structured description",
+        "trigger_words": [],
+        "recommended_granularity": "structured",
+        "notes": ["Prompt behavior is bounded by the checkpoint and graph; this component is not independently routable."]
+      },
+      "compatibility": {
+        "workflow_families": ["flux2-klein"],
+        "adapter_families": []
+      },
+      "source": {
+        "type": "local-project-asset"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "stacked-with-Moody-and-Flux2-VAE",
+        "probes": [
+          {"mode": "text-conditioning-for-text-to-image", "status": "success", "job_id": "f64d07d8-5ae9-4047-b0f5-8999538a3aa7", "prompt_class": "sfw"},
+          {"mode": "text-conditioning-for-image-to-image", "status": "success", "job_id": "25432311-cf08-47cc-a25b-b03449d40e56", "prompt_class": "sfw"}
+        ]
+      },
+      "route_roles": ["text-conditioning"]
+    },
+    {
+      "id": "qwen-3-8b-full-text-encoder",
+      "name": "Qwen 3 8B full-precision text encoder",
+      "kind": "text_encoder",
+      "status": "installed",
+      "routeable": false,
+      "family": "flux2-klein",
+      "architecture": "qwen3",
+      "base_model": "Flux.2/Klein text-conditioning stack",
+      "precision": "full",
+      "tensor_dtypes": ["BF16"],
+      "description": "Optional highest-precision text encoder asset installed for explicit high-precision experiments; it is not selected by the generic route.",
+      "required_file": "models/text_encoders/qwen_3_8b.safetensors",
+      "capabilities": {
+        "domains": ["general", "anime"],
+        "input_types": ["text"],
+        "input_modes": ["text-conditioning"],
+        "output_types": ["conditioning"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "natural-language",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "character_identity": "conditioning support only; not a character adapter"
+      },
+      "prompting": {
+        "dialect": "natural-language or lightly structured description",
+        "trigger_words": [],
+        "recommended_granularity": "structured",
+        "notes": ["Requires a graph binding this filename explicitly; the default graph retains the FP8 mixed encoder to preserve generic VRAM headroom."]
+      },
+      "compatibility": {
+        "workflow_families": ["flux2-klein"],
+        "adapter_families": [],
+        "known_limits": ["The full encoder and the Moody checkpoint together may exceed a 24 GB device once runtime overhead and the 1 GB headroom target are included."]
+      },
+      "source": {
+        "url": "https://huggingface.co/Comfy-Org/vae-text-encorder-for-flux-klein-9b",
+        "path": "split_files/text_encoders/qwen_3_8b.safetensors",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "runtime-probe-partial",
+        "scope": "full-Qwen-with-Moody",
+        "probes": [
+          {"mode": "text-conditioning-on-default-GPU-device", "status": "failed", "job_id": "32987c9b-1527-4f5b-8436-e42df9af1f24", "error": "CUDA out of memory during dynamic weight transfer"},
+          {"mode": "text-conditioning-on-explicit-CPU", "status": "success", "job_id": "0f57a1ad-2928-4e84-b784-63bc6526bc3c", "prompt_class": "sfw"}
+        ],
+        "deployment_limit": "Not routeable in the default generic GPU route; explicit CPU text-encoder placement succeeded but is slower.",
+        "visual_fidelity": "not benchmarked by the API"
+      },
+      "route_roles": ["optional-high-precision-text-conditioning"]
+    },
+    {
+      "id": "flux2-vae",
+      "name": "Flux.2 VAE",
+      "kind": "vae",
+      "status": "installed",
+      "routeable": true,
+      "family": "flux2-klein",
+      "architecture": "flux2",
+      "base_model": "Flux.2",
+      "precision": "fp32",
+      "tensor_dtypes": ["F32", "I64"],
+      "description": "Decoder used by the installed Flux.2/Klein workflow.",
+      "required_file": "models/vae/flux2-vae.safetensors",
+      "capabilities": {
+        "input_types": ["image", "latent"],
+        "input_modes": ["image-encoding", "image-decoding"],
+        "output_types": ["image", "latent"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_relevance": "none",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "minimal",
+          "maximum": "minimal"
+        }
+      },
+      "prompting": {
+        "dialect": "not applicable",
+        "trigger_words": [],
+        "recommended_granularity": "minimal"
+      },
+      "compatibility": {
+        "workflow_families": ["flux2-klein"],
+        "adapter_families": []
+      },
+      "source": {
+        "type": "local-project-asset"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Moody-image-to-image-stack",
+        "probes": [
+          {"mode": "image-encode-and-decode", "status": "success", "job_id": "25432311-cf08-47cc-a25b-b03449d40e56", "prompt_class": "sfw"}
+        ]
+      },
+      "route_roles": ["decoder"]
+    },
+    {
+      "id": "animagine-xl-3.1-checkpoint",
+      "name": "Animagine XL 3.1",
+      "kind": "checkpoint",
+      "status": "installed",
+      "routeable": true,
+      "family": "sdxl-anime",
+      "architecture": "sdxl",
+      "base_model": "SDXL 1.0",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Anime-focused SDXL checkpoint used by the NIKKE and Blue Archive style routes.",
+      "required_file": "models/checkpoints/Animagine_XL_3.1.safetensors",
+      "capabilities": {
+        "domains": ["anime", "character-illustration", "nikke", "blue-archive-style"],
+        "input_types": ["text", "image"],
+        "input_modes": ["text-to-image", "image-to-image"],
+        "output_types": ["image", "latent"],
+        "styles": ["anime", "cel-shaded", "gacha illustration", "danbooru"],
+        "content_modes": ["sfw", "nsfw"],
+        "nsfw_capable": true,
+        "prompt_dialect": "danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "base style; identity normally comes from tags or an adapter",
+        "style_strength": "strong for anime",
+        "outfit_strength": "medium through tags",
+        "composition_strength": "medium through tags"
+      },
+      "prompting": {
+        "dialect": "comma-separated Danbooru-style tags",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_structure": ["quality", "subject count", "character", "series", "appearance", "pose", "camera", "scene", "lighting"],
+        "recommended_granularity": "detailed",
+        "notes": ["Use the adapter profile to supply identity and series-specific trigger hints."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl"],
+        "adapter_families": ["sdxl", "animagine31", "sdxl-locon"],
+        "known_limits": ["Pony-only and Illustrious-only adapters require a separate compatible route."]
+      },
+      "source": {
+        "url": "https://huggingface.co/cagliostrolab/animagine-xl-3.1",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "stacked-with-LoRAs-and-native-latent-I2I-graphs",
+        "probes": [
+          {"mode": "text-to-image-with-NIKKE-adapters", "status": "success", "job_id": "279f3041-cc14-431e-a24d-357ddb4e3bcd", "prompt_class": "sfw"},
+          {"mode": "image-to-image-with-NIKKE-adapters-native-graph", "status": "success", "job_id": "7261d666-1199-43e0-a3b0-61976c54d48c", "prompt_class": "sfw"},
+          {"mode": "image-to-image-with-NIKKE-adapters-named-API", "status": "success", "job_id": "548c1c01-f453-4af1-a08b-17aa8703f6c2", "prompt_class": "sfw"},
+          {"mode": "text-to-image-with-Blue-Archive-style-LoCon", "status": "success", "job_id": "3b4470ed-c45d-4ef1-8e1b-9edb7e17d2b9", "prompt_class": "sfw"},
+          {"mode": "image-to-image-with-Blue-Archive-style-LoCon-native-graph", "status": "success", "job_id": "c3722d65-1868-42d8-9e43-307390368e4b", "prompt_class": "sfw"},
+          {"mode": "image-to-image-with-Blue-Archive-style-LoCon-named-API", "status": "success", "job_id": "045e5159-d8fb-489b-b742-bb043034a442", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "not benchmarked as a general identity or style metric"
+      },
+      "route_roles": ["anime-base", "nikke-base", "blue-archive-style-base"]
+    },
+    {
+      "id": "nikke-profile-animagine-xl",
+      "name": "NIKKE Goddess of Victory Concept — Animagine/SDXL",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "nikke-profile",
+      "architecture": "sdxl",
+      "base_model": "Animagine XL 3.1 / SDXL",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "NIKKE profile adapter intended to establish the series visual vocabulary.",
+      "required_file": "models/loras/NIKKES_GoddessOfVictory_Concept.safetensors",
+      "capabilities": {
+        "domains": ["nikke", "goddess-of-victory-nikke"],
+        "input_types": ["conditioning"],
+        "input_modes": ["adapter-conditioning"],
+        "output_types": ["adapted-conditioning"],
+        "characters": ["NIKKE universe"],
+        "content_modes": ["sfw", "nsfw"],
+        "nsfw_capable": true,
+        "prompt_dialect": "danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "identity_strength": "series/profile-level, not a single-character identity",
+        "style_strength": "strong when paired with Animagine/SDXL"
+      },
+      "prompting": {
+        "dialect": "Danbooru-style tags",
+        "trigger_words": ["IncrsNikkeProfile"],
+        "recommended_strength": 0.9,
+        "recommended_granularity": "detailed",
+        "notes": ["Place the trigger with the series and character tags; the adapter does not select a character by itself."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl"],
+        "base_models": ["Animagine XL 3.1", "SDXL anime checkpoints"],
+        "known_limits": ["Strength and fidelity vary across non-Animagine SDXL checkpoints."]
+      },
+      "source": {
+        "url": "https://huggingface.co/Muapi/nikke-goddess-of-victory-profile-concept-lora-animagine",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Animagine-NIKKE-stack",
+        "probes": [
+          {"mode": "adapter-load-and-generation", "status": "success", "job_id": "6156bd9b-03a6-4cf9-8f4b-dcb6844d85a9", "prompt_class": "sfw", "adapter_strength": 0.9}
+        ]
+      },
+      "route_roles": ["nikke-profile"]
+    },
+    {
+      "id": "nikke-rapi-pony-sdxl",
+      "name": "NIKKE Rapi — Pony/SDXL-shaped adapter",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "nikke-character",
+      "architecture": "sdxl-pony-shaped",
+      "base_model": "Pony XL / compatible SDXL-shaped checkpoints",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Rapi character adapter currently aliased into the Animagine workflow.",
+      "required_file": "models/loras/NIKKES_Rapi.safetensors",
+      "capabilities": {
+        "domains": ["nikke", "goddess-of-victory-nikke"],
+        "input_types": ["conditioning"],
+        "input_modes": ["adapter-conditioning"],
+        "output_types": ["adapted-conditioning"],
+        "characters": ["Rapi", "拉毗", "ラピ"],
+        "outfits": ["default", "swimsuit", "rapidef", "rapiswim", "rapirnd"],
+        "content_modes": ["sfw", "nsfw"],
+        "nsfw_capable": true,
+        "prompt_dialect": "danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "identity_strength": "character-specific when the correct trigger is used",
+        "outfit_strength": "trigger-dependent",
+        "style_strength": "medium"
+      },
+      "prompting": {
+        "dialect": "Danbooru-style tags with one outfit trigger",
+        "trigger_words": ["rapidef", "rapiswim", "rapirnd"],
+        "recommended_strength": 0.8,
+        "recommended_granularity": "detailed",
+        "notes": ["Choose one outfit trigger; do not combine all outfit triggers in one request."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl"],
+        "base_models": ["Animagine XL 3.1 with empirical compatibility", "Pony XL-shaped SDXL routes"],
+        "known_limits": ["This is not a legacy SD 1.5 Rapi adapter; identity fidelity on Animagine is not guaranteed."]
+      },
+      "source": {
+        "url": "https://civitai.com/models/382624",
+        "type": "Civitai"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Animagine-NIKKE-stack",
+        "probes": [
+          {"mode": "adapter-load-and-generation", "status": "success", "job_id": "181145d3-f8d7-4104-9833-ccebf39729dc", "prompt_class": "sfw", "adapter_strength": 0.8},
+          {"mode": "adapter-load-with-profile", "status": "success", "job_id": "279f3041-cc14-431e-a24d-357ddb4e3bcd", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "cross-family compatibility is empirical, not a benchmark"
+      },
+      "route_roles": ["nikke-character-rapi"]
+    },
+    {
+      "id": "blue-archive-gamecg-style-animagine31",
+      "name": "Blue Archive Game CG Style — Animagine3.1 LoCon",
+      "kind": "locon",
+      "status": "installed",
+      "routeable": true,
+      "family": "blue-archive-style",
+      "architecture": "sdxl",
+      "base_model": "Animagine XL 3.1 / SDXL",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Style adapter for bright flat-color Blue Archive-like game CG; it is not a character identity adapter.",
+      "required_file": "models/loras/BlueArchive_GameCG_Style_Animagine31.safetensors",
+      "capabilities": {
+        "domains": ["blue-archive", "blue-archive-style"],
+        "input_types": ["conditioning"],
+        "input_modes": ["adapter-conditioning"],
+        "output_types": ["adapted-conditioning"],
+        "styles": ["game-cg", "flat-color", "gacha illustration", "anime"],
+        "content_modes": ["sfw", "nsfw", "non-explicit"],
+        "nsfw_capable": true,
+        "prompt_dialect": "danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "structured",
+          "maximum": "expert"
+        },
+        "identity_strength": "none; style-only",
+        "style_strength": "strong",
+        "outfit_strength": "medium through tags"
+      },
+      "prompting": {
+        "dialect": "anime/game-CG tags",
+        "trigger_words": [],
+        "recommended_strength": 0.8,
+        "recommended_granularity": "structured",
+        "notes": ["The published Animagine3.1 variant specifies no trigger word; adjust strength rather than adding one."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl"],
+        "base_models": ["Animagine XL 3.1"],
+        "known_limits": ["The source training notes warn that compatibility with other bases can be limited."]
+      },
+      "source": {
+        "url": "https://huggingface.co/licyk/sd-lora/blob/main/sdxl/style/ag31_style_ba_v1-000016.safetensors",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Animagine-Blue-Archive-style-stack",
+        "probes": [
+          {"mode": "adapter-load-and-generation", "status": "success", "job_id": "3b4470ed-c45d-4ef1-8e1b-9edb7e17d2b9", "prompt_class": "sfw", "adapter_strength": 0.8},
+          {"mode": "adapter-load-in-native-latent-I2I-graph", "status": "success", "job_id": "c3722d65-1868-42d8-9e43-307390368e4b", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "style route only; exact character fidelity requires a character adapter or stronger base"
+      },
+      "route_roles": ["blue-archive-style"]
+    },
+    {
+      "id": "illustrious-xl-v0-1-checkpoint",
+      "name": "Illustrious XL v0.1",
+      "kind": "checkpoint",
+      "status": "installed",
+      "routeable": true,
+      "family": "illustrious-xl",
+      "architecture": "sdxl",
+      "base_model": "SDXL 1.0",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Illustrious XL v0.1 SDXL checkpoint used by the Blue Archive character-identity route.",
+      "capabilities": {
+        "domains": ["anime", "blue-archive", "character-illustration"],
+        "input_types": ["text", "image"],
+        "input_modes": ["text-to-image", "image-to-image"],
+        "output_types": ["image", "latent"],
+        "styles": ["anime", "illustration", "gacha", "illustrious", "character illustration"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "illustrious-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "base model; identity is supplied by a compatible character LoRA",
+        "style_strength": "strong for modern anime illustration",
+        "outfit_strength": "strong through compatible adapters and tags",
+        "composition_strength": "medium through tags"
+      },
+      "prompting": {
+        "dialect": "Illustrious XL Danbooru-style tags",
+        "trigger_words": [],
+        "recommended_granularity": "detailed",
+        "recommended_structure": ["quality", "subject count", "identity trigger", "series", "appearance", "outfit", "pose", "camera", "scene", "lighting"],
+        "notes": ["Use the matching character adapter's trained words; do not use Animagine-only or Pony-only trigger recipes."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl-illustrious"],
+        "adapter_families": ["illustrious-xl"],
+        "known_limits": ["Do not mix Illustrious-only adapters into Animagine or Pony routes."]
+      },
+      "source": {
+        "url": "https://huggingface.co/OnomaAIResearch/Illustrious-xl-early-release-v0",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Illustrious-base-and-Asuna-stack",
+        "probes": [
+          {"mode": "text-to-image-without-Asuna-adapter", "status": "success", "job_id": "38d5b63f-8d7e-4760-b38b-23acd6629978", "prompt_class": "sfw"},
+          {"mode": "image-to-image-with-Asuna-adapter-native-graph", "status": "success", "job_id": "a7a0f143-120f-4e36-be14-8827f4476cc5", "prompt_class": "sfw"},
+          {"mode": "image-to-image-with-Asuna-adapter-named-API", "status": "success", "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "base style observed; identity fidelity is adapter- and prompt-dependent"
+      },
+      "required_file": "models/checkpoints/Illustrious_XL_v0.1.safetensors",
+      "route_roles": ["blue-archive-character-base"]
+    },
+    {
+      "id": "blue-archive-asuna-illustriousxl-lora",
+      "name": "Asuna Ichinose — Blue Archive 4 outfits [IllustriousXL]",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "blue-archive-character",
+      "architecture": "illustrious-xl",
+      "base_model": "Illustrious XL v0.1",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Character adapter for Asuna Ichinose with four documented outfit tag blocks.",
+      "capabilities": {
+        "domains": ["blue-archive"],
+        "input_types": ["conditioning"],
+        "input_modes": ["adapter-conditioning"],
+        "output_types": ["adapted-conditioning"],
+        "characters": ["Asuna Ichinose", "一之瀬アスナ", "一之濑明日奈"],
+        "outfits": ["maid", "bunny", "school", "sports"],
+        "styles": ["anime", "illustration", "gacha", "illustrious", "character illustration"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "illustrious-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "identity_strength": "character-specific when 1chn is included",
+        "outfit_strength": "strong when one documented outfit block is selected"
+      },
+      "prompting": {
+        "dialect": "Illustrious XL tags with 1chn identity token and one outfit block",
+        "trigger_words": ["1chn"],
+        "recommended_strength": 1.0,
+        "recommended_granularity": "detailed",
+        "trained_words": {
+          "identity": ["1chn", "blue halo", "blue eyes", "blonde hair", "hair over one eye", "very long hair", "hair ribbon", "blue ribbon", "single hair bun", "bun with braided base"],
+          "maid": ["maid headdress", "white headdress", "headphones", "black choker", "black dress", "pleated dress", "frilled dress", "puffy short sleeves", "cleavage", "white apron", "waist apron", "single garter strap", "white thighhighs", "black ankle bow", "black shoes", "mary janes", "white elbow gloves", "white hairband"],
+          "bunny": ["fake animal ears", "playboy bunny", "blue leotard", "highleg leotard", "detached collar", "blue traditional bowtie", "white elbow gloves", "thighband pantyhose", "black pantyhose", "white shoes", "high heels", "black choker"],
+          "school": ["white collared shirt", "shirt tucked in", "button gap", "sleeves rolled up", "blue loose bowtie", "blue pleated skirt", "blue wrist scrunchie", "black socks", "kneehighs", "black shoes", "loafers", "black choker", "high ponytail", "sticker on face", "star sticker", "white detached collar"],
+          "sports": ["two-tone sports bra", "blue sports bra", "white sports bra", "halterneck", "bare shoulders", "midriff", "miniskirt", "two-tone skirt", "blue skirt", "white skirt", "white sneakers"]
+        },
+        "notes": ["Use 1chn once and select one outfit block. The model card documents the trained words as tags rather than separate named trigger tokens."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl-illustrious"],
+        "base_models": ["Illustrious XL v0.1"],
+        "known_limits": ["Do not load this adapter in the Animagine or Pony routes; use the dedicated Illustrious workflow."]
+      },
+      "source": {
+        "url": "https://huggingface.co/Muapi/asuna-ichinose-blue-archive-4-outfits-illustriousxl",
+        "type": "Hugging Face"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Illustrious-Asuna-stack",
+        "probes": [
+          {"mode": "adapter-load-and-Asuna-identity-generation", "status": "success", "job_id": "d364dcee-70d3-44ad-a1e5-ac483dafabf7", "prompt_class": "sfw", "adapter_strength": 1.0},
+          {"mode": "adapter-load-in-native-latent-I2I-graph", "status": "success", "job_id": "a7a0f143-120f-4e36-be14-8827f4476cc5", "prompt_class": "sfw"},
+          {"mode": "adapter-load-in-named-API-I2I", "status": "success", "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "Asuna identity was visually observed in the SFW text probe; image-to-image probe was load/path validation at 1 step"
+      },
+      "required_file": "models/loras/Asuna_Ichinose_IllustriousXL.safetensors",
+      "route_roles": ["blue-archive-character-asuna"]
+    },
+    {
+      "id": "ipadapter-plus-face-sdxl-vith",
+      "name": "IPAdapter Plus Face — SDXL ViT-H",
+      "kind": "ip-adapter",
+      "status": "installed",
+      "routeable": true,
+      "family": "sdxl-ipadapter",
+      "architecture": "sdxl",
+      "base_model": "SDXL 1.0",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "Official IPAdapter Plus Face SDXL adapter selected for face-centric reference conditioning without InsightFace or a FaceID LoRA.",
+      "required_file": "models/ipadapter/ip-adapter-plus-face_sdxl_vit-h.safetensors",
+      "capabilities": {
+        "domains": ["general", "anime", "blue-archive", "nikke", "character-illustration"],
+        "input_types": ["image", "face"],
+        "input_modes": ["face-reference"],
+        "output_types": ["model-conditioning"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "reference_scope": "face-centric reference; not a pixel-locked identity recognizer",
+        "identity_strength": "medium for a clear single-face portrait",
+        "style_strength": "low-to-medium",
+        "composition_strength": "low",
+        "outfit_strength": "low",
+        "pose_strength": "low",
+        "natural_language": false,
+        "prompt_dialect": "danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        }
+      },
+      "prompting": {
+        "dialect": "short-to-structured SDXL anime tags",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_granularity": "detailed",
+        "notes": ["Describe the requested character, outfit, pose and scene in the prompt; the face reference is an additional face-centric conditioning signal."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl-ipadapter"],
+        "base_models": ["Animagine XL 3.1", "SDXL anime checkpoints"],
+        "adapter_families": ["sdxl-ipadapter"],
+        "known_limits": ["This Plus Face adapter is not FaceID; it does not use InsightFace embeddings and may still change identity, hair or expression when the prompt conflicts with the reference."]
+      },
+      "source": {
+        "url": "https://github.com/comfyorg/comfyui-ipadapter",
+        "model_url": "https://huggingface.co/h94/IP-Adapter/blob/main/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors",
+        "type": "GitHub + Hugging Face",
+        "sha256": "677AD8860204F7D0BFBA12D29E6C31DED9BEEFDF3E4BBD102518357D31A292C1"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "named-API face-reference route",
+        "probes": [
+          {"mode": "loaded-by-face-reference-named-API", "status": "success", "job_id": "b8f04679-0c13-4d12-b5e4-f196985d22a1", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "Not established until an SFW route probe completes; the API exposes the adapter's documented conditioning scope rather than promising exact likeness."
+      },
+      "route_roles": ["face-reference-adapter"]
+    },
+    {
+      "id": "clip-vision-vit-h-ipadapter",
+      "name": "CLIP Vision ViT-H — IPAdapter SDXL dependency",
+      "kind": "clip-vision",
+      "status": "installed",
+      "routeable": true,
+      "family": "sdxl-ipadapter",
+      "architecture": "clip-vit-h",
+      "base_model": "IPAdapter SDXL",
+      "precision": "fp32",
+      "tensor_dtypes": ["F32"],
+      "description": "Matching CLIP Vision ViT-H encoder used by the IPAdapter Unified Loader face preset.",
+      "required_file": "models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors",
+      "capabilities": {
+        "input_types": ["image"],
+        "input_modes": ["vision-encoding"],
+        "output_types": ["image-embedding"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_relevance": "none"
+      },
+      "prompting": {
+        "dialect": "not applicable",
+        "trigger_words": [],
+        "recommended_granularity": "minimal"
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl-ipadapter"],
+        "base_models": ["IPAdapter Plus Face SDXL"],
+        "known_limits": ["This is a dependency of the face route, not a standalone image-generation model."]
+      },
+      "source": {
+        "url": "https://github.com/comfyorg/comfyui-ipadapter",
+        "model_url": "https://huggingface.co/h94/IP-Adapter/blob/main/models/image_encoder/model.safetensors",
+        "type": "GitHub + Hugging Face",
+        "sha256": "6CA9667DA1CA9E0B0F75E46BB030F7E011F44F86CBFB8D5A36590FCD7507B030"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "IPAdapter face route dependency",
+        "probes": [
+          {"mode": "loaded-by-face-reference-named-API", "status": "success", "job_id": "b8f04679-0c13-4d12-b5e4-f196985d22a1", "prompt_class": "sfw"}
+        ]
+      },
+      "route_roles": ["face-reference-dependency"]
+    },
+    {
+      "id": "controlnet-openpose-sdxl-xinsir",
+      "name": "Xinsir ControlNet OpenPose SDXL 1.0",
+      "kind": "controlnet",
+      "status": "installed",
+      "routeable": true,
+      "family": "sdxl-controlnet",
+      "architecture": "sdxl",
+      "base_model": "SDXL 1.0",
+      "precision": "fp16",
+      "tensor_dtypes": ["F16"],
+      "description": "SDXL OpenPose ControlNet used to stabilize body orientation, pose and multi-limb composition while the prompt controls character and scene.",
+      "required_file": "models/controlnet/xinsir-controlnet-openpose-sdxl-1.0.safetensors",
+      "capabilities": {
+        "domains": ["general", "anime", "blue-archive", "nikke", "character-illustration"],
+        "input_types": ["image", "control"],
+        "input_modes": ["openpose-control"],
+        "output_types": ["conditioning"],
+        "control_types": ["openpose"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "pose_strength": "strong when the source image yields a usable human skeleton",
+        "identity_strength": "none; identity remains prompt/model dependent",
+        "outfit_strength": "prompt dependent",
+        "style_strength": "base checkpoint dependent",
+        "composition_strength": "strong for body pose and orientation",
+        "natural_language": false,
+        "prompt_dialect": "danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        }
+      },
+      "prompting": {
+        "dialect": "short-to-structured SDXL anime tags",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_granularity": "detailed",
+        "notes": ["Use the control image for pose and orientation. Keep the prompt responsible for character identity, outfit, expression and scene."]
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl-controlnet"],
+        "base_models": ["Animagine XL 3.1", "SDXL anime checkpoints"],
+        "adapter_families": ["sdxl-controlnet"],
+        "known_limits": ["OpenPose does not control clothing details, face identity or depth; detection quality depends on the supplied source image and the preprocessor."]
+      },
+      "source": {
+        "url": "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0",
+        "type": "Hugging Face",
+        "sha256": "B8524E557A7DF60D081F5D4A0EB109967D107DF217943BF88C2D99B9EBCC06C5"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "named-API OpenPose route",
+        "probes": [
+          {"mode": "loaded-by-openpose-control-named-API", "status": "success", "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b", "prompt_class": "sfw"}
+        ],
+        "visual_fidelity": "Not established until an SFW route probe completes; control success means graph execution and pose-conditioning plumbing, not exact character likeness."
+      },
+      "route_roles": ["openpose-control"]
+    },
+    {
+      "id": "controlnet-aux-openpose-preprocessor",
+      "name": "comfyui_controlnet_aux OpenPose preprocessor",
+      "kind": "preprocessor",
+      "status": "installed",
+      "routeable": true,
+      "family": "sdxl-controlnet",
+      "architecture": "openpose",
+      "base_model": "ControlNet OpenPose",
+      "precision": "fp32",
+      "tensor_dtypes": ["F32"],
+      "description": "Pinned OpenPose preprocessing node that turns a supplied source/control image into an OpenPose map before ControlNet application. Its body/hand/face weights are downloaded and cached by the node on first use.",
+      "capabilities": {
+        "input_types": ["image"],
+        "input_modes": ["pose-preprocessing"],
+        "output_types": ["image", "pose-keypoints"],
+        "control_types": ["openpose"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_relevance": "none"
+      },
+      "prompting": {
+        "dialect": "not applicable",
+        "trigger_words": [],
+        "recommended_granularity": "minimal"
+      },
+      "compatibility": {
+        "workflow_families": ["sdxl-controlnet"],
+        "base_models": ["ControlNet OpenPose"],
+        "known_limits": ["Preprocessor weights are cached under the pinned custom node; a first request may download them and take longer."]
+      },
+      "source": {
+        "url": "https://github.com/Fannovel16/comfyui_controlnet_aux",
+        "type": "GitHub",
+        "commit": "59b1fc411ede8623b2997855b8018f0b3b6cf49f"
+      },
+      "required_files": [
+        "custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/body_pose_model.pth",
+        "custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/hand_pose_model.pth",
+        "custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/facenet.pth"
+      ],
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "OpenPose preprocessing node",
+        "probes": [
+          {"mode": "executed-by-openpose-control-named-API", "status": "success", "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b", "prompt_class": "sfw"}
+        ]
+      },
+      "route_roles": ["openpose-preprocessor-dependency"]
+    },
+    {
+      "id": "anima-turbo-v1-1-checkpoint",
+      "name": "Official Anima Turbo v1.1",
+      "kind": "diffusion-model",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima-turbo",
+      "architecture": "anima",
+      "base_model": "Anima",
+      "precision": "bf16",
+      "tensor_dtypes": ["BF16"],
+      "description": "Official CircleStone Labs Anima Turbo v1.1 diffusion checkpoint. This is the highest-precision published Turbo file in the official Anima repository; it is kept as a separate route from Moody for direct comparison.",
+      "capabilities": {
+        "domains": ["general", "anime", "anime-portrait", "anime-illustration"],
+        "input_types": ["text", "image"],
+        "input_modes": ["text-to-image", "image-to-image"],
+        "output_types": ["image"],
+        "styles": ["anime", "illustration", "stylized", "anime portrait"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {"minimum": "minimal", "recommended": "structured", "maximum": "detailed"},
+        "natural_language": true,
+        "identity_strength": "weak-to-medium from prompt; no identity adapter bundled",
+        "style_strength": "medium-to-strong",
+        "outfit_strength": "medium through prompt",
+        "composition_strength": "medium through prompt",
+        "precision_scope": "BF16 diffusion weights; shared Qwen text encoder and Qwen image VAE are separate dependencies"
+      },
+      "prompting": {
+        "dialect": "ordered natural-language description with optional Danbooru-style tags",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_granularity": "structured",
+        "recommended_structure": ["quality/meta", "subject count", "character/series", "appearance", "outfit", "pose", "composition", "environment", "lighting"],
+        "notes": ["The official model card documents both tag and caption training; use lowercase tags and keep subject count/identity near the beginning."]
+      },
+      "compatibility": {
+        "workflow_families": ["anima", "anima-turbo"],
+        "base_models": ["Anima"],
+        "known_limits": ["Turbo is distilled for 8-12 steps at CFG 1 and trades some diversity for stability; it is not a character-specific checkpoint."]
+      },
+      "source": {
+        "url": "https://huggingface.co/circlestone-labs/Anima",
+        "file_url": "https://huggingface.co/circlestone-labs/Anima/blob/main/split_files/diffusion_models/anima-turbo-v1.1.safetensors",
+        "type": "Hugging Face",
+        "revision": "main",
+        "file_name": "anima-turbo-v1.1.safetensors",
+        "bytes": 4182230656,
+        "sha256": "FBA11953276B57EDF59D1DC4F1857AC05AA079C56F982B4D7C20298D57D3F7EB"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "official Anima Turbo v1.1 checkpoint in named API graph",
+        "probes": [
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "6b080c00-ae58-4321-982f-a4b9e4b2cca9",
+            "prompt_class": "sfw"
+          },
+          {
+            "mode": "face-reference-named-API",
+            "status": "success",
+            "job_id": "3c65cb7d-ffa2-4634-acf6-75fb8e0e7dfc",
+            "prompt_class": "sfw"
+          }
+        ]
+      },
+      "required_file": "models/diffusion_models/anima-turbo-v1.1.safetensors",
+      "route_roles": ["anime-official-turbo", "generic-anime-comparison"]
+    },
+    {
+      "id": "anima-ipadapter-character-reference-v10",
+      "name": "Anima IP-Adapter Character Reference v10",
+      "kind": "ip-adapter",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima-ipadapter",
+      "architecture": "anima",
+      "base_model": "Anima",
+      "precision": "published",
+      "tensor_dtypes": ["F32", "BF16"],
+      "description": "Anima-specific SigLIP2 IPAdapter checkpoint for face/character reference conditioning. It is used by the Anima Turbo face-reference route and is not interchangeable with SDXL IPAdapter weights.",
+      "capabilities": {
+        "domains": ["general", "anime", "anime-portrait", "blue-archive", "nikke", "character-illustration"],
+        "input_types": ["image", "face"],
+        "input_modes": ["face-reference"],
+        "output_types": ["model-conditioning"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "ipadapter_support": true,
+        "face_reference": true,
+        "face_only": false,
+        "reference_scope": "face/character portrait reference with whole-image SigLIP2 encoding; not FaceID",
+        "identity_strength": "medium for a clear single-face portrait",
+        "style_strength": "medium",
+        "composition_strength": "low-to-medium",
+        "outfit_strength": "low; keep outfit in prompt",
+        "pose_strength": "low; keep pose in prompt",
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {"minimum": "structured", "recommended": "detailed", "maximum": "expert"},
+        "natural_language": true
+      },
+      "prompting": {
+        "dialect": "detailed Anima-compatible natural language or ordered anime tags",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_granularity": "detailed",
+        "notes": ["Use a clear single-person portrait. The adapter is reference conditioning, not a prompt replacement and not a pixel-locked face recognizer."]
+      },
+      "compatibility": {
+        "workflow_families": ["anima-ipadapter"],
+        "base_models": ["Anima Turbo v1.1", "Anima"],
+        "adapter_families": ["anima-siglip2-ipadapter"],
+        "known_limits": ["Requires the pinned Anima IPAdapter custom node and SigLIP2 encoder; do not use SDXL IPAdapter nodes or FaceID assumptions."]
+      },
+      "source": {
+        "url": "https://huggingface.co/LuciferTC/Anima-IP-Adapter",
+        "file_url": "https://huggingface.co/LuciferTC/Anima-IP-Adapter/blob/main/ip_adapter-Character_Reference-10.safetensors",
+        "node_url": "https://github.com/LuciferTC9527/ComfyUI-Anima_IP-Adapter",
+        "type": "Hugging Face + GitHub",
+        "file_name": "ip_adapter-Character_Reference-10.safetensors",
+        "bytes": 503229576,
+        "sha256": "DC9612CC28B55F00BA39F6169BFE4871130BE028A55682AB54DD51360ACB8232"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "Anima Turbo IPAdapter face-reference named API graph",
+        "probes": [
+          {
+            "mode": "face-reference-named-API",
+            "status": "success",
+            "job_id": "3c65cb7d-ffa2-4634-acf6-75fb8e0e7dfc",
+            "prompt_class": "sfw",
+            "face_image": "xiaoman_portrait.png"
+          }
+        ]
+      },
+      "required_file": "models/ipadapter/anima-ip-adapter-character-reference-10.safetensors",
+      "route_roles": ["anima-face-reference-dependency"]
+    },
+    {
+      "id": "siglip2-base-patch16-512-anima-ipadapter",
+      "name": "SigLIP2 base patch16 512 — Anima IPAdapter vision encoder",
+      "kind": "vision-encoder",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima-ipadapter",
+      "architecture": "siglip2",
+      "base_model": "SigLIP2 base patch16 512",
+      "precision": "fp32",
+      "tensor_dtypes": ["F32"],
+      "description": "SigLIP2 vision encoder used to convert the supplied face/character reference into Anima IPAdapter tokens. It is loaded separately from the Anima diffusion model.",
+      "capabilities": {
+        "domains": ["general", "anime", "blue-archive", "nikke", "character-illustration"],
+        "input_types": ["image", "face"],
+        "input_modes": ["vision-encoding"],
+        "output_types": ["image-embedding"],
+        "content_modes": ["sfw", "nsfw", "general"],
+        "nsfw_capable": true,
+        "prompt_relevance": "none",
+        "reference_scope": "whole-image visual embedding for Anima IPAdapter",
+        "natural_language": false
+      },
+      "prompting": {"dialect": "not applicable", "trigger_words": [], "recommended_granularity": "minimal"},
+      "compatibility": {
+        "workflow_families": ["anima-ipadapter"],
+        "base_models": ["Anima IP-Adapter Character Reference v10"],
+        "known_limits": ["This is a route dependency, not a standalone image-generation model."]
+      },
+      "source": {
+        "url": "https://huggingface.co/google/siglip2-base-patch16-512",
+        "type": "Hugging Face",
+        "revision": "main",
+        "model_file": "model.safetensors",
+        "bytes": 1503344520,
+        "sha256": "FE0E601C625E69EED8E73500D39E9B6164403FE03DB8048E87913C3CEFBBB3FE"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SigLIP2 local load for Anima IPAdapter",
+        "probes": [
+          {
+            "mode": "vision-encoding-in-face-reference-named-API",
+            "status": "success",
+            "job_id": "3c65cb7d-ffa2-4634-acf6-75fb8e0e7dfc",
+            "prompt_class": "sfw",
+            "face_image": "xiaoman_portrait.png"
+          }
+        ]
+      },
+      "required_files": [
+        "models/siglip2/siglip2-base-patch16-512/model.safetensors",
+        "models/siglip2/siglip2-base-patch16-512/config.json",
+        "models/siglip2/siglip2-base-patch16-512/preprocessor_config.json"
+      ],
+      "route_roles": ["anima-face-reference-dependency"]
+    }
+  ]
+}

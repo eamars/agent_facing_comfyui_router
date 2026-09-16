@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "purpose": "Ten prompt inputs for agent route-selection simulation. This fixture is never submitted to /project/generate.",
+  "generation_requested": false,
+  "routing_boundary": "Only workflow/model selectors are sent to /project/resolve; character and outfit remain inside the agent-authored prompt.",
+  "agent_flow": ["user_request", "agent_route_query", "project_resolve", "agent_prompt", "no_generation"],
+  "prompts": [
+    {
+      "id": "ba-sfw-kazusa",
+      "label": "Blue Archive — Kazusa school portrait",
+      "user_request": "请生成一张《碧蓝档案》杏山和纱的校园肖像，保持明亮的游戏 CG 风格，她穿校服并拿着贝斯箱，下午校园背景，内容保持 SFW。",
+      "agent_route_query": {
+        "domain": "blue archive",
+        "content_mode": "sfw",
+        "style": "game cg",
+        "prompt_granularity": "structured"
+      },
+      "prompt": "masterpiece, best quality, 1girl, solo, 杏山和纱, Blue Archive, short dark hair, cat ears, school uniform, holding a bass case, soft afternoon light, school courtyard, game CG illustration",
+      "negative_prompt": "worst quality, low quality, bad hands, bad face, bad anatomy, text, watermark, nsfw",
+      "expected_workflow": "blue-archive-style-sdxl"
+    },
+    {
+      "id": "ba-sfw-aru",
+      "label": "Blue Archive — Aru city scene",
+      "user_request": "我想要一张《碧蓝档案》陆八魔阿露的城市街景插画，像抽卡卡面一样的平涂二次元风格，夕阳和自信的姿态，SFW。",
+      "agent_route_query": {
+        "domain": "Blue Archive",
+        "content_mode": "sfw",
+        "style": "gacha illustration",
+        "prompt_granularity": "detailed"
+      },
+      "prompt": "masterpiece, best quality, 1girl, solo, 陸八魔アル, Blue Archive, halo, long dark hair, school blazer, confident smile, holding a briefcase, city street at sunset, warm rim light, bright flat-color gacha game CG",
+      "negative_prompt": "worst quality, low quality, bad hands, bad face, bad anatomy, cropped, text, watermark, nsfw",
+      "expected_workflow": "blue-archive-style-sdxl"
+    },
+    {
+      "id": "ba-sfw-group",
+      "label": "Blue Archive — academy rooftop group",
+      "user_request": "请画两名《碧蓝档案》学生在学院屋顶聊天，夏季校服、光环和晴朗天空，做成干净的游戏 CG，非露骨。",
+      "agent_route_query": {
+        "domain": "碧蓝档案",
+        "content_mode": "non-explicit",
+        "style": "flat color",
+        "prompt_granularity": "structured"
+      },
+      "prompt": "masterpiece, best quality, 2girls, Blue Archive, academy rooftop, circular halos, summer uniforms, wind in their hair, friendly conversation, bright blue sky, clean flat-color game CG illustration",
+      "negative_prompt": "worst quality, low quality, bad hands, bad face, bad anatomy, duplicate, multiple view, text, watermark, nsfw",
+      "expected_workflow": "blue-archive-style-sdxl"
+    },
+    {
+      "id": "nikke-sfw-rapi",
+      "label": "NIKKE — Rapi default combat portrait",
+      "user_request": "请生成《胜利女神：NIKKE》拉毗的战斗肖像，保留她的默认军装、贝雷帽和步枪，工业基地背景，动漫风格，SFW。",
+      "agent_route_query": {
+        "domain": "NIKKE",
+        "content_mode": "sfw",
+        "style": "anime",
+        "prompt_granularity": "detailed"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapidef, red eyes, brown hair, black beret, military uniform, holding a rifle, industrial hangar, dramatic rim light",
+      "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature",
+      "expected_workflow": "animagine-xl-3.1-nsfw"
+    },
+    {
+      "id": "nikke-sfw-operative",
+      "label": "NIKKE — original adult operative briefing",
+      "user_request": "我想要一个 NIKKE 世界观的成年女性原创作战人员，她在指挥室查看全息地图，战术夹克和耳机，电影感蓝色灯光，SFW。",
+      "agent_route_query": {
+        "domain": "goddess of victory nikke",
+        "content_mode": "sfw",
+        "style": "character illustration",
+        "prompt_granularity": "detailed"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult woman, NIKKE universe original operative, short silver hair, tactical jacket, headset, standing in a command room, holographic map, cinematic blue lighting, detailed anime character illustration",
+      "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature",
+      "expected_workflow": "animagine-xl-3.1-nsfw"
+    },
+    {
+      "id": "general-sfw-portrait",
+      "label": "General — natural-language anime portrait",
+      "user_request": "请用自然的描述生成一张雨天咖啡馆窗边的成年女性动漫肖像，她正在读书，蓝色和琥珀色的忧郁灯光，画面柔和。",
+      "agent_route_query": {
+        "domain": "general",
+        "content_mode": "sfw",
+        "style": "portrait",
+        "prompt_granularity": "minimal"
+      },
+      "prompt": "A thoughtful young adult anime woman reading beside a rainy cafe window, muted blue and amber lighting, intimate portrait composition, soft painterly atmosphere",
+      "expected_workflow": "anima-turbo-v1-1"
+    },
+    {
+      "id": "nikke-nsfw-rapi-lingerie",
+      "label": "NIKKE NSFW — adult Rapi glamour editorial",
+      "user_request": "请为成年版拉毗制作一张 NIKKE 成人向成熟时尚写真：黑色蕾丝内衣、薄纱睡袍、丝绒贵妃椅和摄影棚灯光，要求非露骨但具有明显 NSFW 氛围。",
+      "agent_route_query": {
+        "domain": "NIKKE",
+        "content_mode": "nsfw",
+        "style": "anime",
+        "prompt_granularity": "expert"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, adult rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapidef, mature adult woman, black lace lingerie, sheer silk robe, seated on a velvet chaise, tasteful implied nudity, mature glamour editorial, soft studio lighting",
+      "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
+      "expected_workflow": "animagine-xl-3.1-nsfw"
+    },
+    {
+      "id": "nikke-nsfw-original-boudoir",
+      "label": "NIKKE NSFW — adult original operative boudoir study",
+      "user_request": "我需要一张 NIKKE 风格成年原创女性作战人员的成人向 boudoir 艺术研究图，敞开的缎面睡袍、裸背、含蓄的非露骨裸体表现，暖色电影灯光。",
+      "agent_route_query": {
+        "domain": "goddess of victory nikke",
+        "content_mode": "nsfw",
+        "style": "character illustration",
+        "prompt_granularity": "detailed"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult woman, NIKKE-inspired original operative, long black hair, white stockings, open satin robe, bare back, tasteful implied nudity, non-graphic artistic boudoir portrait, warm cinematic lighting",
+      "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
+      "expected_workflow": "animagine-xl-3.1-nsfw"
+    },
+    {
+      "id": "nikke-nsfw-pinup",
+      "label": "NIKKE NSFW — adult neon pin-up",
+      "user_request": "请生成一张 NIKKE 世界观成年女性作战人员的 NSFW 霓虹 pin-up 插画，黑色无肩带内衣、过膝靴、夜店背景、紫青色灯光，成熟时尚而非露骨。",
+      "agent_route_query": {
+        "domain": "NIKKE",
+        "content_mode": "nsfw",
+        "style": "danbooru",
+        "prompt_granularity": "expert"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult woman, NIKKE universe operative, mature pin-up, strapless black lingerie, thigh-high boots, confident suggestive pose, neon nightclub, magenta and cyan lighting, polished anime illustration",
+      "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
+      "expected_workflow": "animagine-xl-3.1-nsfw"
+    },
+    {
+      "id": "nikke-nsfw-rapi-swimsuit",
+      "label": "NIKKE NSFW — adult Rapi swimwear glamour",
+      "user_request": "请制作一张成年拉毗的 NIKKE NSFW 泳装写真，黑色比基尼、湿发、黄昏泳池、优雅的成人 glamour 姿势和电影感动漫灯光。",
+      "agent_route_query": {
+        "domain": "NIKKE",
+        "content_mode": "nsfw",
+        "style": "anime",
+        "prompt_granularity": "expert"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, adult rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapiswim, mature adult woman, black bikini, wet hair, poolside at twilight, elegant glamour pose, reflective water, cinematic anime lighting",
+      "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
+      "expected_workflow": "animagine-xl-3.1-nsfw"
+    }
+  ]
+}
