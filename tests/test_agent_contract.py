@@ -24,6 +24,7 @@ node_names = {node["class_type"] for entry in catalog["workflows"]
 node_names.update({"LoadImage", "VAEEncode", "ImageScale", "RepeatLatentBatch"})
 stubs = {
     "execution": types.ModuleType("execution"),
+    "folder_paths": types.SimpleNamespace(get_input_directory=lambda: str(api.COMFY_ROOT / "input")),
     "server": types.SimpleNamespace(PromptServer=types.SimpleNamespace(instance=None)),
     "comfy_execution": types.ModuleType("comfy_execution"),
     "comfy_execution.jobs": types.SimpleNamespace(validate_job_id=lambda value: str(uuid.UUID(value))),
@@ -75,7 +76,17 @@ class AgentContractTests(unittest.TestCase):
         first, second = self.graph(), self.graph()
         a, b = (api._binding_value(g, self.entry, "seed") for g in (first, second))
         self.assertNotEqual(a, b)
+        self.assertLess(a, 2**53)
         self.assertEqual(api._binding_value(self.graph(seed=a), self.entry, "seed"), a)
+
+    def test_error_response_shape_and_missing_status(self):
+        with self.assertRaises(api.ApiError) as caught:
+            api._prepare_graph(self.entry, {"parameters": {}})
+        self.assertEqual(caught.exception.status, 422)
+        caught.exception.route = self.entry["id"]
+        error = json.loads(api._json_error(caught.exception).text)["error"]
+        self.assertEqual(error["expected"], ["prompt", "subject"])
+        self.assertEqual(error["route"], self.entry["id"])
 
     def test_img2img_size_batch_and_budget(self):
         graph = self.graph(input_image="source.png", width=512, height=512, batch_size=2)
@@ -134,6 +145,15 @@ class AgentContractTests(unittest.TestCase):
         with patch.dict(stubs["nodes"].NODE_CLASS_MAPPINGS, {}, clear=True):
             self.assertFalse(api._public_entry(self.entry, [])["ready"])
 
+    def test_inspection_does_not_select_an_unready_workflow(self):
+        high = copy.deepcopy(self.entry)
+        high.update(id="missing-model")
+        high["routing"]["priority"] = 1000
+        available = copy.deepcopy(self.entry)
+        with patch.object(api, "_public_entry", side_effect=lambda entry, models: {"ready": entry["id"] != "missing-model"}):
+            result = api._resolve_routes({"workflows": [high, available]}, {"domain": "anime"}, include_unready=True)
+        self.assertEqual(result["selected_workflow"], available["id"])
+
     def test_parameter_schema_uses_graph_defaults(self):
         graph = api._read_workflow(self.entry)
         schema = api._parameter_schema(self.entry, graph)
@@ -173,6 +193,16 @@ class WorkerGuardTests(unittest.TestCase):
 
 
 class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
+    async def test_never_started_failure_has_stable_timing(self):
+        coordinator = api.ProjectWorkflowCoordinator(types.SimpleNamespace())
+        coordinator._states["gone"] = {"prompt_id": "gone", "timing": {"submitted_monotonic": 1}}
+        with patch.object(api.time, "monotonic", return_value=3):
+            coordinator._set_state("gone", completed=True, state="failed")
+        with patch.object(api.time, "monotonic", return_value=10):
+            response = api._job_response({"prompt_id": "gone"}, coordinator.snapshot("gone"))
+        self.assertEqual(json.loads(response.text)["queued_ms"], 2000)
+        self.assertEqual(json.loads(response.text)["elapsed_ms"], 0)
+
     async def test_removed_native_job_does_not_block_the_queue(self):
         queue = types.SimpleNamespace(get_history=lambda **kw: {}, get_current_queue_volatile=lambda: ([], []))
         coordinator = api.ProjectWorkflowCoordinator(types.SimpleNamespace(prompt_queue=queue))

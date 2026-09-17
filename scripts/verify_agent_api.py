@@ -161,29 +161,39 @@ def main() -> None:
             check("six concurrent submissions complete", all(s["state"] == "succeeded" for s in states))
             check("queue time includes preceding jobs", states[-1]["queued_ms"] > states[0]["queued_ms"])
             check("img2img emits two correctly sized images", len(states[0]["outputs"]) == 2 and image_output(states[0]).size == (512, 512))
-            native_state = wait_job({"job_url": "/project/jobs/" + native["prompt_id"]})
+            native_state = wait_job({"prompt_id": native["prompt_id"], "job_url": "/project/jobs/" + native["prompt_id"]})
             check("native/project interleaving", native_state["state"] == "succeeded")
             pending.clear()
 
             # A missing queued reference must fail promptly and leave the next job runnable.
             blocker = http("/project/generate", {**body, "parameters": {**body["parameters"], "seed": 2917, "steps": 40}})
+            pending.append(blocker)
             disposable = upload("disposable", source)
             inpaint = dry_runs["anima-turbo-inpaint"][0]
             doomed = http("/project/generate", {**inpaint, "parameters": {**inpaint["parameters"], "input_image": disposable}})
+            pending.append(doomed)
             http("/project/inputs/" + disposable, method="DELETE")
             uploaded.remove(disposable)
             successor = http("/project/generate", {**body, "parameters": {**body["parameters"], "seed": 3917}})
+            pending.append(successor)
             check("blocking job completes", wait_job(blocker)["state"] == "succeeded")
             failed = wait_job(doomed)
             check("queued input failure is actionable", failed["state"] == "failed" and bool(failed.get("error")))
             check("queue recovers after failure", wait_job(successor)["state"] == "succeeded")
+            pending.clear()
+    except Exception as exc:
+        report["failure"] = str(exc)
+        raise
     finally:
         # Do not delete fixtures while a known job is still consuming them.
         for job in pending:
             wait_job(job)
         for name in uploaded:
-            result = http("/project/inputs/" + name, method="DELETE")
-            check("delete reports remaining bytes", result["deleted"] and result["remaining_bytes"] >= 0)
+            try:
+                result = http("/project/inputs/" + name, method="DELETE")
+                check("delete reports remaining bytes", result["deleted"] and result["remaining_bytes"] >= 0)
+            except AssertionError as exc:
+                report.setdefault("cleanup_errors", []).append(str(exc))
         report["final_resources"] = http("/project/resources")
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2), encoding="utf-8")

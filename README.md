@@ -446,6 +446,7 @@ workflow description.
 | ID | Family | Purpose | Default assets |
 | --- | --- | --- | --- |
 | `moody-anima-mix` | Anima | Generic fast anime fallback; SFW/NSFW-capable | Moody Anima Mix v1.0, Qwen 3 0.6B encoder, Qwen image VAE |
+| `moody-anima-inpaint` | Anima | Masked edits with unmasked original pixels preserved | Moody Anima Mix, Qwen encoder and VAE |
 | `anima-turbo-v1-1` | Anima Turbo | Official high-precision generic anime route; SFW/NSFW-capable | Official Anima Turbo v1.1 BF16, Qwen 3 0.6B encoder, Qwen image VAE |
 | `anima-turbo-inpaint` | Anima Turbo | Masked edits with unmasked original pixels preserved | Official Anima Turbo v1.1 BF16, Qwen encoder and VAE |
 | `anima-turbo-face-reference-ipadapter` | Anima Turbo + IPAdapter | Anima face/character reference route; SFW/NSFW-capable | Official Anima Turbo v1.1 BF16, Anima IPAdapter Character Reference v10, SigLIP2 |
@@ -453,6 +454,8 @@ workflow description.
 | `animagine-xl-3.1-nsfw` | SDXL | Anime/NIKKE workflow that can produce NSFW content | Animagine XL 3.1, profile LoRA, Rapi LoRA |
 | `blue-archive-style-sdxl` | SDXL | Blue Archive game-CG style workflow; SFW/NSFW-capable | Animagine XL 3.1, Blue Archive Game CG Style LoCon |
 | `blue-archive-character-illustrious-xl` | SDXL/Illustrious | Asuna identity and four-outfit workflow, SFW/NSFW-capable | Illustrious XL v0.1, Asuna Ichinose 4-outfit LoRA |
+| `sdxl-face-reference-ipadapter` | SDXL + IPAdapter | Portrait reference conditioning | Animagine XL 3.1, IPAdapter Plus Face, ViT-H |
+| `sdxl-openpose-controlnet` | SDXL + ControlNet | Body pose conditioning | Animagine XL 3.1, Xinsir OpenPose ControlNet and preprocessor |
 
 Every workflow and every model/component profile in the registry now declares
 `nsfw_capable: true` and includes `nsfw` in its content modes. This is a

@@ -15,6 +15,17 @@ param(
     [string]$SamplerName,
     [string]$Scheduler,
     [string]$FilenamePrefix,
+    [string]$InputImage,
+    [string]$MaskImage,
+    [ValidateSet('red', 'green', 'blue', 'alpha')]
+    [string]$MaskChannel,
+    [int]$GrowMaskBy,
+    [string]$FaceImage,
+    [string]$ControlImage,
+    [double]$ControlStrength,
+    [double]$ControlStartPercent,
+    [double]$ControlEndPercent,
+    [double]$IPAdapterWeight,
     [double]$LoraConceptStrength,
     [double]$LoraRapiStrength,
     [string]$ClientId = 'project-workflow-api-local',
@@ -45,7 +56,9 @@ $bodyObject = [ordered]@{
 
 $parameterNames = @(
     'Prompt', 'NegativePrompt', 'Seed', 'Width', 'Height', 'BatchSize', 'Steps',
-    'Cfg', 'Denoise', 'SamplerName', 'Scheduler', 'FilenamePrefix'
+    'Cfg', 'Denoise', 'SamplerName', 'Scheduler', 'FilenamePrefix',
+    'InputImage', 'MaskImage', 'MaskChannel', 'GrowMaskBy', 'FaceImage',
+    'ControlImage', 'ControlStrength', 'ControlStartPercent', 'ControlEndPercent', 'IPAdapterWeight'
 )
 $parameterMap = @{
     Prompt = 'prompt'
@@ -60,6 +73,16 @@ $parameterMap = @{
     SamplerName = 'sampler_name'
     Scheduler = 'scheduler'
     FilenamePrefix = 'filename_prefix'
+    InputImage = 'input_image'
+    MaskImage = 'mask_image'
+    MaskChannel = 'mask_channel'
+    GrowMaskBy = 'grow_mask_by'
+    FaceImage = 'face_image'
+    ControlImage = 'control_image'
+    ControlStrength = 'control_strength'
+    ControlStartPercent = 'control_start_percent'
+    ControlEndPercent = 'control_end_percent'
+    IPAdapterWeight = 'ipadapter_weight'
 }
 $parameters = [ordered]@{}
 foreach ($name in $parameterNames) {

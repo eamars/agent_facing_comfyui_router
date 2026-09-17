@@ -24,6 +24,7 @@ from aiohttp import web
 from PIL import Image, UnidentifiedImageError
 
 import execution
+import folder_paths
 from comfy_execution.jobs import validate_job_id
 from server import PromptServer
 
@@ -365,7 +366,7 @@ def _as_float(name: str, value: Any, minimum: float, maximum: float) -> float:
         raise ApiError(400, f"{name} must be a number")
     try:
         converted = float(value)
-    except (TypeError, ValueError) as exc:
+    except (TypeError, ValueError, OverflowError) as exc:
         raise ApiError(400, f"{name} must be a number") from exc
     if not minimum <= converted <= maximum:
         raise ApiError(400, f"{name} must be between {minimum} and {maximum}")
@@ -427,7 +428,7 @@ def _safe_input_file(value: Any, parameter_name: str) -> str:
 
 def _resolve_input_file(value: Any, parameter_name: str) -> tuple[str, Path]:
     file_name = _safe_input_file(value, parameter_name)
-    input_root = (COMFY_ROOT / "input").resolve()
+    input_root = Path(folder_paths.get_input_directory()).resolve()
     input_path = (input_root / file_name).resolve()
     try:
         input_path.relative_to(input_root)
@@ -647,7 +648,7 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
     if "prompt" not in parameters:
         raise ApiError(422, "parameters.prompt (or its subject alias) is required; an empty string is allowed", expected=["prompt", "subject"])
     if "seed" not in parameters:
-        parameters["seed"] = secrets.randbelow(2**63)
+        parameters["seed"] = secrets.randbelow(2**53)
     image_info: dict[str, dict[str, Any]] = {}
     for name in ("input_image", "mask_image", "face_image", "control_image"):
         if name in parameters:
@@ -1101,7 +1102,8 @@ def _resolve_routes(
         )
     matches.sort(key=lambda item: (-item["score"], str(item["workflow_id"])))
     total_matches = len(matches)
-    top_match = matches[0] if matches else None
+    ready_matches = [match for match in matches if match["ready"]]
+    top_match = ready_matches[0] if ready_matches else None
     selected = top_match
     has_specific_selector = any(
         query.get(key)
@@ -1118,8 +1120,8 @@ def _resolve_routes(
         and not query.get("workflow")
         and not query.get("domain")
         and not query.get("family")
-        and total_matches > 1
-        and selected["score"] - matches[1]["score"] < 40
+        and len(ready_matches) > 1
+        and selected["score"] - ready_matches[1]["score"] < 40
     ):
         selected = None
         selection_status = "ambiguous"
@@ -1448,7 +1450,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
 
 
 def _openapi_document() -> dict[str, Any]:
-    return {
+    document = {
         "openapi": "3.1.0",
         "info": {
             "title": "Project ComfyUI Agent API",
@@ -1935,6 +1937,52 @@ def _openapi_document() -> dict[str, Any]:
     }
 
 
+    schemas = document["components"]["schemas"]
+    schemas["ApiError"] = {
+        "type": "object", "required": ["error"], "properties": {"error": {
+            "type": "object", "required": ["type", "message", "route", "expected"],
+            "properties": {"type": {"type": "string"}, "message": {"type": "string"},
+                           "route": {"type": ["string", "null"]},
+                           "expected": {"type": "array", "items": {"type": "string"}}, "details": {}},
+        }},
+    }
+    schemas["Warning"] = {"type": "object", "required": ["code", "message"], "properties": {
+        "code": {"type": "string"}, "message": {"type": "string"}, "parameter": {"type": "string"},
+        "value": {"type": "number"}, "recommended": {"type": "array", "items": {"type": "number"}},
+    }}
+    common = {
+        "applied_parameters": {"type": "object", "description": "Canonical graph-bound values including defaults; this describes application to the graph, not model adherence."},
+        "ignored_parameters": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
+        "effective_parameters": {"type": "object"}, "resources": {"type": "object"},
+        "warnings": {"type": "array", "items": {"$ref": "#/components/schemas/Warning"}},
+    }
+    schemas["QueuedJob"] = {"type": "object", "required": ["prompt_id", "job_id", "job_url", "state", *common], "properties": {
+        **common, "prompt_id": {"type": "string", "format": "uuid"},
+        "job_id": {"type": "string", "format": "uuid", "description": "Compatibility alias, identical to prompt_id."},
+        "job_url": {"type": "string"}, "state": {"const": "queued"}, "workflow": {"type": "string"},
+    }}
+    schemas["DryRun"] = {"type": "object", "required": ["prompt", "ready", "validated", *common], "properties": {
+        **common, "prompt": {"type": "object"}, "ready": {"type": "boolean"}, "validated": {"type": "boolean"},
+    }}
+    schemas["JobStatus"] = {"type": "object", "required": ["prompt_id", "job_id", "state", "outputs", "queued_ms", "elapsed_ms"], "properties": {
+        "prompt_id": {"type": "string", "format": "uuid"}, "job_id": {"type": "string", "format": "uuid"},
+        "state": {"enum": ["queued", "running", "succeeded", "failed"]},
+        "queued_ms": {"type": ["integer", "null"], "minimum": 0},
+        "elapsed_ms": {"type": "integer", "minimum": 0}, "outputs": {"type": "array", "items": {"type": "object"}},
+    }}
+    schemas["NamedPromptRequest"]["description"] = "Use the selected workflow's parameter_schema. prompt (or subject alias) and required image inputs are validated before queueing."
+    for path in ("/project/prompt", "/project/generate"):
+        responses = document["paths"][path]["post"]["responses"]
+        responses["200"]["content"] = {"application/json": {"schema": {"oneOf": [
+            {"$ref": "#/components/schemas/QueuedJob"}, {"$ref": "#/components/schemas/DryRun"},
+        ]}}}
+        for status, description in {"400": "Invalid or unknown parameter", "404": "Unknown workflow", "409": "Unavailable dependencies", "422": "Missing required input", "429": "Project queue full"}.items():
+            responses[status] = {"description": description, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApiError"}}}}
+    document["paths"]["/project/jobs/{prompt_id}"]["get"]["responses"]["200"]["content"] = {
+        "application/json": {"schema": {"$ref": "#/components/schemas/JobStatus"}}}
+    return document
+
+
 def _validated_prompt_id(value: Any) -> str:
     if not isinstance(value, str):
         raise ApiError(400, "prompt_id must be a UUID")
@@ -2139,6 +2187,11 @@ class ProjectWorkflowCoordinator:
     def _set_state(self, prompt_id: str, **updates: Any) -> None:
         state = self._states.setdefault(prompt_id, {"prompt_id": prompt_id})
         state.update(updates)
+        if updates.get("completed") and state.get("timing"):
+            timing = state["timing"]
+            now = time.monotonic()
+            timing.setdefault("queued_ms", max(0, round((now - timing["submitted_monotonic"]) * 1000)))
+            timing.setdefault("elapsed_ms", max(0, round((now - timing["started_monotonic"]) * 1000)) if "started_monotonic" in timing else 0)
 
     def _remove_pending(self, prompt_id: str) -> None:
         try:
@@ -2297,7 +2350,7 @@ def _project_input_files() -> tuple[bool, list[dict[str, Any]]]:
     result directly usable as ``parameters.input_image`` without exposing
     filesystem layout to an agent.
     """
-    input_root = (COMFY_ROOT / "input").resolve()
+    input_root = Path(folder_paths.get_input_directory()).resolve()
     if not input_root.is_dir():
         return False, []
 
@@ -2352,7 +2405,7 @@ async def delete_project_input(request: web.Request) -> web.Response:
     """Delete one file from ComfyUI's input directory without path escape."""
     try:
         file_name = _safe_input_file(request.match_info.get("name", ""), "name")
-        input_root = (COMFY_ROOT / "input").resolve()
+        input_root = Path(folder_paths.get_input_directory()).resolve()
         input_path = (input_root / file_name).resolve()
         try:
             input_path.relative_to(input_root)

@@ -184,6 +184,15 @@
             "prompt_class": "sfw",
             "input_image": "example.png",
             "denoise": 0.65
+          },
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "369f4628-1cb9-4334-87ca-e3b67f951d50",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 5640,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -233,7 +242,7 @@
           "style",
           "content_mode"
         ],
-        "negative_prompt": "supported; use short quality/artifact exclusions rather than a long weighted tag chain",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "input_image": "Optional reference image is accepted through input_image for latent image-to-image; use denoise to control adherence.",
         "avoid": [
           "routing explicit Blue Archive or NIKKE identity requests here",
@@ -601,6 +610,15 @@
             "input_image": "example.png",
             "mask_image": "example.png",
             "denoise": 0.65
+          },
+          {
+            "mode": "inpaint-named-API",
+            "status": "success",
+            "job_id": "d7fe8755-eea5-43e5-b4ca-a11a78873396",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 4531,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -642,7 +660,7 @@
         ],
         "mask_image": "The mask is executable, not a semantic region label. White/red means redraw and black means preserve; use mask_channel to select the channel.",
         "denoise": "For clothing replacement use 0.60-0.75 as a starting range; lower values preserve more source detail but may not change the garment.",
-        "negative_prompt": "supported; keep it short and include duplicate, multiple views, text and watermark when the source is a character sheet",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "avoid": [
           "sending a character sheet without 1girl, solo",
           "expecting denoise alone to isolate clothing",
@@ -999,6 +1017,15 @@
             "face_image": "xiaoman_portrait.png",
             "steps": 2,
             "resolution": "512x768"
+          },
+          {
+            "mode": "face-reference-named-API",
+            "status": "success",
+            "job_id": "57f48204-9f99-4a97-89c1-2e1d4de6864f",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 12297,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -1405,6 +1432,15 @@
             "control_image": "asuna_src_up.png",
             "steps": 2,
             "resolution": "512x768"
+          },
+          {
+            "mode": "openpose-control-named-API",
+            "status": "success",
+            "job_id": "e68453f4-faca-4fd7-8971-a08ae277c269",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 11359,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -1794,6 +1830,15 @@
             "status": "success",
             "job_id": "7daaf9a8-751f-46c2-8622-eefd5c62d3c7",
             "prompt_class": "sfw"
+          },
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "855c56cc-61dd-4fc9-80d4-05b0dc3ba0af",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 15609,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -2129,6 +2174,15 @@
             "status": "success",
             "job_id": "548c1c01-f453-4af1-a08b-17aa8703f6c2",
             "prompt_class": "sfw"
+          },
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "1bea3e5e-52f6-4239-8d75-da3fc67d1ea7",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 10172,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -2552,6 +2606,15 @@
             "status": "success",
             "job_id": "045e5159-d8fb-489b-b742-bb043034a442",
             "prompt_class": "sfw"
+          },
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "0a71f1bd-8bba-43b3-981a-1b17059b0d40",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 8672,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -2960,6 +3023,15 @@
             "status": "success",
             "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4",
             "prompt_class": "sfw"
+          },
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "fed59af8-ae8e-4bbb-8983-71ecce431eb6",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 8938,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -3422,6 +3494,15 @@
             "resolution": "512x512",
             "steps": 8,
             "output": "probe_anima_turbo_base_00001_.png"
+          },
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "2915541c-bb28-41a7-ae25-e04efd059e40",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 5157,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -3475,7 +3556,7 @@
           "content_mode"
         ],
         "quality_prefix": "masterpiece, best quality",
-        "negative_prompt": "supported; start with worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
         "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
         "avoid": [
@@ -3850,6 +3931,15 @@
             "resolution": "512x512",
             "steps": 8,
             "output": "probe_anima_turbo_face_00001_.png"
+          },
+          {
+            "mode": "face-reference-named-API",
+            "status": "success",
+            "job_id": "aac4f8f0-ed55-4bcf-9e55-583a2e349523",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 11282,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -3891,7 +3981,7 @@
         ],
         "face_image": "Upload a clear single-person portrait and pass its returned relative filename as face_image. Do not pass input_image for this route.",
         "ipadapter_weight": "Start at 1.0. Higher values increase reference influence but can reduce prompt control; the route's node also uses fixed SigLIP2/IP CFG defaults validated for this adapter.",
-        "negative_prompt": "supported; keep it focused on duplicate subjects, multiple views, anatomy, text and watermark",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "strict_face_only_alternative": "For a stricter SDXL face-centric IPAdapter route, use sdxl-face-reference-ipadapter explicitly; it is a separate architecture and is retained alongside this Anima route.",
         "avoid": [
           "using a three-view sheet when a single portrait is available",
@@ -4121,7 +4211,7 @@
         ],
         "prompt_granularity": {
           "minimum": "minimal",
-          "recommended": "minimal",
+          "recommended": "structured",
           "maximum": "detailed",
           "accepted": [
             "minimal",
@@ -4176,10 +4266,10 @@
         "lora_support": false,
         "inpaint_support": true,
         "mask_support": true,
-        "prompt_dialect": "short-natural-language-or-light-anime-tags",
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
         "prompt_granularity": {
           "minimum": "minimal",
-          "recommended": "minimal",
+          "recommended": "structured",
           "maximum": "detailed"
         },
         "natural_language": true,
@@ -4268,6 +4358,15 @@
             "mask_image": "interface_audit_mask.png",
             "steps": 8,
             "cfg": 1.0
+          },
+          {
+            "mode": "inpaint-named-API",
+            "status": "success",
+            "job_id": "44955bc4-0e56-4795-89c1-fff056e8b640",
+            "prompt_class": "sfw",
+            "date": "2026-09-17",
+            "elapsed_ms": 4469,
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
           }
         ],
         "limitations": [
@@ -4304,9 +4403,9 @@
           "content_mode"
         ],
         "quality_prefix": "masterpiece, best quality",
-        "negative_prompt": "supported; start with worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
-        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "input_image": "Required source image, together with mask_image of identical dimensions; output preserves original unmasked pixels.",
         "avoid": [
           "long unstructured prompt essays",
           "SDXL-only LoRA trigger syntax",
@@ -4361,8 +4460,6 @@
         },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
-          "width": 896,
-          "height": 1152,
           "steps": 12,
           "cfg": 1.0,
           "sampler_name": "er_sde",
