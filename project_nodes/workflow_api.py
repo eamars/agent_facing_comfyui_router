@@ -1015,6 +1015,13 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
         else:
             score += 60
             reasons.append(f"content_mode matched: {requested_content}")
+            preferences = routing.get("content_mode_preferences", {})
+            if isinstance(preferences, dict):
+                preference = preferences.get(requested_content)
+                if isinstance(preference, (int, float)) and not isinstance(preference, bool):
+                    score += int(preference)
+                    if preference:
+                        reasons.append(f"content_mode preference: {requested_content}")
 
     for selector, score_bonus, label in (
         ("input_type", 35, "input type"),
@@ -1120,6 +1127,7 @@ def _resolve_routes(
         and not query.get("workflow")
         and not query.get("domain")
         and not query.get("family")
+        and not query.get("style")
         and len(ready_matches) > 1
         and selected["score"] - ready_matches[1]["score"] < 40
     ):

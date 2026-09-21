@@ -4562,6 +4562,850 @@
         "controlnet": false,
         "image_to_image": false
       }
+    },
+    {
+      "id": "janku-v5-illustrious",
+      "name": "JANKU v5.0 — Polished Illustrious Anime",
+      "description": "Pinned JANKU v5.0 single-file SDXL/Illustrious workflow for polished, vibrant, glossy anime illustration with sharp linework and strong character/artist-tag knowledge.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-janku-v5",
+      "tags": [
+        "anime",
+        "illustration",
+        "sdxl",
+        "illustrious",
+        "janku",
+        "glossy",
+        "vibrant",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-illustration-nsfw-capable",
+      "file": "janku_v5_illustrious.json",
+      "model_ids": [
+        "janku-v5"
+      ],
+      "required_files": [
+        "models/checkpoints/JANKU_v5_0.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "anime",
+          "illustration",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "JANKU",
+          "JANKU v5",
+          "JANKU v5.0",
+          "JANKU Illustrious",
+          "NoobAI RouWei",
+          "NoobAI + RouWei"
+        ],
+        "styles": [
+          "JANKU",
+          "JANKU v5",
+          "JANKU v5.0",
+          "JANKU Illustrious",
+          "NoobAI RouWei",
+          "NoobAI + RouWei",
+          "Illustrious",
+          "glossy anime",
+          "shiny anime",
+          "vibrant anime",
+          "sharp anime linework",
+          "polished character illustration",
+          "anime",
+          "illustration",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 90,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 30,
+        "fallback": false,
+        "exclusive": false,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Do not use this generic route for explicit Blue Archive, NIKKE, face-reference, OpenPose or inpaint requirements; those capability-specific routes take precedence."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "glossy anime",
+          "shiny anime",
+          "vibrant anime",
+          "sharp anime linework",
+          "polished character illustration"
+        ],
+        "subjects": [
+          "anime characters",
+          "anime portraits",
+          "illustration"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": false,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "strong character and artist-tag knowledge without a required trigger word",
+        "style_control": "strong for polished, vibrant, glossy anime illustration",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "named-API-and-native-latent-I2I-graph",
+        "probes": [
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "8934dddc-1e36-4899-987d-050659812e4a",
+            "prompt_class": "sfw",
+            "date": "2026-09-18",
+            "resolution": "512x512",
+            "steps": 8,
+            "seed": 917,
+            "elapsed_ms": 8750,
+            "output": "focused_janku-v5-illustrious_00001_.png",
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
+          }
+        ],
+        "limitations": [
+          "The SFW probe validates graph execution and checkpoint loading, not visual quality, character likeness, NSFW quality or prompt fidelity."
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "explicit JANKU v5 or JANKU v5.0 requests",
+          "generic NSFW anime when no specialized capability is requested",
+          "polished Illustrious anime",
+          "vibrant color, strong contrast and glossy/shiny rendering",
+          "sharp anime linework and artist-tag prompting"
+        ],
+        "not_for": [
+          "explicit Blue Archive or NIKKE identity/style routes",
+          "face-reference, OpenPose or inpaint requests",
+          "requests requiring optional detailers, embeddings or LoRAs"
+        ],
+        "priority_signals": [
+          "JANKU",
+          "JANKU v5",
+          "JANKU Illustrious",
+          "NoobAI RouWei",
+          "glossy anime",
+          "shiny anime",
+          "vibrant anime",
+          "sharp anime linework"
+        ],
+        "specific_route_precedence": [
+          "blue-archive-character-illustrious-xl",
+          "blue-archive-style-sdxl",
+          "animagine-xl-3.1-nsfw",
+          "sdxl-face-reference-ipadapter",
+          "sdxl-openpose-controlnet",
+          "moody-anima-inpaint"
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Use normal Illustrious quality tags, ordered Danbooru/NoobAI tags, character and appearance tags, optional artist tags using the 'by artistname' convention, then pose, camera, scene and lighting. No trigger word is required.",
+        "optional_fields": [
+          "character",
+          "series",
+          "artist",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "avoid": [
+          "injecting sexual terms into a caller prompt",
+          "using this generic route for explicit capability-specific requests",
+          "adding optional LoRAs or embeddings that are not declared by this route"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "lighting"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-30 steps, CFG 3-5, Euler or Euler A/euler_ancestral with the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            30
+          ],
+          "cfg": [
+            3,
+            5
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms."
+      },
+      "compatibility_notes": [
+        "JANKU v5.0 is exposed through the canonical single-file SDXL/Illustrious checkpoint loader.",
+        "The John6666 Hugging Face repository is a Diffusers conversion and is reference metadata only; this route does not download or load a Diffusers directory.",
+        "No trigger word, optional embedding, detailer or LoRA is required by the route.",
+        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "JANKU v5 SFW glossy portrait",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, anime portrait, vibrant colors, glossy hair, sharp linework, looking at viewer, upper body, sunlit garden, soft rim light"
+          },
+          {
+            "purpose": "JANKU v5 SFW artist-tag prompt",
+            "prompt": "masterpiece, best quality, 1girl, solo, by artistname, elegant anime character, detailed outfit, three-quarter view, dramatic colorful lighting"
+          }
+        ]
+      },
+      "source": {
+        "creator": "janxd",
+        "civitai_model_id": 1277670,
+        "civitai_version_id": 1896532,
+        "mirror_url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true",
+        "reference_repository": "https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl",
+        "canonical_file": "JANKUTrainedNoobaiRouwei_v50.safetensors",
+        "local_file": "JANKU_v5_0.safetensors"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "2",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "width": {
+          "node": "4",
+          "input": "width"
+        },
+        "height": {
+          "node": "4",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "4",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "5",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "5",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "5",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "5",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "5",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "5",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "7",
+          "input": "filename_prefix"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "janku_v5_illustrious"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      }
+    },
+    {
+      "id": "one-obsession-v20-bold",
+      "name": "One Obsession v20_BOLD — Textured Illustrious Anime",
+      "description": "Pinned One Obsession v20_BOLD single-file SDXL/Illustrious workflow for high-detail anime with rich texture, dramatic light/shadow and polished 2D-to-2.5D rendering.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-one-obsession-v20-bold",
+      "tags": [
+        "anime",
+        "illustration",
+        "sdxl",
+        "illustrious",
+        "one-obsession",
+        "texture",
+        "dramatic-lighting",
+        "2.5d",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-illustration-nsfw-capable",
+      "file": "one_obsession_v20_bold.json",
+      "model_ids": [
+        "one-obsession-v20-bold"
+      ],
+      "required_files": [
+        "models/checkpoints/OneObsession_v20Bold.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "anime",
+          "illustration",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "One Obsession",
+          "One Obsession v20",
+          "One Obsession v20 BOLD",
+          "v20 BOLD"
+        ],
+        "styles": [
+          "One Obsession",
+          "One Obsession v20",
+          "One Obsession v20 BOLD",
+          "v20 BOLD",
+          "stylized Illustrious",
+          "2.5D anime",
+          "glossy anime",
+          "high contrast anime",
+          "dramatic light and shadow",
+          "polished anime portrait",
+          "anime",
+          "illustration",
+          "anime portrait",
+          "stylized"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 70,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 25,
+        "fallback": false,
+        "exclusive": false,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Do not use this generic route for explicit Blue Archive, NIKKE, face-reference, OpenPose or inpaint requirements; those capability-specific routes take precedence."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized Illustrious",
+          "2.5D anime",
+          "glossy anime",
+          "high contrast anime",
+          "dramatic light and shadow",
+          "polished anime portrait"
+        ],
+        "subjects": [
+          "anime characters",
+          "anime portraits",
+          "illustration"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": false,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "strong stylized character illustration from tags without a required trigger word",
+        "style_control": "strong for rich texture, dramatic light/shadow and polished 2D/2.5D rendering",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "named-API-and-native-latent-I2I-graph",
+        "probes": [
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "e5a0e732-26e3-4c5c-89f9-3523721b571c",
+            "prompt_class": "sfw",
+            "date": "2026-09-18",
+            "resolution": "512x512",
+            "steps": 8,
+            "seed": 917,
+            "elapsed_ms": 7437,
+            "output": "focused_one-obsession-v20-bold_00001_.png",
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
+          }
+        ],
+        "limitations": [
+          "The SFW probe validates graph execution and checkpoint loading, not visual quality, character likeness, NSFW quality or prompt fidelity."
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "explicit One Obsession v20_BOLD requests",
+          "stylized 2D/2.5D anime",
+          "texture-focused polished character portraits",
+          "dramatic light and shadow",
+          "high-contrast glossy anime illustration"
+        ],
+        "not_for": [
+          "explicit Blue Archive or NIKKE identity/style routes",
+          "face-reference, OpenPose or inpaint requests",
+          "requests requiring optional LoRAs or detailers"
+        ],
+        "priority_signals": [
+          "One Obsession",
+          "One Obsession v20",
+          "One Obsession v20 BOLD",
+          "v20 BOLD",
+          "stylized 2D/2.5D",
+          "texture",
+          "dramatic light and shadow",
+          "polished anime portrait"
+        ],
+        "specific_route_precedence": [
+          "blue-archive-character-illustrious-xl",
+          "blue-archive-style-sdxl",
+          "animagine-xl-3.1-nsfw",
+          "sdxl-face-reference-ipadapter",
+          "sdxl-openpose-controlnet",
+          "moody-anima-inpaint"
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Use Illustrious/NoobAI-style tags with a quality prefix, subject count, character/appearance, outfit, pose, camera, scene and lighting. Quality tags improve consistency; no trigger word is required.",
+        "optional_fields": [
+          "character",
+          "series",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting",
+          "rendering_style"
+        ],
+        "avoid": [
+          "injecting sexual terms into a caller prompt",
+          "forcing a 2D-only negative prompt",
+          "using this generic route for explicit capability-specific requests",
+          "adding a LoRA that is not declared by this route"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "appearance",
+          "pose",
+          "lighting",
+          "texture"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-35 steps, CFG 3-6, with Euler A/euler_ancestral for a cleaner/neater result than Euler in the author's guidance; use the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            35
+          ],
+          "cfg": [
+            3,
+            6
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Keep the negative prompt caller-controlled and compatible with a 2D/2.5D request; do not permanently force a 2D-only exclusion."
+      },
+      "compatibility_notes": [
+        "This route is pinned specifically to One Obsession v20_BOLD; it must not silently substitute v21, v22, v23, v24 or latest.",
+        "The checkpoint is loaded as a normal single-file SDXL/Illustrious model and requires no LoRA.",
+        "The model supports anime through mildly 2.5D rendering; caller prompts control the final subject and content.",
+        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal requests; use expert when tuning texture, tag weights, lighting or composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, highres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "One Obsession v20 BOLD SFW 2.5D portrait",
+            "prompt": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, highres, 1girl, solo, polished anime character portrait, textured hair, elegant outfit, three-quarter view, dramatic light and shadow, warm studio background"
+          },
+          {
+            "purpose": "One Obsession v20 BOLD SFW textured illustration",
+            "prompt": "masterpiece, best quality, 1girl, solo, stylized anime illustration, rich fabric texture, glossy highlights, cinematic rim light, detailed environment, polished 2.5D rendering"
+          }
+        ]
+      },
+      "source": {
+        "creator": "maxfeifei8",
+        "civitai_model_id": 1318945,
+        "civitai_model_name": "One Obsession v20_BOLD",
+        "mirror_url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/oneObsession_v20Bold.safetensors?download=true",
+        "canonical_file": "oneObsession_v20Bold.safetensors",
+        "local_file": "OneObsession_v20Bold.safetensors"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "2",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "width": {
+          "node": "4",
+          "input": "width"
+        },
+        "height": {
+          "node": "4",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "4",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "5",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "5",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "5",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "5",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "5",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "5",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "7",
+          "input": "filename_prefix"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "one_obsession_v20_bold"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 4,
+        "min_free_vram_gib": 2,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      }
     }
   ]
 }

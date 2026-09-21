@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "purpose": "Ten prompt inputs for agent route-selection simulation. This fixture is never submitted to /project/generate.",
+  "purpose": "Twelve prompt inputs for agent route-selection simulation. This fixture is never submitted to /project/generate.",
   "generation_requested": false,
   "routing_boundary": "Only workflow/model selectors are sent to /project/resolve; character and outfit remain inside the agent-authored prompt.",
   "agent_flow": ["user_request", "agent_route_query", "project_resolve", "agent_prompt", "no_generation"],
@@ -143,6 +143,32 @@
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, adult rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapiswim, mature adult woman, black bikini, wet hair, poolside at twilight, elegant glamour pose, reflective water, cinematic anime lighting",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
       "expected_workflow": "animagine-xl-3.1-nsfw"
+    },
+    {
+      "id": "janku-v5-glossy-portrait",
+      "label": "JANKU v5 — glossy high-contrast anime portrait",
+      "user_request": "Use JANKU v5 for a glossy high-contrast anime portrait.",
+      "agent_route_query": {
+        "style": "JANKU v5",
+        "content_mode": "sfw",
+        "prompt_granularity": "detailed"
+      },
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, polished anime portrait, glossy hair, vibrant colors, sharp linework, soft studio light",
+      "negative_prompt": "worst quality, low quality, bad anatomy, bad hands, text, watermark, logo, signature",
+      "expected_workflow": "janku-v5-illustrious"
+    },
+    {
+      "id": "one-obsession-v20-bold-portrait",
+      "label": "One Obsession v20 BOLD — polished stylized 2.5D portrait",
+      "user_request": "Use One Obsession v20 BOLD for a polished stylized 2.5D anime portrait.",
+      "agent_route_query": {
+        "style": "One Obsession v20 BOLD",
+        "content_mode": "sfw",
+        "prompt_granularity": "detailed"
+      },
+      "prompt": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, 1girl, solo, stylized anime portrait, rich texture, polished 2.5D rendering, dramatic light and shadow",
+      "negative_prompt": "worst quality, low quality, bad anatomy, bad hands, text, watermark, logo, signature",
+      "expected_workflow": "one-obsession-v20-bold"
     }
   ]
 }

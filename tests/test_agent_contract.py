@@ -131,6 +131,88 @@ class AgentContractTests(unittest.TestCase):
         with self.assertRaises(api.ApiError):
             api._route_query({"domian": "anime"})
 
+    def test_janku_and_one_obsession_registry_downloader_and_graph_contracts(self):
+        entries = {entry["id"]: entry for entry in catalog["workflows"]}
+        models = {model["id"]: model for model in api._read_catalog()["model_registry"]}
+        expected = {
+            "janku-v5-illustrious": (
+                "janku-v5",
+                "JANKU_v5_0.safetensors",
+                6938040674,
+                "217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5",
+            ),
+            "one-obsession-v20-bold": (
+                "one-obsession-v20-bold",
+                "OneObsession_v20Bold.safetensors",
+                6938040682,
+                "7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B",
+            ),
+        }
+        downloader = (ROOT / "scripts" / "download_models.ps1").read_text(encoding="utf-8")
+        for workflow_id, (model_id, filename, size, sha256) in expected.items():
+            entry = entries[workflow_id]
+            model = models[model_id]
+            self.assertEqual(entry["model_ids"], [model_id])
+            self.assertEqual(Path(entry["file"]).suffix, ".json")
+            self.assertEqual(Path(model["required_file"]).name, filename)
+            self.assertEqual(model["file_sizes"][model["required_file"]], size)
+            self.assertEqual(model["source"]["bytes"], size)
+            self.assertEqual(model["source"]["sha256"], sha256)
+            self.assertTrue(model["capabilities"]["nsfw_capable"])
+            self.assertEqual(model["capabilities"]["content_modes"], ["sfw", "nsfw"])
+            self.assertEqual(entry["capabilities"]["content_modes"], ["sfw", "nsfw"])
+            self.assertTrue(entry["required_files"])
+            self.assertEqual(entry["required_files"], [model["required_file"]])
+            self.assertIn(workflow_id, downloader)
+            self.assertIn(filename, downloader)
+            self.assertIn(sha256, downloader)
+            graph = api._read_workflow(entry)
+            self.assertEqual(graph["1"]["class_type"], "CheckpointLoaderSimple")
+            self.assertEqual(graph["1"]["inputs"]["ckpt_name"], filename)
+            self.assertEqual(
+                {node["class_type"] for node in graph.values()},
+                {"CheckpointLoaderSimple", "CLIPTextEncode", "EmptyLatentImage", "KSampler", "VAEDecode", "SaveImage"},
+            )
+            prepared = api._prepare_graph(entry, {"parameters": {"prompt": "1girl, solo, SFW anime portrait"}})
+            self.assertEqual(api._binding_value(prepared, entry, "width"), 1024)
+            self.assertEqual(api._binding_value(prepared, entry, "height"), 1536)
+            self.assertEqual(api._binding_value(prepared, entry, "steps"), 30)
+            with self.assertRaises(api.ApiError):
+                api._prepare_graph(entry, {"parameters": {"prompt": "portrait", "unknown": True}})
+        self.assertIn(
+            "'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl'",
+            downloader,
+        )
+
+    def test_new_route_readiness_tracks_required_file_installation(self):
+        entries = {entry["id"]: entry for entry in catalog["workflows"]}
+        models = {model["id"]: model for model in api._read_catalog()["model_registry"]}
+        for workflow_id, model_id in (
+            ("janku-v5-illustrious", "janku-v5"),
+            ("one-obsession-v20-bold", "one-obsession-v20-bold"),
+        ):
+            entry = copy.deepcopy(entries[workflow_id])
+            model = copy.deepcopy(models[model_id])
+            entry["required_files"] = ["model.bin"]
+            model["required_file"] = "model.bin"
+            model["file_sizes"] = {"model.bin": 4}
+            self.assertFalse(api._public_entry(entry, [model])["ready"])
+            (self.root / "model.bin").write_bytes(b"1234")
+            self.assertTrue(api._public_entry(entry, [model])["ready"])
+            (self.root / "model.bin").unlink()
+
+    def test_content_mode_preferences_preserve_sfw_default_and_prefer_janku_for_nsfw(self):
+        entries = {entry["id"]: entry for entry in catalog["workflows"]}
+        janku = entries["janku-v5-illustrious"]
+        one_obsession = entries["one-obsession-v20-bold"]
+        anima = entries["anima-turbo-v1-1"]
+        sfw = {"domain": "anime", "content_mode": "sfw"}
+        nsfw = {"domain": "anime", "content_mode": "nsfw"}
+        self.assertLess(api._route_score(janku, sfw)[0], api._route_score(anima, sfw)[0])
+        self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0])
+        self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v5"}))
+        self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v20 BOLD"}))
+
     def test_readiness_includes_registry_eligibility_nodes_and_size(self):
         model_file = self.root / "model.bin"
         model_file.write_bytes(b"1234")

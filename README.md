@@ -8,7 +8,8 @@ image-to-image mode when its `input_contract` declares it; the catalog also
 includes masked inpaint, face-centric IPAdapter and OpenPose ControlNet routes.
 The original Moody Desire Mix workflow remains available alongside the
 official Anima Turbo v1.1 routes, the retained Moody Anima Mix comparison
-route, Animagine XL 3.1 and Blue Archive routes.
+route, Animagine XL 3.1, Blue Archive routes, and two pinned
+Illustrious/SDXL checkpoints: JANKU v5.0 and One Obsession v20_BOLD.
 
 The agent API is version **1.5.0**. See the
 [interface audit and verification notes](docs/interface-audit-2026-09-17.md)
@@ -47,6 +48,8 @@ can be downloaded independently:
 .\scripts\download_models.ps1 -Profile animagine-xl-3.1-nsfw
 .\scripts\download_models.ps1 -Profile blue-archive-style-sdxl
 .\scripts\download_models.ps1 -Profile blue-archive-character-illustrious-xl
+.\scripts\download_models.ps1 -Profile janku-v5-illustrious
+.\scripts\download_models.ps1 -Profile one-obsession-v20-bold
 .\scripts\download_models.ps1 -Profile ipadapter-face-sdxl
 .\scripts\download_models.ps1 -Profile controlnet-openpose-sdxl
 ```
@@ -102,6 +105,9 @@ hint layers:
   outfit.
 - `anima-turbo-v1-1` is the preferred official generic Anima/Turbo route.
   `moody-anima-mix` remains available as a separate comparison/fallback route.
+  For generic SFW anime with no model/style preference, Anima Turbo remains
+  preferred. The metadata-driven resolver prefers JANKU v5.0 for generic NSFW
+  anime and honors exact JANKU/One Obsession style aliases.
   Explicit Blue Archive or
   NIKKE requests are routed to their specialized routes first; the agent keeps
   the character, outfit and pose in the prompt after route selection.
@@ -373,7 +379,7 @@ route-specific prompting contract and does not synthesize prompt content.
 Passing `character` or `outfit` to `/project/resolve` is rejected deliberately;
 those fields belong in `parameters.prompt` after the route is selected.
 
-`workflows\agent_route_simulation_10.json` contains ten natural-language user
+`workflows\agent_route_simulation_10.json` contains twelve natural-language user
 requests, the route query an agent would extract, and the resulting prompt
 input. It includes SFW and NSFW-capable NIKKE cases. It is a simulation fixture
 only and is not submitted to the generation endpoint. Repeat the real route
@@ -454,6 +460,8 @@ workflow description.
 | `animagine-xl-3.1-nsfw` | SDXL | Anime/NIKKE workflow that can produce NSFW content | Animagine XL 3.1, profile LoRA, Rapi LoRA |
 | `blue-archive-style-sdxl` | SDXL | Blue Archive game-CG style workflow; SFW/NSFW-capable | Animagine XL 3.1, Blue Archive Game CG Style LoCon |
 | `blue-archive-character-illustrious-xl` | SDXL/Illustrious | Asuna identity and four-outfit workflow, SFW/NSFW-capable | Illustrious XL v0.1, Asuna Ichinose 4-outfit LoRA |
+| `janku-v5-illustrious` | SDXL/Illustrious | Polished, vibrant, glossy anime; SFW/NSFW-capable | Pinned JANKU v5.0 single-file checkpoint |
+| `one-obsession-v20-bold` | SDXL/Illustrious | Textured, dramatic-lighting anime with polished 2D/2.5D range; SFW/NSFW-capable | Pinned One Obsession v20_BOLD single-file checkpoint |
 | `sdxl-face-reference-ipadapter` | SDXL + IPAdapter | Portrait reference conditioning | Animagine XL 3.1, IPAdapter Plus Face, ViT-H |
 | `sdxl-openpose-controlnet` | SDXL + ControlNet | Body pose conditioning | Animagine XL 3.1, Xinsir OpenPose ControlNet and preprocessor |
 
@@ -532,6 +540,74 @@ agent should select the tags from the route's `prompting.lora_triggers`
 metadata. This route is a separate workflow/model route; it does not make
 character or outfit a resolver selector.
 
+## JANKU v5.0 model notes
+
+`janku-v5-illustrious` is pinned to the canonical single-file checkpoint
+associated with janxd's Civitai model 1277670, version 1896532. The stable
+local filename is `JANKU_v5_0.safetensors`; the downloader requires both
+6,938,040,674 bytes and SHA-256
+`217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5`.
+The public mirror is `Quiho/best-from-civitai`. The John6666 Hugging Face
+repository is a Diffusers conversion and is retained as reference metadata
+only; this route loads the single-file checkpoint through the normal
+`CheckpointLoaderSimple` path.
+
+The route is Illustrious/NoobAI/Danbooru-tag oriented and needs no trigger
+word. Start with 1024x1536, 25-30 steps, CFG 3-5, Euler or Euler A
+(`euler_ancestral`) and the `normal` scheduler. It is declared SFW/NSFW-capable
+as a capability only: the API never injects sexual prompt text. No embeddings,
+detailers or LoRAs are bundled.
+
+## One Obsession v20_BOLD model notes
+
+`one-obsession-v20-bold` is pinned specifically to maxfeifei8's One Obsession
+v20_BOLD from Civitai model 1318945. It must not silently substitute v21 or a
+later release. The stable local filename is
+`OneObsession_v20Bold.safetensors`; the downloader requires both 6,938,040,682
+bytes and SHA-256
+`7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B`.
+The public single-file mirror is `Quiho/best-from-civitai`.
+
+Use Illustrious/NoobAI-style tags with quality guidance such as
+`masterpiece, best quality, amazing quality, very aesthetic, absurdres,
+newest, highres` when useful. Start with 1024x1536, 25-35 steps, CFG 3-6,
+Euler A/`euler_ancestral` and the `normal` scheduler. It supports anime through
+a mildly 2.5D look; keep the final prompt and negative prompt caller-controlled
+instead of forcing a 2D-only negative. It is also declared SFW/NSFW-capable as
+a capability only and requires no LoRA.
+
+Both new routes expose the existing text-to-image and optional latent img2img
+contract, reject unknown named parameters, publish their checkpoint size/hash
+metadata, and use the existing 2,359,296-pixel SDXL admission convention.
+
+The public mirrors and original attribution records are sources for the pinned
+files, not a redistribution of model binaries in this repository. Check the
+upstream model pages and their applicable terms before commercial use.
+
+## Deployment probe results — 2026-09-18
+
+The two downloader profiles completed with exact byte-size and SHA-256
+verification, and the managed ComfyUI service was restarted before API probing.
+The non-generating verifier passed all 43 checks, including readiness,
+validated graphs, model/workflow discovery, parameter rejection and route
+selection. The route simulation fixture passed 12/12, including the JANKU and
+One Obsession requests and the existing Blue Archive/NIKKE specialized cases.
+
+Focused real-generation probes used the same SFW ceramic-teapot prompt, seed
+917, 512x512 output, 8 steps and Euler A for both new checkpoints:
+
+- JANKU job `8934dddc-1e36-4899-987d-050659812e4a` succeeded in 8,750 ms.
+- One Obsession job `e5a0e732-26e3-4c5c-89f9-3523721b571c` succeeded in 7,437 ms.
+
+These probes establish graph loading, model execution and output delivery only;
+they are not a benchmark of visual quality, prompt adherence, character
+likeness or NSFW quality. The all-ready-route `verify_agent_api.py --generate`
+pass was intentionally not claimed as complete because the pre-existing
+`moody-desire-v30` Flux.2 route exhausted the selected 24-GB GPU during model
+unload and aborted ComfyUI before the new routes were reached. The focused
+probes above independently verified both new routes after restarting the
+service.
+
 Sources used for the pinned model choices and workflow defaults:
 
 - [Moody Anima Mix model page](https://civitai.com/models/2700077/moody-anima-mix)
@@ -551,6 +627,11 @@ Sources used for the pinned model choices and workflow defaults:
 - [Blue Archive Game CG Style — Animagine3.1](https://huggingface.co/licyk/sd-lora/blob/main/sdxl/style/ag31_style_ba_v1-000016.safetensors)
 - [Illustrious XL v0.1 model card](https://huggingface.co/OnomaAIResearch/Illustrious-xl-early-release-v0)
 - [Asuna Ichinose 4-outfit IllustriousXL LoRA](https://huggingface.co/Muapi/asuna-ichinose-blue-archive-4-outfits-illustriousxl)
+- [JANKU v5.0 original Civitai model 1277670](https://civitai.com/models/1277670)
+- [JANKU v5.0 canonical single-file public mirror](https://huggingface.co/Quiho/best-from-civitai/blob/main/JANKUTrainedNoobaiRouwei_v50.safetensors)
+- [JANKU v5.0 Diffusers reference repository](https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl)
+- [One Obsession original Civitai model 1318945](https://civitai.com/models/1318945)
+- [One Obsession v20_BOLD canonical single-file public mirror](https://huggingface.co/Quiho/best-from-civitai/blob/main/oneObsession_v20Bold.safetensors)
 - [ComfyUI LoRA guide](https://docs.comfy.org/tutorials/basic/lora)
 
 Models, generated images and runtime logs are ignored by the root repository;

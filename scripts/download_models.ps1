@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
+    [ValidateSet('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -150,6 +150,24 @@ $AssetSets = @{
             Sha256 = '24E04396471196283291B664FFB3DE9E59B770F4CBF99FF6573E6816F8B69685'
         }
     )
+    'janku-v5-illustrious' = @(
+        [pscustomobject]@{
+            Name = 'JANKU v5.0 canonical Illustrious/SDXL checkpoint (janxd, Civitai model 1277670, version 1896532)'
+            Url = 'https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'checkpoints\JANKU_v5_0.safetensors')
+            Bytes = [int64]6938040674
+            Sha256 = '217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5'
+        }
+    )
+    'one-obsession-v20-bold' = @(
+        [pscustomobject]@{
+            Name = 'One Obsession v20_BOLD canonical Illustrious/SDXL checkpoint (maxfeifei8, Civitai model 1318945)'
+            Url = 'https://huggingface.co/Quiho/best-from-civitai/resolve/main/oneObsession_v20Bold.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'checkpoints\OneObsession_v20Bold.safetensors')
+            Bytes = [int64]6938040682
+            Sha256 = '7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B'
+        }
+    )
     'ipadapter-face-sdxl' = @(
         [pscustomobject]@{
             Name = 'IPAdapter Plus Face SDXL ViT-H adapter'
@@ -217,7 +235,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }
