@@ -64,6 +64,37 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(api._request_parameters({"parameters": {"positive_prompt": "unchanged"}}), {"prompt": "unchanged"})
         self.assertEqual(api._request_parameters({"parameters": {"subject": "A ceramic teapot."}}), {"prompt": "A ceramic teapot."})
 
+    def test_qwen_official_sampling_and_edit_reference_size(self):
+        self.entry = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-t2i")
+        graph = self.graph()
+        self.assertEqual([api._binding_value(graph, self.entry, key) for key in
+                          ("width", "height", "batch_size", "steps", "cfg", "sampler_name", "scheduler", "denoise")],
+                         [1024, 1024, 1, 25, 1, "euler", "simple", 1])
+        self.assertBad(input_image="source.png")
+        self.entry = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-edit")
+        with self.assertRaises(api.ApiError) as caught:
+            self.graph()
+        self.assertEqual(caught.exception.status, 422)
+        Image.new("RGB", (333, 349), "navy").save(self.root / "input/source.png")
+        graph = self.graph(input_image="source.png")
+        resource = api._resource_request(graph, self.entry)
+        self.assertEqual((resource["width"], resource["height"], resource["total_pixels"]), (320, 352, 320 * 352))
+        self.assertEqual(graph["452"]["inputs"]["resolution"], 0)
+        self.assertEqual(graph["458"]["inputs"]["latent_image"], ["452", 2])
+        self.assertEqual(graph["452"]["inputs"]["images.image_1"], ["470", 0])
+        self.assertBad(input_image="source.png", width=1024)
+        self.assertBad(input_image="source.png", batch_size=2)
+
+    def test_qwen_selection_does_not_replace_existing_generic_routes(self):
+        for entry in catalog["workflows"]:
+            if not entry["id"].startswith("qwen-image-2.1-"):
+                continue
+            self.assertIsNone(api._route_score(entry, {"domain": "anime"}))
+            self.assertIsNone(api._route_score(entry, {"domain": "blue archive"}))
+            self.assertIsNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw"}))
+            mode = "image-to-image" if entry["id"].endswith("edit") else "text-to-image"
+            self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "input_mode": mode}))
+
     def test_prompt_is_explicit_and_verbatim(self):
         with self.assertRaises(api.ApiError):
             api._prepare_graph(self.entry, {})

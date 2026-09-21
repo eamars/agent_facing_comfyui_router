@@ -477,6 +477,9 @@ def _resource_request(graph: dict[str, Any], entry: dict[str, Any]) -> dict[str,
         _, path = _resolve_input_file(_binding_value(graph, entry, "input_image"), "input_image")
         info = _image_info(path, "input_image")
         width, height, batch = info["width"], info["height"], 1
+        if entry.get("input_contract", {}).get("image", {}).get("mode") == "qwen-image-2.1-reference":
+            # Official resolution=0 rounds each reference dimension to 32.
+            width, height = (max(32, round(value / 32) * 32) for value in (width, height))
     limits = _resource_limits(entry)
     total = width * height * batch
     if total > limits["max_total_pixels"]:

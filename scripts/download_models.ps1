@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -12,6 +12,29 @@ $SigLIP2Root = Join-Path $ModelRoot 'siglip2\siglip2-base-patch16-512'
 $ControlNetAuxAnnotators = Join-Path $Comfy 'custom_nodes\comfyui_controlnet_aux\ckpts\lllyasviel\Annotators'
 
 $AssetSets = @{
+    'qwen-image-2.1' = @(
+        [pscustomobject]@{
+            Name = 'Official Qwen-Image-2.1 INT8 ConvRot diffusion model'
+            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/ace0edeb3791a594ddfa36ed5f41a178a394e921/diffusion_models/qwen_image_2.1_int8_convrot.safetensors'
+            Path = (Join-Path $ModelRoot 'diffusion_models\qwen_image_2.1_int8_convrot.safetensors')
+            Bytes = [int64]7256783064
+            Sha256 = 'CB74113CB03FAECD79611B01FD7FD642F0AA60D6F0B95086ABEE214D75EAA57D'
+        },
+        [pscustomobject]@{
+            Name = 'Official Qwen3VL 8B INT8 ConvRot text encoder'
+            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/ace0edeb3791a594ddfa36ed5f41a178a394e921/text_encoders/qwen3vl_8b_int8_convrot.safetensors'
+            Path = (Join-Path $ModelRoot 'text_encoders\qwen3vl_8b_int8_convrot.safetensors')
+            Bytes = [int64]9350798360
+            Sha256 = '8BFD0F6E12ABF2D2D697ECC888E5E90B0D6741D6708F05799F53AFA560452E8F'
+        },
+        [pscustomobject]@{
+            Name = 'Official Qwen-Image-2.1 BF16 VAE'
+            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/ace0edeb3791a594ddfa36ed5f41a178a394e921/vae/qwen_image_2.1_vae_bf16.safetensors'
+            Path = (Join-Path $ModelRoot 'vae\qwen_image_2.1_vae_bf16.safetensors')
+            Bytes = [int64]675509688
+            Sha256 = 'BB21F7473051E1AC368515DD3F2E15CD44D7A11748EE8823E1DDCA3E4876B7C9'
+        }
+    )
     'moody-anima-mix' = @(
         [pscustomobject]@{
             Name = 'Moody Anima Mix v1.0 checkpoint (Civitai model 2700077, file 2911005)'
@@ -235,7 +258,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

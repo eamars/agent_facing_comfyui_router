@@ -4,6 +4,438 @@
   "model_registry_file": "models.json",
   "workflows": [
     {
+      "id": "qwen-image-2.1-t2i",
+      "name": "Official Qwen-Image-2.1 Text to Image",
+      "description": "Official ComfyUI text-to-image template, INT8 ConvRot weights, 1024 square, 25 Euler/simple steps and CFG 1.",
+      "family": "qwen-image-2.1",
+      "resident_group": "qwen-image-2.1-t2i",
+      "tags": [
+        "qwen",
+        "official",
+        "natural-language",
+        "text-to-image"
+      ],
+      "content_class": "general",
+      "file": "qwen_image_2_1_t2i.json",
+      "model_ids": [
+        "qwen-image-2.1-diffusion",
+        "qwen-image-2.1-text-encoder",
+        "qwen-image-2.1-vae"
+      ],
+      "required_files": [
+        "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+        "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "domains": [
+          "qwen",
+          "qwen image",
+          "qwen image 2.1"
+        ],
+        "aliases": [
+          "Qwen-Image-2.1",
+          "Qwen Image",
+          "通义万相 Qwen"
+        ],
+        "styles": [
+          "qwen",
+          "qwen image 2.1"
+        ],
+        "content_modes": [
+          "sfw",
+          "general"
+        ],
+        "priority": 30,
+        "exclusive": true,
+        "prompt_granularity": {
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "recommended": "detailed"
+        }
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image"
+        ],
+        "input_types": [
+          "text"
+        ],
+        "input_modes": [
+          "text-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "natural_language": true,
+        "prompt_dialect": "natural-language",
+        "content_modes": [
+          "sfw",
+          "general"
+        ],
+        "nsfw_capable": false,
+        "lora_support": false,
+        "recommended_resolutions": [
+          "1024x1024"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Natural-language scene description; quote desired text literally."
+        },
+        "image": {
+          "supported": false
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ]
+      },
+      "bindings": {
+        "prompt": {
+          "node": "452",
+          "input": "prompt"
+        },
+        "negative_prompt": {
+          "node": "452",
+          "input": "negative_prompt"
+        },
+        "seed": {
+          "node": "458",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "458",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "458",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "458",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "458",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "458",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "461",
+          "input": "filename_prefix"
+        },
+        "width": {
+          "node": "456",
+          "input": "width"
+        },
+        "height": {
+          "node": "456",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "456",
+          "input": "batch_size"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1,
+        "steps": 25,
+        "cfg": 1,
+        "denoise": 1,
+        "sampler_name": "euler",
+        "scheduler": "simple",
+        "filename_prefix": "qwen_image_2_1"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 20,
+        "min_free_vram_gib": 2,
+        "basis": "RTX 4090 admission budget with CPU VAE and RAM offload; runtime fit must be measured."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": false
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "recommended": {
+          "steps": [
+            25,
+            50
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1, denoise 1.",
+        "negative_prompt": "Inactive at CFG 1."
+      },
+      "prompting": {
+        "style": "natural-language",
+        "recommended": {
+          "steps": 25,
+          "cfg": 1,
+          "sampler_name": "euler",
+          "scheduler": "simple"
+        },
+        "negative_prompt_effective_at_default": false
+      },
+      "compatibility_notes": [
+        "Uses official ComfyUI Qwen-Image-2.1 components; incompatible with older Qwen-Image/2511 LoRAs.",
+        "Shares the existing named-job coordinator and worker model-unload boundary."
+      ],
+      "source": {
+        "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_t2i.json",
+        "model_url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "RTX 4090 named API, official defaults, 1024x1024; bidirectional hot switching. NSFW behavior has not been validated.",
+        "date": "2026-09-22",
+        "job_id": "3bdf70a8-9327-4865-b576-008a3fea43e7",
+        "elapsed_ms": 52813,
+        "report": "ComfyUI/.codex-runtime/qwen21-hot-switch.json"
+      }
+    },
+    {
+      "id": "qwen-image-2.1-edit",
+      "name": "Official Qwen-Image-2.1 Image Edit",
+      "description": "Official reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32.",
+      "family": "qwen-image-2.1",
+      "resident_group": "qwen-image-2.1-edit",
+      "tags": [
+        "qwen",
+        "official",
+        "natural-language",
+        "image-edit"
+      ],
+      "content_class": "general",
+      "file": "qwen_image_2_1_edit.json",
+      "model_ids": [
+        "qwen-image-2.1-diffusion",
+        "qwen-image-2.1-text-encoder",
+        "qwen-image-2.1-vae"
+      ],
+      "required_files": [
+        "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+        "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "domains": [
+          "qwen",
+          "qwen image",
+          "qwen image 2.1"
+        ],
+        "aliases": [
+          "Qwen-Image-2.1",
+          "Qwen Image",
+          "通义万相 Qwen"
+        ],
+        "styles": [
+          "qwen",
+          "qwen image 2.1"
+        ],
+        "content_modes": [
+          "sfw",
+          "general"
+        ],
+        "priority": 30,
+        "exclusive": true,
+        "required_selectors": [
+          "input_mode"
+        ],
+        "prompt_granularity": {
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "recommended": "detailed"
+        }
+      },
+      "capabilities": {
+        "modalities": [
+          "image-to-image"
+        ],
+        "input_types": [
+          "image"
+        ],
+        "input_modes": [
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "natural_language": true,
+        "prompt_dialect": "natural-language",
+        "content_modes": [
+          "sfw",
+          "general"
+        ],
+        "nsfw_capable": false,
+        "lora_support": false,
+        "recommended_resolutions": [
+          "1024x1024"
+        ],
+        "max_reference_images": 1
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Natural-language editing instruction."
+        },
+        "image": {
+          "supported": true,
+          "required": true,
+          "parameter": "input_image",
+          "mode": "qwen-image-2.1-reference",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "processing": "Official TextEncodeQwenImage21 with resolution=0; reference conditioning plus source-sized empty latent. One reference exposed by this named route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt",
+          "input_image"
+        ]
+      },
+      "bindings": {
+        "prompt": {
+          "node": "452",
+          "input": "prompt"
+        },
+        "negative_prompt": {
+          "node": "452",
+          "input": "negative_prompt"
+        },
+        "seed": {
+          "node": "458",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "458",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "458",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "458",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "458",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "458",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "461",
+          "input": "filename_prefix"
+        },
+        "input_image": {
+          "node": "470",
+          "input": "image"
+        }
+      },
+      "defaults": {
+        "steps": 25,
+        "cfg": 1,
+        "denoise": 1,
+        "sampler_name": "euler",
+        "scheduler": "simple",
+        "filename_prefix": "qwen_image_2_1_edit"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "min_free_ram_gib": 20,
+        "min_free_vram_gib": 2,
+        "basis": "RTX 4090 admission budget with CPU VAE and RAM offload; runtime fit must be measured."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "recommended": {
+          "steps": [
+            25,
+            50
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1, denoise 1.",
+        "negative_prompt": "Inactive at CFG 1.",
+        "input_image": "Required relative uploaded filename. Reference size determines output size, rounded to multiples of 32; batch is one."
+      },
+      "prompting": {
+        "style": "natural-language",
+        "recommended": {
+          "steps": 25,
+          "cfg": 1,
+          "sampler_name": "euler",
+          "scheduler": "simple"
+        },
+        "negative_prompt_effective_at_default": false
+      },
+      "compatibility_notes": [
+        "Uses official ComfyUI Qwen-Image-2.1 components; incompatible with older Qwen-Image/2511 LoRAs.",
+        "Shares the existing named-job coordinator and worker model-unload boundary.",
+        "The official editable-size switch is fixed to false, and reference resolution is 0 as in the template. The named route currently exposes one reference."
+      ],
+      "source": {
+        "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_image_edit.json",
+        "model_url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "RTX 4090 named API, official defaults, 1024x1024; bidirectional hot switching. NSFW behavior has not been validated.",
+        "date": "2026-09-22",
+        "job_id": "974bcfe1-6caa-4bb7-90ff-4818960d8720",
+        "elapsed_ms": 63125,
+        "report": "ComfyUI/.codex-runtime/qwen21-hot-switch.json"
+      }
+    },
+    {
       "id": "moody-anima-mix",
       "name": "Moody Anima Mix — General Anime Fallback",
       "description": "Fast Anima-based anime workflow for generic illustrations and portraits. It is the default anime fallback when the request does not require a Blue Archive, NIKKE or other model-specific identity/style route.",

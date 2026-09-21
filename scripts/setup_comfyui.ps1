@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$ComfyCommit = '7972b5ba',
+    [string]$ComfyCommit = 'b0f4b7b294ce482a2e071d9d762c133d38c7aa07',
     [string]$KJCommit = 'dcfcb5d',
     [string]$IPAdapterCommit = 'b188a6cb39b512a9c6da7235b880af42c78ccd0d',
     [string]$ControlNetAuxCommit = '59b1fc411ede8623b2997855b8018f0b3b6cf49f',
@@ -24,6 +24,8 @@ if (-not (Test-Path -LiteralPath $Comfy)) {
 }
 
 if ($ComfyCommit) {
+    git -C $Comfy fetch origin $ComfyCommit
+    if ($LASTEXITCODE -ne 0) { throw "ComfyUI fetch failed with exit code $LASTEXITCODE" }
     git -C $Comfy checkout --detach $ComfyCommit
     if ($LASTEXITCODE -ne 0) { throw "ComfyUI checkout failed with exit code $LASTEXITCODE" }
 }

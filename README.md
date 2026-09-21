@@ -1,639 +1,181 @@
-# Generic ComfyUI text/image generation deployment
+# ComfyUI 本地图像生成服务
 
-This repository wraps an isolated ComfyUI checkout with a small named-workflow
-catalog. A remote agent can discover the available workflows, inspect their
-model requirements, runtime probes and parameter bindings, then queue the
-workflow it chose. Each generation route can use text-to-image or latent
-image-to-image mode when its `input_contract` declares it; the catalog also
-includes masked inpaint, face-centric IPAdapter and OpenPose ControlNet routes.
-The original Moody Desire Mix workflow remains available alongside the
-official Anima Turbo v1.1 routes, the retained Moody Anima Mix comparison
-route, Animagine XL 3.1, Blue Archive routes, and two pinned
-Illustrious/SDXL checkpoints: JANKU v5.0 and One Obsession v20_BOLD.
+一个面向个人使用和 AI Agent 的本地图像生成服务。通过 ComfyUI 网页或统一 HTTP API，使用不同模型完成文生图、图生图、指令编辑、局部重绘、人物参考和姿态控制。
 
-The agent API is version **1.5.0**. See the
-[interface audit and verification notes](docs/interface-audit-2026-09-17.md)
-for the current contract, routing and memory fixes.
+项目提供可查询的模型与工作流目录。调用方可以指定工作流，也可以按题材、风格和输入类型选择路由，无需自行拼装 ComfyUI 节点。模型在任务之间自动热切换，不需要重启服务。
 
-## Runtime policy
+## 能做什么
 
-- ComfyUI chooses the default CUDA device. The launcher does not pass a GPU
-  name or `--cuda-device`, so the deployment is not tied to an RTX 4090.
-- The managed launcher passes `--vram-headroom 1` for dynamic weight loading,
-  `--reserve-vram 1` for the standard memory manager, `--cpu-vae` and two
-  async offload streams. These safeguards do not guarantee an OOM-free run.
-- `GET /project/resources` reports the selected CUDA device and memory estimates.
-  NVIDIA physical memory is matched by UUID because CUDA and `nvidia-smi` GPU
-  indices can differ. Each route publishes its configurable pixel/RAM/VRAM
-  admission budgets in `resource_limits`; total pixels include batch size.
-- The default bind is `0.0.0.0:8191` and there is no authentication layer.
-  Treat this as a trusted-LAN service; do not expose it directly to the
-  internet. Use `-BindHost 127.0.0.1` for local-only access.
+- **图像生成**：使用 Qwen-Image、Anima、Flux.2/Klein 和 SDXL/Illustrious 系列模型生成写实图像、动漫人物和插画。
+- **参考图编辑**：通过 Qwen-Image-2.1 输入一张图片和自然语言指令，修改颜色、服装、场景等内容。
+- **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
+- **人物与姿态参考**：通过 IPAdapter 参考人物外观，通过 OpenPose ControlNet 控制身体姿态。
+- **自动选路**：根据题材、内容模式、风格和输入方式，从可用工作流中选择合适的模型组合。
+- **队列与热切换**：串行处理生成任务，同一工作流复用模型缓存，切换工作流时自动释放并加载所需模型。
+- **Agent 接入**：提供能力发现、参数说明、图片上传、任务状态和结果下载接口，也保留原生 ComfyUI 接口。
 
-## Setup and launch
+当前部署面向 Windows、Python 3.12 和 RTX 4090。启动器锁定本机指定的 4090，支持 RAM offload 和 CPU VAE；模型权重与生成过程均在本机运行。
+
+## 支持的模型
+
+下表列出可通过命名工作流调用的模型组合。图生图指基于参考图的重采样；Qwen 的指令编辑使用独立工作流。
+
+| 模型 / 组合 | 主要用途 | 支持方式 | 工作流 ID |
+| --- | --- | --- | --- |
+| Qwen-Image-2.1 · 官方 INT8 ConvRot | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
+| Anima Turbo v1.1 · 官方 BF16 | 通用动漫、人物与插画 | 文生图、图生图 | `anima-turbo-v1-1` |
+| Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
+| Moody Desire Mix v3.0 · Flux.2/Klein | 动漫、人物肖像 | 文生图、图生图 | `moody-desire-v30` |
+| Animagine XL 3.1 + NIKKE LoRA | NIKKE 风格；可选 Rapi 角色适配 | 文生图、图生图 | `animagine-xl-3.1-nsfw` |
+| Animagine XL 3.1 + Blue Archive 风格 LoRA | 蔚蓝档案游戏 CG 风格 | 文生图、图生图 | `blue-archive-style-sdxl` |
+| Illustrious XL v0.1 + Asuna LoRA | 一之濑明日奈及其服装表现 | 文生图、图生图 | `blue-archive-character-illustrious-xl` |
+| JANKU v5.0 · Illustrious/NoobAI 系 | 色彩鲜明、光泽感较强的动漫插画 | 文生图、图生图 | `janku-v5-illustrious` |
+| One Obsession v20_BOLD · Illustrious 系 | 纹理、戏剧性光影与轻度 2.5D 风格 | 文生图、图生图 | `one-obsession-v20-bold` |
+
+动漫路由声明支持 SFW / NSFW 内容模式；Qwen 官方路由目前不声明 NSFW 能力。内容模式用于路由选择，具体画面由调用方的提示词决定。
+
+### 局部重绘、人物参考与姿态控制
+
+| 工作流 ID | 模型 / 组件 | 用途 | 除提示词外的必需输入 |
+| --- | --- | --- | --- |
+| `anima-turbo-inpaint` | Anima Turbo v1.1 | 蒙版区域重绘 | `input_image`、`mask_image` |
+| `moody-anima-inpaint` | Moody Anima Mix | 蒙版区域重绘 | `input_image`、`mask_image` |
+| `anima-turbo-face-reference-ipadapter` | Anima Turbo + Character Reference IPAdapter | 人物外观参考 | `face_image` |
+| `sdxl-face-reference-ipadapter` | Animagine XL 3.1 + IPAdapter Plus Face | 面部外观参考 | `face_image` |
+| `sdxl-openpose-controlnet` | Animagine XL 3.1 + Xinsir OpenPose | 身体姿态参考 | `control_image` |
+
+人物参考用于引导外观，不保证身份或五官完全一致。姿态控制主要约束身体姿势，人物、服装和背景仍由提示词描述。
+
+### 如何选择
+
+通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU。明确指定 NIKKE、Blue Archive 或模型风格时，路由器优先匹配对应组合。Asuna 角色工作流需要显式指定工作流 ID。
+
+使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
+
+全部工作流、默认参数和输入要求见 [工作流目录](workflows/catalog.json)；模型组件、来源与文件信息见 [模型表](workflows/models.json)。运行时可查询 `GET /project/workflows` 获取实际可用状态。
+
+## 快速开始
+
+在 PowerShell 中进入项目目录，安装运行环境并下载所需模型：
 
 ```powershell
 .\scripts\setup_comfyui.ps1
-.\scripts\download_models.ps1 -Profile all
+.\scripts\download_models.ps1 -Profile qwen-image-2.1
 .\scripts\manage_comfyui.ps1 start
 ```
 
-The model downloader is resumable and verifies file size and SHA-256. Profiles
-can be downloaded independently:
+打开 [ComfyUI 网页](http://127.0.0.1:8191)。同一可信局域网内的客户端可以通过 `http://<主机局域网 IP>:8191` 访问。
 
-```powershell
-.\scripts\download_models.ps1 -Profile moody-desire-v30
-.\scripts\download_models.ps1 -Profile moody-anima-mix
-.\scripts\download_models.ps1 -Profile anima-turbo
-.\scripts\download_models.ps1 -Profile animagine-xl-3.1-nsfw
-.\scripts\download_models.ps1 -Profile blue-archive-style-sdxl
-.\scripts\download_models.ps1 -Profile blue-archive-character-illustrious-xl
-.\scripts\download_models.ps1 -Profile janku-v5-illustrious
-.\scripts\download_models.ps1 -Profile one-obsession-v20-bold
-.\scripts\download_models.ps1 -Profile ipadapter-face-sdxl
-.\scripts\download_models.ps1 -Profile controlnet-openpose-sdxl
-```
+下载器支持断点续传，并校验文件大小和 SHA-256。模型按需下载，也可以使用 `-Profile all` 下载全部配置。
 
-Service management:
+| 所需模型 / 功能 | 下载 Profile |
+| --- | --- |
+| Qwen-Image-2.1 生成与编辑 | `qwen-image-2.1` |
+| Anima Turbo、局部重绘与 Anima 人物参考 | `anima-turbo` |
+| Moody Anima Mix 与局部重绘 | `moody-anima-mix` |
+| Moody Desire Mix | `moody-desire-v30` |
+| Animagine XL 3.1 / NIKKE | `animagine-xl-3.1-nsfw` |
+| Blue Archive 风格 | `blue-archive-style-sdxl` |
+| Asuna 角色 | `blue-archive-character-illustrious-xl` |
+| JANKU v5.0 | `janku-v5-illustrious` |
+| One Obsession v20_BOLD | `one-obsession-v20-bold` |
+| SDXL 人物参考附加组件 | `ipadapter-face-sdxl` |
+| SDXL 姿态控制附加组件 | `controlnet-openpose-sdxl` |
+
+SDXL 人物参考与姿态控制还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
+
+查看状态或停止服务：
 
 ```powershell
 .\scripts\manage_comfyui.ps1 status
 .\scripts\manage_comfyui.ps1 stop
 ```
 
-The server is intended to be reachable by another trusted machine at
-`http://<host-LAN-IP>:8191`. If Windows Firewall blocks it, allow inbound TCP
-8191 on the appropriate Private network profile.
+默认监听 `0.0.0.0:8191`，供可信局域网使用，接口不带身份认证。仅本机使用时，以 `-BindHost 127.0.0.1` 启动；后续管理命令使用相同的 `-BindHost`。启动器按 GPU UUID 绑定本机 4090，在另一台机器部署时需要调整 [启动器](scripts/launch_comfyui.py) 中的绑定。
 
-## Agent-facing workflow API
+## 通过 API 使用
 
-The project custom-node extension adds these unauthenticated routes on the
-same ComfyUI port:
+网页与 API 共用 `8191` 端口。AI Agent 可以从 `GET /.well-known/agent-manifest.json` 发现服务能力，通过 `GET /project/openapi.json` 获取接口定义。
 
-```text
-GET  /.well-known/agent-manifest.json
-GET  /project/agent-manifest
-GET  /project/openapi.json
-GET  /project/resources
-GET  /project/resources
-GET  /project/routes
-GET  /project/inputs
-DELETE /project/inputs/{name}
-POST /project/resolve
-POST /upload/image
-GET  /project/models
-GET  /project/models/{model_id}
-GET  /project/workflows
-GET  /project/workflows/{workflow_id}
-POST /project/generate
-POST /project/prompt
-GET  /project/jobs/{prompt_id}
-```
+### 选择并生成图像
 
-An independent agent should first call `/.well-known/agent-manifest.json`.
-`/project/agent-manifest` is a compatibility alias and `/project/openapi.json`
-is the importable contract. The root path remains the native ComfyUI UI, so an
-agent should not infer the project API from the root page.
-
-The manifest and workflow catalog expose two complementary machine-readable
-hint layers:
-
-- `routing` describes when a workflow/model combination is a match: domain,
-  content mode, style, input type/mode, aliases, priority and accepted prompt
-  granularity.
-  Routing is intentionally at the workflow/model level, not per character or
-  outfit.
-- `anima-turbo-v1-1` is the preferred official generic Anima/Turbo route.
-  `moody-anima-mix` remains available as a separate comparison/fallback route.
-  For generic SFW anime with no model/style preference, Anima Turbo remains
-  preferred. The metadata-driven resolver prefers JANKU v5.0 for generic NSFW
-  anime and honors exact JANKU/One Obsession style aliases.
-  Explicit Blue Archive or
-  NIKKE requests are routed to their specialized routes first; the agent keeps
-  the character, outfit and pose in the prompt after route selection.
-- `capabilities`, `prompting`, `agent_hints` and the referenced `models`
-  describe what the route can control, which prompt dialect it expects, and
-  where its limits are.
-- `/project/resources` is an advisory selected-device memory snapshot plus
-  configured queue/input limits; it is diagnostic information, not a resource
-  reservation.
-- `capabilities.input_types`, `capabilities.input_modes` and
-  `input_contract` describe executable input behavior. Latent img2img routes
-  use `LoadImage -> VAEEncode`; the inpaint route uses
-  `LoadImageMask -> VAEEncodeForInpaint`, the face route uses `face_image` with
-  IPAdapter, and the OpenPose route preprocesses `control_image` before
-  applying ControlNet.
-
-The model registry is stored in `workflows\models.json`. It includes the
-checkpoint, text encoder, VAE and adapter profiles used by each installed
-route. `ready` checks file presence and recorded sizes, registry eligibility and
-registered graph node classes. The downloader performs SHA-256 verification;
-discovery does not rehash weights or promise runtime fit or visual quality.
-The full `qwen_3_8b.safetensors` text encoder is also installed as a
-non-routeable high-precision asset; the generic Moody route intentionally keeps
-the verified FP8-mixed encoder because the full encoder plus checkpoint may not
-fit a 24 GB device with the one-GB headroom target.
-
-The full `qwen_3_8b.safetensors` encoder was also tested. It succeeded when the
-text encoder was explicitly placed on CPU, but the default dynamic-GPU
-placement OOMed while transferring weights alongside Moody on the selected
-24-GB device. It therefore remains installed but `routeable: false`; the
-generic route uses the FP8-mixed encoder to preserve the one-GB VRAM headroom
-target.
-
-The preferred route-selection call is:
+如果已确定模型，直接向 `POST /project/generate` 提交工作流 ID 和提示词：
 
 ```json
 {
-  "domain": "blue archive",
+  "workflow": "qwen-image-2.1-t2i",
+  "parameters": {
+    "prompt": "A blue ceramic teapot on a wooden table beside a sunlit window.",
+    "seed": 921
+  }
+}
+```
+
+Qwen 文生图默认使用 1024×1024、25 步、Euler/simple、CFG 1。各工作流均提供自己的默认参数，可通过工作流详情中的 `parameter_schema` 查询允许调整的字段。省略 `seed` 时会随机生成，并在响应中返回实际值。
+
+如果希望自动选路，先调用 `POST /project/resolve`：
+
+```json
+{
+  "domain": "anime",
   "content_mode": "sfw",
   "input_type": "text",
-  "input_mode": "text-to-image",
-  "prompt_granularity": "detailed",
-  "style": "game cg"
+  "input_mode": "text-to-image"
 }
 ```
 
-`POST /project/resolve` returns ranked ready workflows, reasons for each match,
-the complete route metadata and the prompt/model hints needed to construct the
-final request. It does not load a model or queue a generation. The resolver
-selects the workflow/model combination; character, outfit, pose and appearance
-remain inputs to the agent's final prompt. Generic Blue Archive requests select
-the style route. The Asuna identity route requires an explicit `workflow`
-choice so it cannot impose Asuna on other characters. Optional `family`
-selects an exact catalog family, such as `sdxl-ipadapter` for SDXL face reference.
+响应中的 `selected_workflow` 可用于生成请求。选路只返回工作流及其提示词建议，不会启动生成；角色、服装、动作和场景等细节写入 `parameters.prompt`。
 
-Capability-specific routes declare `routing.required_selectors`. In particular,
-inpaint, face-reference and OpenPose routes require the resolver request to
-include the matching `input_mode`; this prevents a normal text-only portrait
-request from accidentally selecting a reference/control workflow.
+生成响应提供 `job_id` 和 `job_url`。轮询 `job_url`，直到状态为 `succeeded` 或 `failed`；成功时通过 `outputs[].url` 获取图片。请求顶层添加 `"dry_run": true` 可检查参数和依赖而不生成图像，响应会说明工作流是否就绪及图是否通过验证。
 
-For an image-to-image request, use the same selected workflow with
-`input_type: "image"` and `input_mode: "image-to-image"`, then pass a relative
-filename from `GET /project/inputs`. If the reference is not present, upload it
-to the native ComfyUI endpoint on the same port first:
+### 上传图片并编辑
 
-```text
-POST /upload/image
-Content-Type: multipart/form-data
-Fields: image=<file>, type=input, overwrite=false
+先上传参考图：
+
+```powershell
+curl.exe -X POST http://127.0.0.1:8191/upload/image `
+  -F "image=@.\reference.png" -F "type=input" -F "overwrite=false"
 ```
 
-The response contains `name`, `subfolder` and `type`. Join `subfolder` and
-`name` with `/` and pass the result as `parameters.input_image`:
+将返回的 `subfolder` 和 `name` 用 `/` 拼接为相对文件名，再提交编辑请求：
 
 ```json
 {
-  "workflow": "blue-archive-character-illustrious-xl",
+  "workflow": "qwen-image-2.1-edit",
   "parameters": {
-    "input_image": "example.png",
-    "prompt": "preserve the subject and pose, change the lighting to soft evening light",
-    "denoise": 0.65
+    "input_image": "reference.png",
+    "prompt": "Change the blue teapot to red. Keep the background and lighting unchanged."
   }
 }
 ```
 
-For example, a command-line agent can upload a local file with:
-
-```powershell
-curl.exe -X POST http://<host>:8191/upload/image `
-  -F "image=@.\xiaoman_ref.png" -F "type=input" -F "overwrite=false"
-```
-
-`input_image` is intentionally not an arbitrary host path, URL or output job
-reference. The named API does not yet implement automatic output-to-input
-copying between jobs; use the upload response or the `/project/inputs` listing
-to obtain the relative filename before submitting the workflow.
-
-Use a unique basename for each new upload. With `overwrite=false`, native
-ComfyUI may return an already-existing same-name file instead of creating a
-new one; only delete input filenames owned by the calling agent.
-
-To remove a reference or a temporary probe, delete the exact relative filename
-returned by `/project/inputs`:
-
-```text
-DELETE /project/inputs/xiaoman_ref.png
-```
-
-The delete operation removes one regular file below `ComfyUI/input`; it does
-not accept absolute paths, traversal segments or directories.
-Its response includes `remaining_bytes`, a snapshot of the remaining input
-files' combined size. Inputs persist across restarts: this project has no
-automatic TTL or cleanup. Files disappear only through explicit deletion or
-external/manual filesystem actions. Keep references unchanged until their jobs finish.
-
-### Masked inpaint
-
-`anima-turbo-inpaint` is the preferred Anima masked-edit route;
-`moody-anima-inpaint` remains available for comparison. Both require the original image in
-`parameters.input_image` and a mask in `parameters.mask_image`. Upload both
-through `/upload/image`, or use names already listed by `/project/inputs`.
-The red channel is used by default: white/red pixels are redrawn and black
-pixels are preserved. Use `mask_channel: "alpha"` for an alpha mask. A mask is
-an executable image region, not a text label such as `clothing`. For alpha masks,
-transparent pixels are redrawn and opaque pixels are preserved. Source and mask
-must have identical dimensions, with both dimensions multiples of 8.
-
-`anima-turbo-inpaint` exposes the same contract on the official Anima Turbo
-base and is the preferred masked-edit route when the request is already using
-the Anima family. It is still generic masked sampling rather than a dedicated
-inpaint-trained checkpoint; choose it with `input_mode: "inpaint"` when
-resolving the route.
-
-```json
-{
-  "workflow": "anima-turbo-inpaint",
-  "parameters": {
-    "input_image": "character.png",
-    "mask_image": "clothing_mask.png",
-    "mask_channel": "red",
-    "prompt": "1girl, solo, a navy school uniform with a red ribbon, preserve the face, hair, pose and background",
-    "negative_prompt": "duplicate, multiple views, text, watermark",
-    "denoise": 0.65,
-    "grow_mask_by": 6
-  },
-  "client_id": "remote-agent-1"
-}
-```
-
-The routes use ComfyUI's core `VAEEncodeForInpaint` path, then composite the
-result onto the original image through the supplied mask to preserve unmasked
-pixels exactly. These are generic masked workflows, not specially trained
-inpaint checkpoints. Turbo defaults to 12 steps and CFG 1; Moody defaults to
-4 steps and CFG 1. For clothing replacement,
-start with denoise `0.60`–`0.75`; prompts should remain short and should begin
-with `1girl, solo` when the source is a character sheet or multi-view image.
-
-### Face reference and pose control
-
-The catalog has two SDXL control routes plus the Anima-native face-reference
-route so an agent can choose the smallest matching capability:
-
-- `sdxl-face-reference-ipadapter`: requires `face_image`, uses IPAdapter Plus
-  Face with the matching ViT-H encoder, and primarily controls facial
-  appearance. It does not carry the outfit, pose or background and is not
-  FaceID recognition.
-- `sdxl-openpose-controlnet`: requires `control_image`, runs the pinned
-  `OpenposePreprocessor` internally and applies an SDXL OpenPose ControlNet.
-  It primarily controls body pose and orientation; character identity and
-  clothing stay in the prompt.
-- `anima-turbo-face-reference-ipadapter`: requires `face_image`, uses the
-  Anima-specific SigLIP2 IPAdapter path described above, and is the preferred
-  face-reference route when the selected base model is Anima Turbo.
-
-Both routes accept SFW or NSFW-capable prompts supplied by the caller. They
-expose only one adapter/control strength knob in the named API, with the
-remaining node choices fixed to the validated route so an agent does not have
-to choose among incompatible model variants.
-
-The first OpenPose request may take longer because the preprocessor caches its
-body/hand/face detector weights under the custom-node checkout. The model
-downloader installs the route's fixed SDXL adapter and ControlNet weights:
-
-```powershell
-.\scripts\download_models.ps1 -Profile ipadapter-face-sdxl
-.\scripts\download_models.ps1 -Profile controlnet-openpose-sdxl
-```
-
-After route selection, the agent can submit a named workflow:
-
-```json
-{
-  "workflow": "animagine-xl-3.1-nsfw",
-  "parameters": {
-    "prompt": "masterpiece, best quality, 1girl, solo, rapi (nikke), standing, looking at viewer",
-    "negative_prompt": "worst quality, low quality, bad anatomy, bad hands, watermark",
-    "width": 832,
-    "height": 1216,
-    "seed": 382624,
-    "steps": 28,
-    "cfg": 6.0,
-    "loras": {
-      "concept": 0.9,
-      "rapi": 0.8
-    },
-    "filename_prefix": "agent_rapi"
-  },
-  "client_id": "remote-agent-1"
-}
-```
-
-For a generic anime request, the agent should normally resolve to
-`anima-turbo-v1-1`. Its prompt contract accepts structured natural language or
-Danbooru-style tags, uses the official BF16 Turbo checkpoint with CFG 1 and
-8–12 steps, and defaults to 12 steps for the comparison-quality setting. The
-route is NSFW-capable but does not require NSFW wording; the caller supplies
-the final prompt.
-
-`moody-anima-mix` remains useful for direct comparison and as a lower-priority
-fallback. Its prompt contract is deliberately short natural language with
-optional light anime tags, and its default is a 4-step Anima render. The named
-route exposes only the minimal generation core of the referenced workflow, not
-its optional upscale/detailer branch.
-
-### Official Anima Turbo and face reference
-
-`anima-turbo-v1-1` uses the official `anima-turbo-v1.1.safetensors` BF16
-checkpoint, `ModelSamplingAuraFlow` with shift `3`, the official Qwen 3 0.6B
-text encoder and Qwen image VAE. The downloader pins the published file size
-and SHA-256. This route is the generic high-precision comparison target and
-does not include a character-specific LoRA.
-
-The separate `anima-turbo-face-reference-ipadapter` route keeps an Anima-native
-face/character-reference path available to agents. It uses the pinned Anima
-IPAdapter custom node, the `ip_adapter-Character_Reference-10.safetensors`
-weights and a local SigLIP2 base patch16 512 vision encoder. It requires
-`parameters.face_image`, preferably a clear single-person portrait, and keeps
-outfit, pose, scene and lighting in `parameters.prompt`:
-
-```json
-{
-  "workflow": "anima-turbo-face-reference-ipadapter",
-  "parameters": {
-    "face_image": "xiaoman_portrait.png",
-    "prompt": "masterpiece, best quality, 1girl, solo, an anime maid in a sunlit cafe, standing, warm afternoon light",
-    "ipadapter_weight": 1.0,
-    "steps": 12,
-    "cfg": 1.0
-  }
-}
-```
-
-This is reference conditioning rather than FaceID recognition: the current
-implementation encodes the supplied image as a whole and does not guarantee
-pixel-locked identity. The route is marked `face_only: false` in the manifest;
-the existing SDXL face-reference route remains available when its separate
-architecture is explicitly preferred.
-
-`POST /project/generate` and `POST /project/prompt` accept the same body. The
-optional top-level `prompt_granularity` is advisory and echoed in the response.
-`parameters.prompt` is required, with `subject` accepted as a compatibility
-alias; an empty string is allowed. Suggested subject/appearance details in
-`agent_hints` describe prompt writing, not additional required API fields.
-Unknown fields return 400, missing required inputs return 422, and unknown
-workflows return 404. Errors consistently include `message`, `route`, and
-`expected`. The final positive
-and negative prompt text remains caller-provided; the API only exposes the
-route-specific prompting contract and does not synthesize prompt content.
-Passing `character` or `outfit` to `/project/resolve` is rejected deliberately;
-those fields belong in `parameters.prompt` after the route is selected.
-
-`workflows\agent_route_simulation_10.json` contains twelve natural-language user
-requests, the route query an agent would extract, and the resulting prompt
-input. It includes SFW and NSFW-capable NIKKE cases. It is a simulation fixture
-only and is not submitted to the generation endpoint. Repeat the real route
-simulation with:
-
-```powershell
-.\scripts\simulate_agent_routes.ps1
-```
-
-For a public HTTP contract audit, run the fast non-generating probe with the
-ComfyUI virtual environment:
-
-```powershell
-.\ComfyUI\.venv\Scripts\python.exe .\scripts\verify_agent_api.py
-```
-
-It checks discovery, route selection, parameter validation, every ready
-workflow's dry-run graph, input lifecycle and resource reporting. The optional
-`--generate` flag runs the same SFW teapot probes through the named queue.
-
-The API returns identical `prompt_id` and `job_id` plus `job_url`; poll `/project/jobs/{prompt_id}`
-until it reports `succeeded` or `failed`, then use the returned `/view` URL for
-the output. During execution, the job response also exposes `phase` values such
-as `waiting_for_turn`, `waiting_for_comfyui`, `model_switch` and `generation`,
-plus queue position where applicable. `queued_ms` measures acceptance to worker
-start; `elapsed_ms` includes model switching and generation after worker start.
-`dry_run: true` validates the resolved graph without queueing it.
-
-Each workflow publishes `parameter_schema`, `control_ports`, `resource_limits`
-and `agent_hints.recommended` sampling ranges. Responses include
-`applied_parameters`, `ignored_parameters` (empty, since unknown fields are
-rejected), `effective_parameters`, and advisory `warnings`. Values outside a
-recommended sampling range are retained. Official Anima Turbo recommends
-8–12 steps at CFG 1; negative prompts have no effect at CFG 1.
-Omitted seeds are random; the selected seed is returned for reproducibility.
-Img2img honors size and batch: two explicit dimensions resize to that size,
-one preserves aspect ratio, and neither uses source size rounded down to 8.
-
-Named `/project/prompt` requests are admitted to a FIFO project queue guarded by
-one mutex. Only one named workflow is handed to ComfyUI at a time. Consecutive
-jobs for the same workflow keep its model set resident; switching to another
-workflow clears executor caches and releases models inside ComfyUI's serial
-worker before the next job starts. Native/project transitions use the same
-boundary; cleanup cannot unload a concurrently executing native job.
-A failed job clears the residency assumption, so the next job also gets
-a clean model boundary. The native ComfyUI `POST /prompt` and `/history`
-endpoints remain available for clients that already build complete API-format
-graphs. Raw native graphs bypass project size and input admission budgets.
-The project queue allows 32 pending jobs (overflow returns 429), retains 1,000
-job states, and detects native queue removals without waiting a day. Queue and
-job state are in memory; restarting the service does not preserve pending jobs.
-
-For PowerShell callers, the helper supports both named workflows and the
-legacy raw workflow path:
-
-```powershell
-.\scripts\queue_workflow.ps1 -WorkflowName animagine-xl-3.1-nsfw `
-  -Prompt 'masterpiece, best quality, 1girl, solo, rapi (nikke)' `
-  -LoraConceptStrength 0.9 -LoraRapiStrength 0.8
-
-.\scripts\queue_workflow.ps1 -WorkflowPath .\workflows\moody_desire_v30_minimal.json
-```
-
-The independent interface can use the same HTTP contract as the ComfyUI
-client; it does not need to know internal node IDs until it asks for a
-workflow description.
-
-## Included workflows
-
-| ID | Family | Purpose | Default assets |
-| --- | --- | --- | --- |
-| `moody-anima-mix` | Anima | Generic fast anime fallback; SFW/NSFW-capable | Moody Anima Mix v1.0, Qwen 3 0.6B encoder, Qwen image VAE |
-| `moody-anima-inpaint` | Anima | Masked edits with unmasked original pixels preserved | Moody Anima Mix, Qwen encoder and VAE |
-| `anima-turbo-v1-1` | Anima Turbo | Official high-precision generic anime route; SFW/NSFW-capable | Official Anima Turbo v1.1 BF16, Qwen 3 0.6B encoder, Qwen image VAE |
-| `anima-turbo-inpaint` | Anima Turbo | Masked edits with unmasked original pixels preserved | Official Anima Turbo v1.1 BF16, Qwen encoder and VAE |
-| `anima-turbo-face-reference-ipadapter` | Anima Turbo + IPAdapter | Anima face/character reference route; SFW/NSFW-capable | Official Anima Turbo v1.1 BF16, Anima IPAdapter Character Reference v10, SigLIP2 |
-| `moody-desire-v30` | Flux.2/Klein | General anime/portrait workflow; SFW/NSFW-capable | Moody checkpoint, Qwen3 text encoder, Flux.2 VAE |
-| `animagine-xl-3.1-nsfw` | SDXL | Anime/NIKKE workflow that can produce NSFW content | Animagine XL 3.1, profile LoRA, Rapi LoRA |
-| `blue-archive-style-sdxl` | SDXL | Blue Archive game-CG style workflow; SFW/NSFW-capable | Animagine XL 3.1, Blue Archive Game CG Style LoCon |
-| `blue-archive-character-illustrious-xl` | SDXL/Illustrious | Asuna identity and four-outfit workflow, SFW/NSFW-capable | Illustrious XL v0.1, Asuna Ichinose 4-outfit LoRA |
-| `janku-v5-illustrious` | SDXL/Illustrious | Polished, vibrant, glossy anime; SFW/NSFW-capable | Pinned JANKU v5.0 single-file checkpoint |
-| `one-obsession-v20-bold` | SDXL/Illustrious | Textured, dramatic-lighting anime with polished 2D/2.5D range; SFW/NSFW-capable | Pinned One Obsession v20_BOLD single-file checkpoint |
-| `sdxl-face-reference-ipadapter` | SDXL + IPAdapter | Portrait reference conditioning | Animagine XL 3.1, IPAdapter Plus Face, ViT-H |
-| `sdxl-openpose-controlnet` | SDXL + ControlNet | Body pose conditioning | Animagine XL 3.1, Xinsir OpenPose ControlNet and preprocessor |
-
-Every workflow and every model/component profile in the registry now declares
-`nsfw_capable: true` and includes `nsfw` in its content modes. This is a
-capability declaration for agent routing; the existing validation probes remain
-SFW-only.
-
-The runtime probes and their scope are recorded in the linked audit. A successful probe proves that the
-graph/model stack loaded and completed; it is not a benchmark of character
-likeness, NSFW quality or prompt fidelity. Individual model profiles in
-`workflows\models.json` retain the probe IDs and scope. The two Anima Turbo
-routes were additionally re-probed after installing the official checkpoint,
-Anima IPAdapter and SigLIP2 assets.
-
-Adding another workflow is data-driven: place an API-format JSON graph in
-`workflows\`, add its `model_ids`, `routing`, `capabilities`, `prompting` and
-`agent_hints` alongside `required_files`, `bindings`, defaults and compatibility
-notes in `workflows\catalog.json`, then add the model profiles to
-`workflows\models.json` and restart ComfyUI so the custom-node state is
-refreshed.
-
-## Moody Anima Mix model notes
-
-`moody-anima-mix` is the deliberately broad anime comparison/fallback route.
-The official `anima-turbo-v1-1` route has higher generic priority now, while a
-request that explicitly names a Blue Archive or NIKKE model/style is sent to
-that specialized route instead. Character identity remains part of the
-agent's prompt; this route does not contain a character LoRA.
-
-The route uses the Civitai Moody Anima Mix v1.0 checkpoint with the official
-Anima Qwen 3 0.6B text encoder and Qwen image VAE. Its API graph follows the
-reference minimal workflow's fast 4-step core. The reference archive also
-contains an optional UltimateSDUpscale branch and UI-only helper nodes; those
-are not exposed as separate route choices. The downloaded checkpoint and
-dependencies are pinned by byte size and SHA-256 in
-`scripts\download_models.ps1`.
-
-## Animagine/NIKKE model notes
-
-Animagine XL 3.1 is an anime-focused SDXL checkpoint. Its model card
-recommends Danbooru-style tag prompting, a quality prefix such as
-`masterpiece, best quality, very aesthetic, absurdres`, CFG around 5–7 and
-fewer than 30 steps. The included workflow follows those defaults and does
-not put `nsfw` in the negative prompt, because this profile is deliberately
-NSFW-capable.
-
-The downloaded assets are stored under stable project filenames:
-
-- `Animagine_XL_3.1.safetensors` — official 6.94 GB SDXL checkpoint.
-- `NIKKES_GoddessOfVictory_Concept.safetensors` — the Animagine/SDXL profile
-  LoRA; trigger `IncrsNikkeProfile`, default strength `0.9`.
-- `NIKKES_Rapi.safetensors` — the selected current Pony-XL/SDXL-shaped Rapi
-  candidate; triggers `rapidef`, `rapiswim` and `rapirnd`, disabled by default
-  (`0.0`) and available through an explicit `loras.rapi` value.
-
-The Rapi candidate is not a legacy SD 1.5 LoRA, but it was trained for Pony
-family models rather than specifically for Animagine. It loaded and generated
-successfully with the included Animagine graph, but visual fidelity is not
-guaranteed. Enable `loras.rapi` only for an intentional experiment, or replace the aliased file
-and update the catalog metadata when a native Animagine-trained Rapi LoRA is
-preferred.
-
-The third workflow uses `BlueArchive_GameCG_Style_Animagine31.safetensors`,
-the Animagine3.1/SDXL version of Blue Archive Game CG Style. The published
-model notes specify no trigger word and a style strength around `0.8`–`1.0`;
-the catalog records those facts so an agent can choose and parameterize it.
-Its default graph uses 832×1216, CFG 5, 36 steps, `dpmpp_2m_sde` and Karras.
-
-The fourth workflow uses the compatible Illustrious XL v0.1 checkpoint and
-the Asuna Ichinose four-outfit adapter. The adapter model card documents the
-identity token `1chn` and the following tag groups: maid, bunny, school and
-sports. Use exactly one outfit group per request. The model card describes
-these as trained tags rather than separate named outfit trigger words, so the
-agent should select the tags from the route's `prompting.lora_triggers`
-metadata. This route is a separate workflow/model route; it does not make
-character or outfit a resolver selector.
-
-## JANKU v5.0 model notes
-
-`janku-v5-illustrious` is pinned to the canonical single-file checkpoint
-associated with janxd's Civitai model 1277670, version 1896532. The stable
-local filename is `JANKU_v5_0.safetensors`; the downloader requires both
-6,938,040,674 bytes and SHA-256
-`217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5`.
-The public mirror is `Quiho/best-from-civitai`. The John6666 Hugging Face
-repository is a Diffusers conversion and is retained as reference metadata
-only; this route loads the single-file checkpoint through the normal
-`CheckpointLoaderSimple` path.
-
-The route is Illustrious/NoobAI/Danbooru-tag oriented and needs no trigger
-word. Start with 1024x1536, 25-30 steps, CFG 3-5, Euler or Euler A
-(`euler_ancestral`) and the `normal` scheduler. It is declared SFW/NSFW-capable
-as a capability only: the API never injects sexual prompt text. No embeddings,
-detailers or LoRAs are bundled.
-
-## One Obsession v20_BOLD model notes
-
-`one-obsession-v20-bold` is pinned specifically to maxfeifei8's One Obsession
-v20_BOLD from Civitai model 1318945. It must not silently substitute v21 or a
-later release. The stable local filename is
-`OneObsession_v20Bold.safetensors`; the downloader requires both 6,938,040,682
-bytes and SHA-256
-`7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B`.
-The public single-file mirror is `Quiho/best-from-civitai`.
-
-Use Illustrious/NoobAI-style tags with quality guidance such as
-`masterpiece, best quality, amazing quality, very aesthetic, absurdres,
-newest, highres` when useful. Start with 1024x1536, 25-35 steps, CFG 3-6,
-Euler A/`euler_ancestral` and the `normal` scheduler. It supports anime through
-a mildly 2.5D look; keep the final prompt and negative prompt caller-controlled
-instead of forcing a 2D-only negative. It is also declared SFW/NSFW-capable as
-a capability only and requires no LoRA.
-
-Both new routes expose the existing text-to-image and optional latent img2img
-contract, reject unknown named parameters, publish their checkpoint size/hash
-metadata, and use the existing 2,359,296-pixel SDXL admission convention.
-
-The public mirrors and original attribution records are sources for the pinned
-files, not a redistribution of model binaries in this repository. Check the
-upstream model pages and their applicable terms before commercial use.
-
-## Deployment probe results — 2026-09-18
-
-The two downloader profiles completed with exact byte-size and SHA-256
-verification, and the managed ComfyUI service was restarted before API probing.
-The non-generating verifier passed all 43 checks, including readiness,
-validated graphs, model/workflow discovery, parameter rejection and route
-selection. The route simulation fixture passed 12/12, including the JANKU and
-One Obsession requests and the existing Blue Archive/NIKKE specialized cases.
-
-Focused real-generation probes used the same SFW ceramic-teapot prompt, seed
-917, 512x512 output, 8 steps and Euler A for both new checkpoints:
-
-- JANKU job `8934dddc-1e36-4899-987d-050659812e4a` succeeded in 8,750 ms.
-- One Obsession job `e5a0e732-26e3-4c5c-89f9-3523721b571c` succeeded in 7,437 ms.
-
-These probes establish graph loading, model execution and output delivery only;
-they are not a benchmark of visual quality, prompt adherence, character
-likeness or NSFW quality. The all-ready-route `verify_agent_api.py --generate`
-pass was intentionally not claimed as complete because the pre-existing
-`moody-desire-v30` Flux.2 route exhausted the selected 24-GB GPU during model
-unload and aborted ComfyUI before the new routes were reached. The focused
-probes above independently verified both new routes after restarting the
-service.
-
-Sources used for the pinned model choices and workflow defaults:
-
-- [Moody Anima Mix model page](https://civitai.com/models/2700077/moody-anima-mix)
-- [Moody Anima Mix current metadata](https://civitai.com/api/v1/models/2700077)
-- [Moody Anima Minimal Workflow metadata](https://civitai.com/api/v1/models/2700120)
-- [CivArchive record for the pinned Moody Anima Mix hash and active mirror](https://civitaiarchives.com/sha256/5368c9b1318c783d7215492002cd1bca94895d1dca8c780ef24f75536fd341f8)
-- [CivArchive record for the pinned minimal workflow archive](https://civitaiarchives.com/sha256/4970209212d8ff406f05b5a9c30ae6263bc11340bd3a241d730ae903a07664f9)
-- [Official Anima model repository and dependencies](https://huggingface.co/circlestone-labs/Anima)
-- [Official Anima Turbo v1.1 diffusion weights](https://huggingface.co/circlestone-labs/Anima/blob/main/split_files/diffusion_models/anima-turbo-v1.1.safetensors)
-- [Anima-specific IPAdapter custom node](https://github.com/LuciferTC9527/ComfyUI-Anima_IP-Adapter)
-- [Anima IPAdapter Character Reference v10 weights](https://huggingface.co/LuciferTC/Anima-IP-Adapter)
-- [SigLIP2 base patch16 512 vision encoder](https://huggingface.co/google/siglip2-base-patch16-512)
-- [ComfyUI Anima workflow guidance](https://github.com/niknah/comfyui-docs/blob/main/tutorials/image/anima/anima.mdx)
-- [Animagine XL 3.1 model card](https://huggingface.co/cagliostrolab/animagine-xl-3.1)
-- [NIKKE profile LoRA mirror](https://huggingface.co/Muapi/nikke-goddess-of-victory-profile-concept-lora-animagine)
-- [Selected Rapi Pony-XL/SDXL model](https://civitai.com/models/382624)
-- [Blue Archive Game CG Style — Animagine3.1](https://huggingface.co/licyk/sd-lora/blob/main/sdxl/style/ag31_style_ba_v1-000016.safetensors)
-- [Illustrious XL v0.1 model card](https://huggingface.co/OnomaAIResearch/Illustrious-xl-early-release-v0)
-- [Asuna Ichinose 4-outfit IllustriousXL LoRA](https://huggingface.co/Muapi/asuna-ichinose-blue-archive-4-outfits-illustriousxl)
-- [JANKU v5.0 original Civitai model 1277670](https://civitai.com/models/1277670)
-- [JANKU v5.0 canonical single-file public mirror](https://huggingface.co/Quiho/best-from-civitai/blob/main/JANKUTrainedNoobaiRouwei_v50.safetensors)
-- [JANKU v5.0 Diffusers reference repository](https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl)
-- [One Obsession original Civitai model 1318945](https://civitai.com/models/1318945)
-- [One Obsession v20_BOLD canonical single-file public mirror](https://huggingface.co/Quiho/best-from-civitai/blob/main/oneObsession_v20Bold.safetensors)
-- [ComfyUI LoRA guide](https://docs.comfy.org/tutorials/basic/lora)
-
-Models, generated images and runtime logs are ignored by the root repository;
-only the deployment scripts, workflow catalog and API-format graphs are meant
-to be versioned here.
+Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取整，不接受宽高或批量数量覆盖。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘。
+
+局部重绘需要原图和同尺寸蒙版，宽高均为 8 的倍数。默认读取蒙版红色通道：白色区域重绘、黑色区域保留。人物参考使用 `face_image`，姿态参考使用 `control_image`。
+
+图片参数接受已上传的相对文件名，不接受主机绝对路径或 URL。上传图片跨重启保留，可通过输入列表查询并按文件名删除；生成结果如需作为下一次输入，需要重新上传。
+
+### 常用接口
+
+| 接口 | 用途 |
+| --- | --- |
+| `GET /.well-known/agent-manifest.json` | 发现服务能力与调用方式 |
+| `GET /project/openapi.json` | 获取 OpenAPI 定义 |
+| `GET /project/models`、`GET /project/models/{model_id}` | 查询模型及组件信息 |
+| `GET /project/workflows`、`GET /project/workflows/{workflow_id}` | 查询工作流、参数和就绪状态 |
+| `GET /project/routes`、`POST /project/resolve` | 查询与选择路由 |
+| `POST /project/generate` | 提交命名工作流任务 |
+| `GET /project/jobs/{job_id}` | 查询排队、执行状态与输出 |
+| `POST /upload/image`、`GET /project/inputs` | 上传与查看输入图片 |
+| `DELETE /project/inputs/{name}` | 删除指定输入图片 |
+| `GET /project/resources` | 查看当前 GPU、RAM 和资源限制 |
+
+`POST /project/prompt` 是生成接口的兼容别名。需要自行构建完整节点图的客户端，也可以使用原生 ComfyUI 的 `POST /prompt` 和 `/history`。
+
+## 使用说明
+
+- 所有命名工作流共用队列并支持模型热切换；切换模型时，任务状态会显示 `model_switch`。
+- 队列最多接受 32 个待处理的命名任务。任务队列保存在内存中，重启服务不会保留未完成的排队任务。
+- 分辨率和批量数量受各工作流的资源预算约束；实际可用显存与 RAM 可通过资源接口查看。
+- CFG 为 1 时，负面提示词不参与采样。提示词风格、采样参数和可用 LoRA 以各工作流说明为准。
+- 模型文件位于 `ComfyUI/models/`，输入图片位于 `ComfyUI/input/`，生成图片位于 `ComfyUI/output/`。

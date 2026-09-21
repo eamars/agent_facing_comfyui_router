@@ -1,8 +1,9 @@
-"""Launch this project's isolated ComfyUI with normal device selection."""
+"""Launch this project's isolated ComfyUI on the RTX 4090 only."""
 
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 COMFY = ROOT / "ComfyUI"
 VENV_PY = COMFY / ".venv" / "Scripts" / "python.exe"
+GPU_UUID = "GPU-eed52936-813f-8d68-1654-bfb56cb42bc3"
 
 
 def main() -> int:
@@ -26,6 +28,18 @@ def main() -> int:
     if extra_args and extra_args[0] == "--":
         extra_args = extra_args[1:]
 
+    if any(arg.split("=", 1)[0] in {"--cuda-device", "--default-device", "--cpu", "--directml"} for arg in extra_args):
+        raise SystemExit("Device overrides are disabled: this deployment requires its RTX 4090.")
+    result = subprocess.run(
+        ["nvidia-smi", "--query-gpu=uuid,name", "--format=csv,noheader"],
+        capture_output=True, text=True, check=True, timeout=10,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    )
+    devices = dict(line.strip().split(", ", 1) for line in result.stdout.splitlines() if line.strip())
+    if "RTX 4090" not in devices.get(GPU_UUID, ""):
+        raise SystemExit(f"Required RTX 4090 is unavailable: {GPU_UUID}")
+    environment = {**os.environ, "CUDA_VISIBLE_DEVICES": GPU_UUID}
+
     cmd = [
         str(VENV_PY),
         str(COMFY / "main.py"),
@@ -35,10 +49,10 @@ def main() -> int:
         str(args.port),
     ] + extra_args
     print(
-        f"ComfyUI will use its default device selection; port: {args.port}",
+        f"ComfyUI device: {devices[GPU_UUID]} ({GPU_UUID}); visible as cuda:0; port: {args.port}",
         flush=True,
     )
-    return subprocess.call(cmd, cwd=COMFY)
+    return subprocess.call(cmd, cwd=COMFY, env=environment)
 
 
 if __name__ == "__main__":

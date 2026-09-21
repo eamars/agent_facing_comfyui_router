@@ -3,6 +3,93 @@
   "description": "Capability and prompting profiles for checkpoints, text encoders, VAEs and adapters referenced by workflow routes.",
   "models": [
     {
+      "id": "qwen-image-2.1-diffusion",
+      "name": "qwen_image_2.1_int8_convrot.safetensors",
+      "kind": "diffusion-model",
+      "status": "installed",
+      "routeable": true,
+      "family": "qwen-image-2.1",
+      "architecture": "qwen-image-2.1",
+      "precision": "INT8 ConvRot",
+      "required_file": "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+      "file_sizes": {
+        "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors": 7256783064
+      },
+      "compatibility": {
+        "workflow_families": [
+          "qwen-image-2.1"
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921",
+        "sha256": "cb74113cb03faecd79611b01fd7fd642f0aa60d6f0b95086abee214d75eaa57d"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SHA-256 verified; official text-to-image and reference-edit graphs executed on RTX 4090.",
+        "date": "2026-09-22"
+      }
+    },
+    {
+      "id": "qwen-image-2.1-text-encoder",
+      "name": "qwen3vl_8b_int8_convrot.safetensors",
+      "kind": "text-encoder",
+      "status": "installed",
+      "routeable": true,
+      "family": "qwen-image-2.1",
+      "architecture": "qwen-image-2.1",
+      "precision": "INT8 ConvRot",
+      "required_file": "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+      "file_sizes": {
+        "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors": 9350798360
+      },
+      "compatibility": {
+        "workflow_families": [
+          "qwen-image-2.1"
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921",
+        "sha256": "8bfd0f6e12abf2d2d697ecc888e5e90b0d6741d6708f05799f53afa560452e8f"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SHA-256 verified; official text-to-image and reference-edit graphs executed on RTX 4090.",
+        "date": "2026-09-22"
+      }
+    },
+    {
+      "id": "qwen-image-2.1-vae",
+      "name": "qwen_image_2.1_vae_bf16.safetensors",
+      "kind": "vae",
+      "status": "installed",
+      "routeable": true,
+      "family": "qwen-image-2.1",
+      "architecture": "qwen-image-2.1",
+      "precision": "BF16",
+      "required_file": "models/vae/qwen_image_2.1_vae_bf16.safetensors",
+      "file_sizes": {
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors": 675509688
+      },
+      "compatibility": {
+        "workflow_families": [
+          "qwen-image-2.1"
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921",
+        "sha256": "bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SHA-256 verified; official text-to-image and reference-edit graphs executed on RTX 4090.",
+        "date": "2026-09-22"
+      }
+    },
+    {
       "id": "moody-anima-mix-checkpoint",
       "name": "Moody Anima Mix v1.0",
       "kind": "diffusion-model",
