@@ -1625,6 +1625,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "job_phases": ["waiting_for_turn", "model_switch", "generation", "complete"],
             "queued_position": "queue_position is scoped to the named project queue and is zero-based",
             "download_urls": "relative /view URLs returned by /project/jobs/{prompt_id}",
+            "output_metadata": "Saved PNGs keep ComfyUI's prompt metadata (prompts, seeds, models, settings) for reproducibility; input image file names in it are replaced with [input image] before the job is reported. Strip all metadata yourself before sending an image somewhere that should not see the prompt.",
         },
         "openapi": "/project/openapi.json",
         "workflows": [
@@ -2195,6 +2196,21 @@ def _validated_prompt_id(value: Any) -> str:
         raise ApiError(400, "prompt_id must be a valid UUID") from exc
 
 
+def _redact_output_metadata(history_entry: dict[str, Any]) -> None:
+    """Drop input image names from saved PNG metadata before the job is reported; prompts and settings stay."""
+    from project_nodes.output_metadata import redact_input_names
+    output_root = Path(folder_paths.get_output_directory()).resolve()
+    for reference in _output_references(history_entry):
+        if reference["type"] != "output" or not reference["filename"].lower().endswith(".png"):
+            continue
+        path = (output_root / reference["subfolder"] / reference["filename"]).resolve()
+        try:
+            path.relative_to(output_root)
+            redact_input_names(path)
+        except (ValueError, OSError):
+            logging.warning("Could not redact input names in %s", reference["filename"])
+
+
 def _output_references(history_entry: dict[str, Any]) -> list[dict[str, Any]]:
     references: list[dict[str, Any]] = []
     outputs = history_entry.get("outputs", {})
@@ -2445,6 +2461,7 @@ class ProjectWorkflowCoordinator:
                 )
             )
             history_entry = await self._wait_for_history(job.prompt_id)
+            _redact_output_metadata(history_entry)
             status = history_entry.get("status", {})
             if not isinstance(status, dict):
                 status = {}

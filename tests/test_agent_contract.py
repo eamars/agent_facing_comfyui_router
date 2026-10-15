@@ -413,6 +413,33 @@ class WorkerGuardTests(unittest.TestCase):
         self.assertNotIn("code", error)
 
 
+class OutputMetadataTests(unittest.TestCase):
+    def test_input_names_are_redacted_and_everything_else_is_kept(self):
+        from PIL.PngImagePlugin import PngInfo
+        from project_nodes.output_metadata import REDACTED_INPUT, redact_input_names
+        with tempfile.TemporaryDirectory() as root:
+            for prompt_text in ("Change the teapot to blue.", "把茶壶改成蓝色。"):  # tEXt and iTXt chunks
+                graph = {"1": {"class_type": "LoadImage", "inputs": {"image": "asuna-edit-0123456789ab-x1y2z3.png"}},
+                         "2": {"class_type": "LoadImageMask", "inputs": {"image": "_fitted/abc.png", "channel": "red"}},
+                         "3": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt_text, "clip": ["4", 0]}},
+                         "5": {"class_type": "VAEEncode", "inputs": {"pixels": ["1", 0]}}}
+                info = PngInfo(); info.add_text("prompt", json.dumps(graph, ensure_ascii=False))
+                path = Path(root) / "out.png"
+                Image.new("RGB", (64, 48), "navy").save(path, pnginfo=info)
+                with Image.open(path) as before:
+                    pixels = before.tobytes()
+                self.assertTrue(redact_input_names(path))
+                self.assertFalse(redact_input_names(path))
+                with Image.open(path) as after:
+                    saved = json.loads(after.info["prompt"])
+                    self.assertEqual(after.tobytes(), pixels)
+                self.assertEqual(saved["1"]["inputs"]["image"], REDACTED_INPUT)
+                self.assertEqual(saved["2"]["inputs"]["image"], REDACTED_INPUT)
+                self.assertEqual(saved["3"]["inputs"]["text"], prompt_text)
+                self.assertEqual(saved["5"]["inputs"]["pixels"], ["1", 0])
+                self.assertNotIn(b"asuna-edit", path.read_bytes())
+
+
 class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
     async def test_never_started_failure_has_stable_timing(self):
         coordinator = api.ProjectWorkflowCoordinator(types.SimpleNamespace())
