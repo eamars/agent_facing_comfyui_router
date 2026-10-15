@@ -14,22 +14,22 @@ $ControlNetAuxAnnotators = Join-Path $Comfy 'custom_nodes\comfyui_controlnet_aux
 $AssetSets = @{
     'qwen-image-2.1' = @(
         [pscustomobject]@{
-            Name = 'Official Qwen-Image-2.1 INT8 ConvRot diffusion model'
-            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/ace0edeb3791a594ddfa36ed5f41a178a394e921/diffusion_models/qwen_image_2.1_int8_convrot.safetensors'
-            Path = (Join-Path $ModelRoot 'diffusion_models\qwen_image_2.1_int8_convrot.safetensors')
-            Bytes = [int64]7256783064
-            Sha256 = 'CB74113CB03FAECD79611B01FD7FD642F0AA60D6F0B95086ABEE214D75EAA57D'
+            Name = 'Qwen-Image-2.1 Uncensored GGUF Q4_K_M diffusion model'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/qwen-image-2.1-UC-Q4_K_M.gguf?download=true'
+            Path = (Join-Path $ModelRoot 'diffusion_models\qwen-image-2.1-UC-Q4_K_M.gguf')
+            Bytes = [int64]4604558112
+            Sha256 = 'E79C8A009F2ECBDB6C70FD663D9AEA9EE304A0D91F347E4169A756B8AD141B41'
         },
         [pscustomobject]@{
-            Name = 'Official Qwen3VL 8B INT8 ConvRot text encoder'
-            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/ace0edeb3791a594ddfa36ed5f41a178a394e921/text_encoders/qwen3vl_8b_int8_convrot.safetensors'
+            Name = 'Qwen-Image-2.1 Qwen3VL 8B INT8 ConvRot text encoder'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/text_encoders/qwen3vl_8b_int8_convrot.safetensors?download=true'
             Path = (Join-Path $ModelRoot 'text_encoders\qwen3vl_8b_int8_convrot.safetensors')
             Bytes = [int64]9350798360
             Sha256 = '8BFD0F6E12ABF2D2D697ECC888E5E90B0D6741D6708F05799F53AFA560452E8F'
         },
         [pscustomobject]@{
-            Name = 'Official Qwen-Image-2.1 BF16 VAE'
-            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/ace0edeb3791a594ddfa36ed5f41a178a394e921/vae/qwen_image_2.1_vae_bf16.safetensors'
+            Name = 'Qwen-Image-2.1 BF16 VAE'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/vae/qwen_image_2.1_vae_bf16.safetensors?download=true'
             Path = (Join-Path $ModelRoot 'vae\qwen_image_2.1_vae_bf16.safetensors')
             Bytes = [int64]675509688
             Sha256 = 'BB21F7473051E1AC368515DD3F2E15CD44D7A11748EE8823E1DDCA3E4876B7C9'

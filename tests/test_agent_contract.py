@@ -64,7 +64,7 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(api._request_parameters({"parameters": {"positive_prompt": "unchanged"}}), {"prompt": "unchanged"})
         self.assertEqual(api._request_parameters({"parameters": {"subject": "A ceramic teapot."}}), {"prompt": "A ceramic teapot."})
 
-    def test_qwen_official_sampling_and_edit_reference_size(self):
+    def test_qwen_sampling_and_edit_reference_size(self):
         self.entry = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-t2i")
         graph = self.graph()
         self.assertEqual([api._binding_value(graph, self.entry, key) for key in
@@ -91,7 +91,7 @@ class AgentContractTests(unittest.TestCase):
                 continue
             self.assertIsNone(api._route_score(entry, {"domain": "anime"}))
             self.assertIsNone(api._route_score(entry, {"domain": "blue archive"}))
-            self.assertIsNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw"}))
+            self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw"}))
             mode = "image-to-image" if entry["id"].endswith("edit") else "text-to-image"
             self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "input_mode": mode}))
 

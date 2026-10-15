@@ -5,13 +5,13 @@
   "workflows": [
     {
       "id": "qwen-image-2.1-t2i",
-      "name": "Official Qwen-Image-2.1 Text to Image",
-      "description": "Official ComfyUI text-to-image template, INT8 ConvRot weights, 1024 square, 25 Euler/simple steps and CFG 1.",
+      "name": "Qwen-Image-2.1 Uncensored Q4_K_M Text to Image",
+      "description": "Qwen-Image-2.1 Uncensored Q4_K_M GGUF transformer, 1024 square, 25 Euler/simple steps and CFG 1.",
       "family": "qwen-image-2.1",
       "resident_group": "qwen-image-2.1-t2i",
       "tags": [
         "qwen",
-        "official",
+        "uncensored",
         "natural-language",
         "text-to-image"
       ],
@@ -23,7 +23,7 @@
         "qwen-image-2.1-vae"
       ],
       "required_files": [
-        "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+        "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
         "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
         "models/vae/qwen_image_2.1_vae_bf16.safetensors"
       ],
@@ -45,6 +45,7 @@
         ],
         "content_modes": [
           "sfw",
+          "nsfw",
           "general"
         ],
         "priority": 30,
@@ -76,9 +77,10 @@
         "prompt_dialect": "natural-language",
         "content_modes": [
           "sfw",
+          "nsfw",
           "general"
         ],
-        "nsfw_capable": false,
+        "nsfw_capable": true,
         "lora_support": false,
         "recommended_resolutions": [
           "1024x1024"
@@ -200,32 +202,32 @@
         "negative_prompt_effective_at_default": false
       },
       "compatibility_notes": [
-        "Uses official ComfyUI Qwen-Image-2.1 components; incompatible with older Qwen-Image/2511 LoRAs.",
+        "Uses the uncensored Qwen-Image-2.1 Q4_K_M GGUF transformer with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs.",
         "Shares the existing named-job coordinator and worker model-unload boundary."
       ],
       "source": {
         "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_t2i.json",
-        "model_url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
-        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921"
+        "model_url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
+        "revision": "40319fb15542f0ad22921e0124a191a8a935a60a"
       },
       "validation": {
         "status": "verified-by-runtime-probe",
-        "scope": "RTX 4090 named API, official defaults, 1024x1024; bidirectional hot switching. NSFW behavior has not been validated.",
-        "date": "2026-09-22",
-        "job_id": "3bdf70a8-9327-4865-b576-008a3fea43e7",
-        "elapsed_ms": 52813,
-        "report": "ComfyUI/.codex-runtime/qwen21-hot-switch.json"
+        "scope": "RTX 4090 named API; Q4_K_M 1024x1024 25-step T2I and NSFW Qwen route selection.",
+        "date": "2026-09-26",
+        "job_id": "bf18c760-0da4-4e8b-a1bb-f3745f03c843",
+        "elapsed_ms": 51907,
+        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json"
       }
     },
     {
       "id": "qwen-image-2.1-edit",
-      "name": "Official Qwen-Image-2.1 Image Edit",
-      "description": "Official reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32.",
+      "name": "Qwen-Image-2.1 Uncensored Q4_K_M Image Edit",
+      "description": "Uncensored Q4_K_M reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32.",
       "family": "qwen-image-2.1",
       "resident_group": "qwen-image-2.1-edit",
       "tags": [
         "qwen",
-        "official",
+        "uncensored",
         "natural-language",
         "image-edit"
       ],
@@ -237,7 +239,7 @@
         "qwen-image-2.1-vae"
       ],
       "required_files": [
-        "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+        "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
         "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
         "models/vae/qwen_image_2.1_vae_bf16.safetensors"
       ],
@@ -259,6 +261,7 @@
         ],
         "content_modes": [
           "sfw",
+          "nsfw",
           "general"
         ],
         "priority": 30,
@@ -293,9 +296,10 @@
         "prompt_dialect": "natural-language",
         "content_modes": [
           "sfw",
+          "nsfw",
           "general"
         ],
-        "nsfw_capable": false,
+        "nsfw_capable": true,
         "lora_support": false,
         "recommended_resolutions": [
           "1024x1024"
@@ -417,22 +421,22 @@
         "negative_prompt_effective_at_default": false
       },
       "compatibility_notes": [
-        "Uses official ComfyUI Qwen-Image-2.1 components; incompatible with older Qwen-Image/2511 LoRAs.",
+        "Uses the uncensored Qwen-Image-2.1 Q4_K_M GGUF transformer with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs.",
         "Shares the existing named-job coordinator and worker model-unload boundary.",
         "The official editable-size switch is fixed to false, and reference resolution is 0 as in the template. The named route currently exposes one reference."
       ],
       "source": {
         "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_image_edit.json",
-        "model_url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
-        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921"
+        "model_url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
+        "revision": "40319fb15542f0ad22921e0124a191a8a935a60a"
       },
       "validation": {
         "status": "verified-by-runtime-probe",
-        "scope": "RTX 4090 named API, official defaults, 1024x1024; bidirectional hot switching. NSFW behavior has not been validated.",
-        "date": "2026-09-22",
-        "job_id": "974bcfe1-6caa-4bb7-90ff-4818960d8720",
-        "elapsed_ms": 63125,
-        "report": "ComfyUI/.codex-runtime/qwen21-hot-switch.json"
+        "scope": "RTX 4090 named API; Q4_K_M reference edit using the T2I result at 1024x1024.",
+        "date": "2026-09-26",
+        "job_id": "1c4ff487-8f1e-4f52-b35f-188c81582e43",
+        "elapsed_ms": 63922,
+        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json"
       }
     },
     {

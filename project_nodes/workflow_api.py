@@ -1049,6 +1049,8 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
         elif routing.get("exclusive", False) and not explicit_workflow:
             return None
         else:
+            # A domain-specific route should outrank a generic fallback's content preference.
+            score -= 100
             reasons.append("generic fallback route")
 
     requested_style = query.get("style")

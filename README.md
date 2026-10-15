@@ -22,7 +22,7 @@
 
 | 模型 / 组合 | 主要用途 | 支持方式 | 工作流 ID |
 | --- | --- | --- | --- |
-| Qwen-Image-2.1 · 官方 INT8 ConvRot | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
+| Qwen-Image-2.1 · Uncensored GGUF Q4_K_M | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑，SFW / NSFW 路由 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
 | Anima Turbo v1.1 · 官方 BF16 | 通用动漫、人物与插画 | 文生图、图生图 | `anima-turbo-v1-1` |
 | Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
 | Moody Desire Mix v3.0 · Flux.2/Klein | 动漫、人物肖像 | 文生图、图生图 | `moody-desire-v30` |
@@ -32,7 +32,7 @@
 | JANKU v5.0 · Illustrious/NoobAI 系 | 色彩鲜明、光泽感较强的动漫插画 | 文生图、图生图 | `janku-v5-illustrious` |
 | One Obsession v20_BOLD · Illustrious 系 | 纹理、戏剧性光影与轻度 2.5D 风格 | 文生图、图生图 | `one-obsession-v20-bold` |
 
-动漫路由声明支持 SFW / NSFW 内容模式；Qwen 官方路由目前不声明 NSFW 能力。内容模式用于路由选择，具体画面由调用方的提示词决定。
+动漫路由和 Qwen-Image-2.1 Uncensored 路由均声明支持 SFW / NSFW 内容模式。内容模式用于路由选择，具体画面由调用方的提示词决定。
 
 ### 局部重绘、人物参考与姿态控制
 
@@ -70,7 +70,7 @@
 
 | 所需模型 / 功能 | 下载 Profile |
 | --- | --- |
-| Qwen-Image-2.1 生成与编辑 | `qwen-image-2.1` |
+| Qwen-Image-2.1 Uncensored GGUF Q4_K_M 生成与编辑 | `qwen-image-2.1` |
 | Anima Turbo、局部重绘与 Anima 人物参考 | `anima-turbo` |
 | Moody Anima Mix 与局部重绘 | `moody-anima-mix` |
 | Moody Desire Mix | `moody-desire-v30` |
@@ -83,6 +83,8 @@
 | SDXL 姿态控制附加组件 | `controlnet-openpose-sdxl` |
 
 SDXL 人物参考与姿态控制还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
+
+Qwen-Image-2.1 使用 abenzerps 发布的 Uncensored Q4_K_M GGUF 扩散模型，并配套 Qwen3VL INT8 文本编码器与 BF16 VAE。`setup_comfyui.ps1` 会安装固定版本的 ComfyUI-GGUF 节点；目标模型及配套文件由 Qwen profile 下载并校验。原官方 INT8 扩散文件保留在本地作回滚，不再被命名工作流加载。部署细节见 [Qwen 2.1 替换记录](docs/qwen-image-2.1-uncensored-migration.md)。
 
 查看状态或停止服务：
 

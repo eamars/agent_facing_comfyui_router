@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$ComfyCommit = 'b0f4b7b294ce482a2e071d9d762c133d38c7aa07',
+    [string]$GGUFCommit = '373048b8403a7820620065210a691263d4da0a61',
+    [string]$GGUFVersion = '0.19.0',
     [string]$KJCommit = 'dcfcb5d',
     [string]$IPAdapterCommit = 'b188a6cb39b512a9c6da7235b880af42c78ccd0d',
     [string]$ControlNetAuxCommit = '59b1fc411ede8623b2997855b8018f0b3b6cf49f',
@@ -69,6 +71,25 @@ if (Test-Path -LiteralPath $KJRequirements) {
     & $Python -m pip install -r $KJRequirements
     if ($LASTEXITCODE -ne 0) { throw "KJNodes dependency installation failed with exit code $LASTEXITCODE" }
 }
+
+$GGUF = Join-Path $NodesDir 'ComfyUI-GGUF'
+if (-not (Test-Path -LiteralPath $GGUF)) {
+    git clone https://github.com/leejet/ComfyUI-GGUF.git $GGUF
+    if ($LASTEXITCODE -ne 0) { throw "ComfyUI-GGUF clone failed with exit code $LASTEXITCODE" }
+} else {
+    Write-Host '  ComfyUI-GGUF already exists - reusing checkout.'
+}
+if ($GGUFCommit) {
+    git -C $GGUF checkout --detach $GGUFCommit
+    if ($LASTEXITCODE -ne 0) { throw "ComfyUI-GGUF checkout failed with exit code $LASTEXITCODE" }
+}
+$GGUFRequirements = Join-Path $GGUF 'requirements.txt'
+if (Test-Path -LiteralPath $GGUFRequirements) {
+    & $Python -m pip install -r $GGUFRequirements
+    if ($LASTEXITCODE -ne 0) { throw "ComfyUI-GGUF dependency installation failed with exit code $LASTEXITCODE" }
+}
+& $Python -m pip install "gguf==$GGUFVersion"
+if ($LASTEXITCODE -ne 0) { throw "GGUF Python package pin installation failed with exit code $LASTEXITCODE" }
 
 $IPAdapter = Join-Path $NodesDir 'ComfyUI_IPAdapter_plus'
 if (-not (Test-Path -LiteralPath $IPAdapter)) {

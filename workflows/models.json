@@ -4,31 +4,32 @@
   "models": [
     {
       "id": "qwen-image-2.1-diffusion",
-      "name": "qwen_image_2.1_int8_convrot.safetensors",
+      "name": "qwen-image-2.1-UC-Q4_K_M.gguf",
       "kind": "diffusion-model",
       "status": "installed",
       "routeable": true,
       "family": "qwen-image-2.1",
       "architecture": "qwen-image-2.1",
-      "precision": "INT8 ConvRot",
-      "required_file": "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+      "precision": "GGUF Q4_K_M",
+      "required_file": "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
       "file_sizes": {
-        "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors": 7256783064
+        "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf": 4604558112
       },
+      "description": "Uncensored Qwen-Image-2.1 Q4_K_M GGUF diffusion transformer paired with the Qwen3VL INT8 encoder and Qwen-Image-2.1 BF16 VAE.",
       "compatibility": {
         "workflow_families": [
           "qwen-image-2.1"
         ]
       },
       "source": {
-        "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
-        "revision": "ace0edeb3791a594ddfa36ed5f41a178a394e921",
-        "sha256": "cb74113cb03faecd79611b01fd7fd642f0aa60d6f0b95086abee214d75eaa57d"
+        "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
+        "revision": "40319fb15542f0ad22921e0124a191a8a935a60a",
+        "sha256": "e79c8a009f2ecbdb6c70fd663d9aea9ee304a0d91f347e4169a756b8ad141b41"
       },
       "validation": {
         "status": "verified-by-runtime-probe",
-        "scope": "SHA-256 verified; official text-to-image and reference-edit graphs executed on RTX 4090.",
-        "date": "2026-09-22"
+        "scope": "SHA-256 verified; Q4_K_M named T2I and reference-edit APIs succeeded on RTX 4090; NSFW domain resolved to Qwen.",
+        "date": "2026-09-26"
       }
     },
     {
