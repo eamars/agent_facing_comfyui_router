@@ -20,12 +20,14 @@
       "model_ids": [
         "qwen-image-2.1-diffusion",
         "qwen-image-2.1-text-encoder",
-        "qwen-image-2.1-vae"
+        "qwen-image-2.1-vae",
+        "qwen-image-2.1-uncensored-lora"
       ],
       "required_files": [
         "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
         "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
-        "models/vae/qwen_image_2.1_vae_bf16.safetensors"
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors",
+        "models/loras/qwen-image-2.1-uncensored-lora.safetensors"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -81,7 +83,7 @@
           "general"
         ],
         "nsfw_capable": true,
-        "lora_support": false,
+        "lora_support": true,
         "recommended_resolutions": [
           "1024x1024"
         ]
@@ -150,6 +152,10 @@
         "batch_size": {
           "node": "456",
           "input": "batch_size"
+        },
+        "uncensored_strength_model": {
+          "node": "471",
+          "input": "strength_model"
         }
       },
       "defaults": {
@@ -161,7 +167,10 @@
         "denoise": 1,
         "sampler_name": "euler",
         "scheduler": "simple",
-        "filename_prefix": "qwen_image_2_1"
+        "filename_prefix": "qwen_image_2_1",
+        "loras": {
+          "uncensored": 1.0
+        }
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
@@ -201,7 +210,8 @@
       },
       "compatibility_notes": [
         "Uses the uncensored Qwen-Image-2.1 Q4_K_M GGUF transformer with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs.",
-        "Shares the existing named-job coordinator and worker model-unload boundary."
+        "Shares the existing named-job coordinator and worker model-unload boundary.",
+        "The route applies the publisher's qwen-image-2.1-uncensored-lora (rank 16, attention only, model-only) on top of the UC GGUF at strength 1.0; callers can set loras.uncensored from -2 to 2, or 0 to disable it."
       ],
       "source": {
         "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_t2i.json",
@@ -214,7 +224,28 @@
         "date": "2026-09-26",
         "job_id": "bf18c760-0da4-4e8b-a1bb-f3745f03c843",
         "elapsed_ms": 51907,
-        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json"
+        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json",
+        "probes": [
+          {
+            "mode": "text-to-image-lora",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-15",
+            "resolution": "1024x1024",
+            "seed": 4242,
+            "elapsed_ms": 56360,
+            "output": "qwen_image_2_1_00008.png",
+            "scope": "uncensored LoRA 1.0 vs 0.0 at the same seed: mean absolute pixel difference 1.05/255, 2.1% of pixels changed by more than 10. All LoRA keys loaded."
+          }
+        ]
+      },
+      "lora_bindings": {
+        "uncensored": {
+          "file": "qwen-image-2.1-uncensored-lora.safetensors",
+          "triggers": [],
+          "default": 1.0,
+          "strength_model": "uncensored_strength_model"
+        }
       }
     },
     {
@@ -234,12 +265,14 @@
       "model_ids": [
         "qwen-image-2.1-diffusion",
         "qwen-image-2.1-text-encoder",
-        "qwen-image-2.1-vae"
+        "qwen-image-2.1-vae",
+        "qwen-image-2.1-uncensored-lora"
       ],
       "required_files": [
         "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
         "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
-        "models/vae/qwen_image_2.1_vae_bf16.safetensors"
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors",
+        "models/loras/qwen-image-2.1-uncensored-lora.safetensors"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -298,7 +331,7 @@
           "general"
         ],
         "nsfw_capable": true,
-        "lora_support": false,
+        "lora_support": true,
         "recommended_resolutions": [
           "1024x1024"
         ],
@@ -369,6 +402,10 @@
         "input_image": {
           "node": "470",
           "input": "image"
+        },
+        "uncensored_strength_model": {
+          "node": "471",
+          "input": "strength_model"
         }
       },
       "defaults": {
@@ -377,7 +414,10 @@
         "denoise": 1,
         "sampler_name": "euler",
         "scheduler": "simple",
-        "filename_prefix": "qwen_image_2_1_edit"
+        "filename_prefix": "qwen_image_2_1_edit",
+        "loras": {
+          "uncensored": 1.0
+        }
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
@@ -419,7 +459,8 @@
       "compatibility_notes": [
         "Uses the uncensored Qwen-Image-2.1 Q4_K_M GGUF transformer with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs.",
         "Shares the existing named-job coordinator and worker model-unload boundary.",
-        "The official editable-size switch is fixed to false, and reference resolution is 0 as in the template. The named route currently exposes one reference."
+        "The official editable-size switch is fixed to false, and reference resolution is 0 as in the template. The named route currently exposes one reference.",
+        "The route applies the publisher's qwen-image-2.1-uncensored-lora (rank 16, attention only, model-only) on top of the UC GGUF at strength 1.0; callers can set loras.uncensored from -2 to 2, or 0 to disable it."
       ],
       "source": {
         "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_image_edit.json",
@@ -432,7 +473,28 @@
         "date": "2026-09-26",
         "job_id": "1c4ff487-8f1e-4f52-b35f-188c81582e43",
         "elapsed_ms": 63922,
-        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json"
+        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json",
+        "probes": [
+          {
+            "mode": "image-edit-lora",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-15",
+            "resolution": "1024x1024",
+            "seed": 7,
+            "elapsed_ms": 79032,
+            "output": "qwen_image_2_1_edit_00001.png",
+            "scope": "Red-to-cobalt teapot edit preserved composition; LoRA 1.0 vs 0.0 mean absolute pixel difference 0.17/255."
+          }
+        ]
+      },
+      "lora_bindings": {
+        "uncensored": {
+          "file": "qwen-image-2.1-uncensored-lora.safetensors",
+          "triggers": [],
+          "default": 1.0,
+          "strength_model": "uncensored_strength_model"
+        }
       }
     },
     {
@@ -4974,11 +5036,11 @@
       }
     },
     {
-      "id": "janku-v5-illustrious",
-      "name": "JANKU v5.0 — Polished Illustrious Anime",
-      "description": "Pinned JANKU v5.0 single-file SDXL/Illustrious workflow for polished, vibrant, glossy anime illustration with sharp linework and strong character/artist-tag knowledge.",
+      "id": "janku-illustrious",
+      "name": "JANKU v7.77 — Polished Illustrious Anime",
+      "description": "Pinned JANKU v7.77 (JANKU + Chenkin v0.2 base) single-file SDXL/Illustrious workflow for polished, vibrant anime illustration with thick clean linework, detailed backgrounds and strong character-tag knowledge.",
       "family": "sdxl-illustrious",
-      "resident_group": "sdxl-illustrious-janku-v5",
+      "resident_group": "sdxl-illustrious-janku",
       "tags": [
         "anime",
         "illustration",
@@ -4990,12 +5052,12 @@
         "nsfw-capable"
       ],
       "content_class": "anime-illustration-nsfw-capable",
-      "file": "janku_v5_illustrious.json",
+      "file": "janku_illustrious.json",
       "model_ids": [
-        "janku-v5"
+        "janku-v7-77"
       ],
       "required_files": [
-        "models/checkpoints/JANKU_v5_0.safetensors"
+        "models/checkpoints/JANKU_v7_77.safetensors"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -5015,16 +5077,16 @@
         ],
         "aliases": [
           "JANKU",
-          "JANKU v5",
-          "JANKU v5.0",
+          "JANKU v7.77",
           "JANKU Illustrious",
           "NoobAI RouWei",
-          "NoobAI + RouWei"
+          "NoobAI + RouWei",
+          "Chenkin",
+          "JANKU Chenkin"
         ],
         "styles": [
           "JANKU",
-          "JANKU v5",
-          "JANKU v5.0",
+          "JANKU v7.77",
           "JANKU Illustrious",
           "NoobAI RouWei",
           "NoobAI + RouWei",
@@ -5036,7 +5098,9 @@
           "polished character illustration",
           "anime",
           "illustration",
-          "anime portrait"
+          "anime portrait",
+          "Chenkin",
+          "JANKU Chenkin"
         ],
         "content_modes": [
           "sfw",
@@ -5119,7 +5183,7 @@
           "maximum": "expert"
         },
         "natural_language": false,
-        "character_identity": "strong character and artist-tag knowledge without a required trigger word",
+        "character_identity": "strong character-tag knowledge without a required trigger word; the author notes less artist-tag knowledge than earlier JANKU versions",
         "style_control": "strong for polished, vibrant, glossy anime illustration",
         "outfit_control": "medium through tags",
         "composition_control": "medium through tags",
@@ -5173,15 +5237,15 @@
           {
             "mode": "text-to-image",
             "status": "success",
-            "job_id": "8934dddc-1e36-4899-987d-050659812e4a",
             "prompt_class": "sfw",
-            "date": "2026-09-18",
-            "resolution": "512x512",
-            "steps": 8,
-            "seed": 917,
-            "elapsed_ms": 8750,
-            "output": "focused_janku-v5-illustrious_00001_.png",
-            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
+            "date": "2026-10-15",
+            "resolution": "1024x1536",
+            "steps": 30,
+            "cfg": 5.0,
+            "seed": 2026,
+            "elapsed_ms": 30375,
+            "output": "janku_illustrious_00001_.png",
+            "scope": "JANKU v7.77 named API run plus same-seed CFG 3 run via the previous id; compared visually with JANKU v5.0 at the same seed. Not an NSFW or artist-tag benchmark."
           }
         ],
         "limitations": [
@@ -5190,11 +5254,11 @@
       },
       "selection": {
         "best_for": [
-          "explicit JANKU v5 or JANKU v5.0 requests",
+          "explicit JANKU or JANKU v7.77 requests",
           "generic NSFW anime when no specialized capability is requested",
           "polished Illustrious anime",
           "vibrant color, strong contrast and glossy/shiny rendering",
-          "sharp anime linework and artist-tag prompting"
+          "thick, clean anime linework and detailed backgrounds"
         ],
         "not_for": [
           "explicit Blue Archive or NIKKE identity/style routes",
@@ -5203,13 +5267,14 @@
         ],
         "priority_signals": [
           "JANKU",
-          "JANKU v5",
+          "JANKU v7.77",
           "JANKU Illustrious",
           "NoobAI RouWei",
           "glossy anime",
           "shiny anime",
           "vibrant anime",
-          "sharp anime linework"
+          "sharp anime linework",
+          "Chenkin"
         ],
         "specific_route_precedence": [
           "blue-archive-character-illustrious-xl",
@@ -5261,8 +5326,8 @@
         "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms."
       },
       "compatibility_notes": [
-        "JANKU v5.0 is exposed through the canonical single-file SDXL/Illustrious checkpoint loader.",
-        "The John6666 Hugging Face repository is a Diffusers conversion and is reference metadata only; this route does not download or load a Diffusers directory.",
+        "JANKU v7.77 is a new JANKU + Chenkin v0.2 base exposed through the canonical single-file SDXL/Illustrious checkpoint loader (epsilon prediction).",
+        "The author notes thicker linework, more detailed backgrounds and less artist knowledge than earlier JANKU versions; artist tags may have weaker effect than on v5.",
         "No trigger word, optional embedding, detailer or LoRA is required by the route.",
         "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
       ],
@@ -5304,11 +5369,11 @@
         "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
         "examples": [
           {
-            "purpose": "JANKU v5 SFW glossy portrait",
+            "purpose": "JANKU v7.77 SFW glossy portrait",
             "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, anime portrait, vibrant colors, glossy hair, sharp linework, looking at viewer, upper body, sunlit garden, soft rim light"
           },
           {
-            "purpose": "JANKU v5 SFW artist-tag prompt",
+            "purpose": "JANKU v7.77 SFW artist-tag prompt",
             "prompt": "masterpiece, best quality, 1girl, solo, by artistname, elegant anime character, detailed outfit, three-quarter view, dramatic colorful lighting"
           }
         ]
@@ -5316,11 +5381,11 @@
       "source": {
         "creator": "janxd",
         "civitai_model_id": 1277670,
-        "civitai_version_id": 1896532,
-        "mirror_url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true",
-        "reference_repository": "https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl",
-        "canonical_file": "JANKUTrainedNoobaiRouwei_v50.safetensors",
-        "local_file": "JANKU_v5_0.safetensors"
+        "civitai_version_id": 2786084,
+        "mirror_url": "https://huggingface.co/LillyCherry/JANKUTrainedChenkinNoobai_v777/resolve/0226c4f27bfbcfdb744224073ad369288637974c/JANKUTrainedChenkinNoobai_v777.safetensors?download=true",
+        "canonical_file": "JANKUTrainedChenkinNoobai_v777.safetensors",
+        "local_file": "JANKU_v7_77.safetensors",
+        "sha256": "88177D224CE97F60CF3E908F87902F913ED4562BD79D237F84238A4354601EFB"
       },
       "bindings": {
         "prompt": {
@@ -5381,7 +5446,7 @@
         "denoise": 1.0,
         "sampler_name": "euler_ancestral",
         "scheduler": "normal",
-        "filename_prefix": "janku_v5_illustrious"
+        "filename_prefix": "janku_illustrious"
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
@@ -5392,14 +5457,17 @@
         "face_reference": false,
         "controlnet": false,
         "image_to_image": true
-      }
+      },
+      "previous_ids": [
+        "janku-v5-illustrious"
+      ]
     },
     {
-      "id": "one-obsession-v20-bold",
-      "name": "One Obsession v20_BOLD — Textured Illustrious Anime",
-      "description": "Pinned One Obsession v20_BOLD single-file SDXL/Illustrious workflow for high-detail anime with rich texture, dramatic light/shadow and polished 2D-to-2.5D rendering.",
+      "id": "one-obsession",
+      "name": "One Obsession v24 — Textured Illustrious Anime",
+      "description": "Pinned One Obsession v24 single-file SDXL/Illustrious workflow for high-detail anime with rich texture, dramatic light/shadow and polished 2D-to-2.5D rendering.",
       "family": "sdxl-illustrious",
-      "resident_group": "sdxl-illustrious-one-obsession-v20-bold",
+      "resident_group": "sdxl-illustrious-one-obsession",
       "tags": [
         "anime",
         "illustration",
@@ -5412,12 +5480,12 @@
         "nsfw-capable"
       ],
       "content_class": "anime-illustration-nsfw-capable",
-      "file": "one_obsession_v20_bold.json",
+      "file": "one_obsession.json",
       "model_ids": [
-        "one-obsession-v20-bold"
+        "one-obsession-v24"
       ],
       "required_files": [
-        "models/checkpoints/OneObsession_v20Bold.safetensors"
+        "models/checkpoints/OneObsession_v24.safetensors"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -5437,15 +5505,13 @@
         ],
         "aliases": [
           "One Obsession",
-          "One Obsession v20",
-          "One Obsession v20 BOLD",
-          "v20 BOLD"
+          "One Obsession v24",
+          "One Obsession v24"
         ],
         "styles": [
           "One Obsession",
-          "One Obsession v20",
-          "One Obsession v20 BOLD",
-          "v20 BOLD",
+          "One Obsession v24",
+          "One Obsession v24",
           "stylized Illustrious",
           "2.5D anime",
           "glossy anime",
@@ -5592,15 +5658,15 @@
           {
             "mode": "text-to-image",
             "status": "success",
-            "job_id": "e5a0e732-26e3-4c5c-89f9-3523721b571c",
             "prompt_class": "sfw",
-            "date": "2026-09-18",
-            "resolution": "512x512",
-            "steps": 8,
-            "seed": 917,
-            "elapsed_ms": 7437,
-            "output": "focused_one-obsession-v20-bold_00001_.png",
-            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
+            "date": "2026-10-15",
+            "resolution": "1024x1536",
+            "steps": 24,
+            "cfg": 4.5,
+            "seed": 2026,
+            "elapsed_ms": 25047,
+            "output": "one_obsession_00001_.png",
+            "scope": "One Obsession v24 named API run; compared visually with v20_BOLD at the same seed. Not an NSFW benchmark."
           }
         ],
         "limitations": [
@@ -5609,7 +5675,7 @@
       },
       "selection": {
         "best_for": [
-          "explicit One Obsession v20_BOLD requests",
+          "explicit One Obsession v24 requests",
           "stylized 2D/2.5D anime",
           "texture-focused polished character portraits",
           "dramatic light and shadow",
@@ -5622,9 +5688,8 @@
         ],
         "priority_signals": [
           "One Obsession",
-          "One Obsession v20",
-          "One Obsession v20 BOLD",
-          "v20 BOLD",
+          "One Obsession v24",
+          "One Obsession v24",
           "stylized 2D/2.5D",
           "texture",
           "dramatic light and shadow",
@@ -5666,10 +5731,10 @@
           "texture"
         ],
         "prompt_details_are_advisory": true,
-        "sampling": "Default to 25-35 steps, CFG 3-6, with Euler A/euler_ancestral for a cleaner/neater result than Euler in the author's guidance; use the normal scheduler.",
+        "sampling": "Default to 24 steps, CFG 4.5, Euler A/euler_ancestral with the normal scheduler, matching the author's v24 samples; 20-35 steps and CFG 3-6 remain reasonable.",
         "recommended": {
           "steps": [
-            25,
+            20,
             35
           ],
           "cfg": [
@@ -5681,7 +5746,7 @@
         "negative_prompt": "Keep the negative prompt caller-controlled and compatible with a 2D/2.5D request; do not permanently force a 2D-only exclusion."
       },
       "compatibility_notes": [
-        "This route is pinned specifically to One Obsession v20_BOLD; it must not silently substitute v21, v22, v23, v24 or latest.",
+        "This route is pinned to One Obsession v24 (2.5D texture refresh per the author); newer versions are adopted only by an explicit catalog update.",
         "The checkpoint is loaded as a normal single-file SDXL/Illustrious model and requires no LoRA.",
         "The model supports anime through mildly 2.5D rendering; caller prompts control the final subject and content.",
         "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
@@ -5716,19 +5781,19 @@
         "recommended": {
           "width": 1024,
           "height": 1536,
-          "steps": 30,
-          "cfg": 5.0,
+          "steps": 24,
+          "cfg": 4.5,
           "sampler_name": "euler_ancestral",
           "scheduler": "normal"
         },
         "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
         "examples": [
           {
-            "purpose": "One Obsession v20 BOLD SFW 2.5D portrait",
+            "purpose": "One Obsession v24 SFW 2.5D portrait",
             "prompt": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, highres, 1girl, solo, polished anime character portrait, textured hair, elegant outfit, three-quarter view, dramatic light and shadow, warm studio background"
           },
           {
-            "purpose": "One Obsession v20 BOLD SFW textured illustration",
+            "purpose": "One Obsession v24 SFW textured illustration",
             "prompt": "masterpiece, best quality, 1girl, solo, stylized anime illustration, rich fabric texture, glossy highlights, cinematic rim light, detailed environment, polished 2.5D rendering"
           }
         ]
@@ -5736,10 +5801,12 @@
       "source": {
         "creator": "maxfeifei8",
         "civitai_model_id": 1318945,
-        "civitai_model_name": "One Obsession v20_BOLD",
-        "mirror_url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/oneObsession_v20Bold.safetensors?download=true",
-        "canonical_file": "oneObsession_v20Bold.safetensors",
-        "local_file": "OneObsession_v20Bold.safetensors"
+        "civitai_version_id": 3218603,
+        "civitai_model_name": "One Obsession v24",
+        "mirror_url": "https://huggingface.co/RunningHubAI/rh-one-obsession-v24-checkpoint/resolve/372518ef0b955be4cd6de0907e7a1dd9d928c262/oneObsession_v24.safetensors?download=true",
+        "canonical_file": "oneObsession_v24.safetensors",
+        "local_file": "OneObsession_v24.safetensors",
+        "sha256": "2FAE33D7F0D23920D145897827E6015AC098A2B90CB682D07846AE762213100B"
       },
       "bindings": {
         "prompt": {
@@ -5795,12 +5862,12 @@
         "width": 1024,
         "height": 1536,
         "batch_size": 1,
-        "steps": 30,
-        "cfg": 5.0,
+        "steps": 24,
+        "cfg": 4.5,
         "denoise": 1.0,
         "sampler_name": "euler_ancestral",
         "scheduler": "normal",
-        "filename_prefix": "one_obsession_v20_bold"
+        "filename_prefix": "one_obsession"
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
@@ -5811,7 +5878,10 @@
         "face_reference": false,
         "controlnet": false,
         "image_to_image": true
-      }
+      },
+      "previous_ids": [
+        "one-obsession-v20-bold"
+      ]
     }
   ]
 }

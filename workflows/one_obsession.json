@@ -2,7 +2,7 @@
   "1": {
     "class_type": "CheckpointLoaderSimple",
     "inputs": {
-      "ckpt_name": "OneObsession_v20Bold.safetensors"
+      "ckpt_name": "OneObsession_v24.safetensors"
     }
   },
   "2": {
@@ -37,8 +37,8 @@
     "class_type": "KSampler",
     "inputs": {
       "seed": 425418,
-      "steps": 30,
-      "cfg": 5.0,
+      "steps": 24,
+      "cfg": 4.5,
       "sampler_name": "euler_ancestral",
       "scheduler": "normal",
       "denoise": 1.0,
@@ -76,7 +76,7 @@
   "7": {
     "class_type": "SaveImage",
     "inputs": {
-      "filename_prefix": "one_obsession_v20_bold",
+      "filename_prefix": "one_obsession",
       "images": [
         "6",
         0

@@ -56,7 +56,7 @@
     "class_type": "KSampler",
     "inputs": {
       "model": [
-        "451",
+        "471",
         0
       ],
       "positive": [
@@ -90,6 +90,17 @@
       "format": "png",
       "format.bit_depth": "8-bit",
       "format.input_color_space": "sRGB"
+    }
+  },
+  "471": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "qwen-image-2.1-uncensored-lora.safetensors",
+      "strength_model": 1.0,
+      "model": [
+        "451",
+        0
+      ]
     }
   }
 }

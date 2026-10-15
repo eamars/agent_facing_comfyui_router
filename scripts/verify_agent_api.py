@@ -97,7 +97,7 @@ def main() -> None:
             ({"domain": "anime", "input_mode": "inpaint"}, "anima-turbo-inpaint"),
             ({"domain": "anime", "input_mode": "face-reference", "family": "sdxl-ipadapter"}, "sdxl-face-reference-ipadapter"),
             ({"workflow": "blue-archive-character-illustrious-xl"}, "blue-archive-character-illustrious-xl"),
-            ({"domain": "anime", "content_mode": "nsfw"}, "janku-v5-illustrious"),
+            ({"domain": "anime", "content_mode": "nsfw"}, "janku-illustrious"),
         ]
         for query, expected in routes:
             check("route " + json.dumps(query), http("/project/resolve", query)["selected_workflow"] == expected)

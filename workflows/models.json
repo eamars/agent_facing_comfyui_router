@@ -22,7 +22,7 @@
         ]
       },
       "source": {
-        "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
+        "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized",
         "revision": "40319fb15542f0ad22921e0124a191a8a935a60a",
         "sha256": "e79c8a009f2ecbdb6c70fd663d9aea9ee304a0d91f347e4169a756b8ad141b41"
       },
@@ -88,6 +88,34 @@
         "status": "verified-by-runtime-probe",
         "scope": "SHA-256 verified; official text-to-image and reference-edit graphs executed on RTX 4090.",
         "date": "2026-09-22"
+      }
+    },
+    {
+      "id": "qwen-image-2.1-uncensored-lora",
+      "name": "qwen-image-2.1-uncensored-lora.safetensors",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "qwen-image-2.1",
+      "architecture": "qwen-image-2.1",
+      "precision": "bf16",
+      "required_file": "models/loras/qwen-image-2.1-uncensored-lora.safetensors",
+      "file_sizes": {
+        "models/loras/qwen-image-2.1-uncensored-lora.safetensors": 33586704
+      },
+      "description": "Publisher's rank-16 Qwen-Image-2.1 uncensored LoRA (PEFT format, attention q/k/v/out in all 32 blocks, model-only). Applied on top of the UC GGUF by both Qwen routes.",
+      "compatibility": {
+        "workflow_families": [
+          "qwen-image-2.1"
+        ],
+        "known_limits": [
+          "Not merged into the UC GGUF: UC-minus-base weight deltas do not correlate with this LoRA (r≈0.00). Its weight delta is about 0.01-0.05% of the attention weights."
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized",
+        "revision": "7959e658915f52274897fb573ffeda49de8dc16b",
+        "sha256": "00EE2CB7F00A37B097640C1880ED0D17E368E30599F34BB348FEE0E8C2CC4CA1"
       }
     },
     {
@@ -2209,8 +2237,8 @@
       }
     },
     {
-      "id": "janku-v5",
-      "name": "JANKU v5.0",
+      "id": "janku-v7-77",
+      "name": "JANKU v7.77",
       "kind": "checkpoint",
       "status": "installed",
       "routeable": true,
@@ -2221,7 +2249,7 @@
       "tensor_dtypes": [
         "F16"
       ],
-      "description": "Pinned JANKU v5.0 NoobAI + RouWei + Illustrious-derived single-file SDXL checkpoint for polished, vibrant anime illustration.",
+      "description": "Pinned JANKU v7.77 (JANKU + Chenkin v0.2 base) single-file SDXL/Illustrious checkpoint for polished, vibrant anime illustration with thick linework and detailed backgrounds.",
       "capabilities": {
         "domains": [
           "anime",
@@ -2248,7 +2276,7 @@
           "glossy anime",
           "shiny anime",
           "vibrant anime",
-          "sharp anime linework",
+          "thick clean anime linework",
           "polished character illustration"
         ],
         "content_modes": [
@@ -2263,7 +2291,7 @@
           "maximum": "expert"
         },
         "natural_language": false,
-        "character_identity": "strong character and artist-tag knowledge; no trigger word is required",
+        "character_identity": "strong character-tag knowledge; the author notes less artist knowledge than earlier JANKU versions; no trigger word is required",
         "style_strength": "strong for vibrant, glossy anime illustration",
         "composition_strength": "medium through tags",
         "recommended_resolutions": [
@@ -2291,9 +2319,8 @@
         ],
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "notes": [
-          "Normal Illustrious quality tags and artist tags work well.",
-          "Use the by artistname convention when an artist tag is desired.",
-          "No trigger word is required; final prompt text remains caller-controlled."
+          "No trigger word is required; final prompt text remains caller-controlled.",
+          "Artist tags (by artistname) still work but the author notes weaker artist knowledge than v5."
         ]
       },
       "compatibility": {
@@ -2310,23 +2337,19 @@
           "NoobAI"
         ],
         "known_limits": [
-          "This profile intentionally uses the canonical single-file checkpoint; the John6666 Diffusers conversion is not a router dependency.",
           "No optional embeddings, detailers or LoRAs are bundled by this route."
         ]
       },
       "source": {
-        "url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true",
-        "repository": "https://huggingface.co/Quiho/best-from-civitai",
-        "reference_repository": "https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl",
-        "type": "Hugging Face public single-file mirror",
-        "creator": "janxd",
+        "url": "https://civitai.com/models/1277670",
+        "type": "Civitai (Hugging Face public mirror, SHA-256 identical)",
         "civitai_model_id": 1277670,
-        "civitai_version_id": 1896532,
-        "file_name": "JANKUTrainedNoobaiRouwei_v50.safetensors",
-        "canonical_file_name": "JANKUTrainedNoobaiRouwei_v50.safetensors",
-        "bytes": 6938040674,
-        "sha256": "217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5",
-        "loading_note": "Use the single-file checkpoint loader; do not download the reference Diffusers directory."
+        "civitai_version_id": 2786084,
+        "mirror_url": "https://huggingface.co/LillyCherry/JANKUTrainedChenkinNoobai_v777",
+        "revision": "0226c4f27bfbcfdb744224073ad369288637974c",
+        "file_name": "JANKUTrainedChenkinNoobai_v777.safetensors",
+        "sha256": "88177D224CE97F60CF3E908F87902F913ED4562BD79D237F84238A4354601EFB",
+        "bytes": 6938040674
       },
       "validation": {
         "status": "verified-by-runtime-probe",
@@ -2350,19 +2373,19 @@
           "The SFW execution probe establishes graph/model loading, not visual quality, character likeness or NSFW quality."
         ]
       },
-      "required_file": "models/checkpoints/JANKU_v5_0.safetensors",
+      "required_file": "models/checkpoints/JANKU_v7_77.safetensors",
       "route_roles": [
         "generic-nsfw-anime-preference",
         "glossy-anime-base",
         "illustrious-anime-base"
       ],
       "file_sizes": {
-        "models/checkpoints/JANKU_v5_0.safetensors": 6938040674
+        "models/checkpoints/JANKU_v7_77.safetensors": 6938040674
       }
     },
     {
-      "id": "one-obsession-v20-bold",
-      "name": "One Obsession v20_BOLD",
+      "id": "one-obsession-v24",
+      "name": "One Obsession v24",
       "kind": "checkpoint",
       "status": "installed",
       "routeable": true,
@@ -2373,7 +2396,7 @@
       "tensor_dtypes": [
         "F16"
       ],
-      "description": "Pinned One Obsession v20_BOLD single-file SDXL/Illustrious checkpoint for textured, dramatic-lighting anime and mildly 2.5D character illustration.",
+      "description": "Pinned One Obsession v24 single-file SDXL/Illustrious checkpoint for textured, dramatic-lighting anime and 2.5D character illustration.",
       "capabilities": {
         "domains": [
           "anime",
@@ -2463,21 +2486,20 @@
           "NoobAI"
         ],
         "known_limits": [
-          "This route is pinned to v20_BOLD and must not silently substitute v21 or a later release.",
+          "This profile is pinned to v24; newer releases are adopted only by an explicit catalog update.",
           "No LoRA is required or bundled by this route."
         ]
       },
       "source": {
-        "url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/oneObsession_v20Bold.safetensors?download=true",
-        "repository": "https://huggingface.co/Quiho/best-from-civitai",
-        "type": "Hugging Face public single-file mirror",
-        "creator": "maxfeifei8",
+        "url": "https://civitai.com/models/1318945",
+        "type": "Civitai (Hugging Face public mirror, SHA-256 identical)",
         "civitai_model_id": 1318945,
-        "civitai_model_name": "One Obsession v20_BOLD",
-        "file_name": "oneObsession_v20Bold.safetensors",
-        "canonical_file_name": "oneObsession_v20Bold.safetensors",
-        "bytes": 6938040682,
-        "sha256": "7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B"
+        "civitai_version_id": 3218603,
+        "mirror_url": "https://huggingface.co/RunningHubAI/rh-one-obsession-v24-checkpoint",
+        "revision": "372518ef0b955be4cd6de0907e7a1dd9d928c262",
+        "file_name": "oneObsession_v24.safetensors",
+        "sha256": "2FAE33D7F0D23920D145897827E6015AC098A2B90CB682D07846AE762213100B",
+        "bytes": 6938040682
       },
       "validation": {
         "status": "verified-by-runtime-probe",
@@ -2501,14 +2523,14 @@
           "The SFW execution probe establishes graph/model loading, not visual quality, character likeness or NSFW quality."
         ]
       },
-      "required_file": "models/checkpoints/OneObsession_v20Bold.safetensors",
+      "required_file": "models/checkpoints/OneObsession_v24.safetensors",
       "route_roles": [
         "stylized-2d-2-5d-anime-base",
         "dramatic-lighting-anime-base",
         "illustrious-anime-base"
       ],
       "file_sizes": {
-        "models/checkpoints/OneObsession_v20Bold.safetensors": 6938040682
+        "models/checkpoints/OneObsession_v24.safetensors": 6938040682
       }
     }
   ]

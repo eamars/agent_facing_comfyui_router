@@ -2,7 +2,7 @@
   "1": {
     "class_type": "CheckpointLoaderSimple",
     "inputs": {
-      "ckpt_name": "JANKU_v5_0.safetensors"
+      "ckpt_name": "JANKU_v7_77.safetensors"
     }
   },
   "2": {
@@ -76,7 +76,7 @@
   "7": {
     "class_type": "SaveImage",
     "inputs": {
-      "filename_prefix": "janku_v5_illustrious",
+      "filename_prefix": "janku_illustrious",
       "images": [
         "6",
         0

@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -15,24 +15,31 @@ $AssetSets = @{
     'qwen-image-2.1' = @(
         [pscustomobject]@{
             Name = 'Qwen-Image-2.1 Uncensored GGUF Q4_K_M diffusion model'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/qwen-image-2.1-UC-Q4_K_M.gguf?download=true'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/qwen-image-2.1-UC-Q4_K_M.gguf?download=true'
             Path = (Join-Path $ModelRoot 'diffusion_models\qwen-image-2.1-UC-Q4_K_M.gguf')
             Bytes = [int64]4604558112
             Sha256 = 'E79C8A009F2ECBDB6C70FD663D9AEA9EE304A0D91F347E4169A756B8AD141B41'
         },
         [pscustomobject]@{
             Name = 'Qwen-Image-2.1 Qwen3VL 8B INT8 ConvRot text encoder'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/text_encoders/qwen3vl_8b_int8_convrot.safetensors?download=true'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/text_encoders/qwen3vl_8b_int8_convrot.safetensors?download=true'
             Path = (Join-Path $ModelRoot 'text_encoders\qwen3vl_8b_int8_convrot.safetensors')
             Bytes = [int64]9350798360
             Sha256 = '8BFD0F6E12ABF2D2D697ECC888E5E90B0D6741D6708F05799F53AFA560452E8F'
         },
         [pscustomobject]@{
             Name = 'Qwen-Image-2.1 BF16 VAE'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/vae/qwen_image_2.1_vae_bf16.safetensors?download=true'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/vae/qwen_image_2.1_vae_bf16.safetensors?download=true'
             Path = (Join-Path $ModelRoot 'vae\qwen_image_2.1_vae_bf16.safetensors')
             Bytes = [int64]675509688
             Sha256 = 'BB21F7473051E1AC368515DD3F2E15CD44D7A11748EE8823E1DDCA3E4876B7C9'
+        },
+        [pscustomobject]@{
+            Name = 'Qwen-Image-2.1 uncensored LoRA (rank 16, attention only)'
+            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/7959e658915f52274897fb573ffeda49de8dc16b/qwen-image-2.1-uncensored-lora.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'loras\qwen-image-2.1-uncensored-lora.safetensors')
+            Bytes = [int64]33586704
+            Sha256 = '00EE2CB7F00A37B097640C1880ED0D17E368E30599F34BB348FEE0E8C2CC4CA1'
         }
     )
     'moody-anima-mix' = @(
@@ -173,22 +180,22 @@ $AssetSets = @{
             Sha256 = '24E04396471196283291B664FFB3DE9E59B770F4CBF99FF6573E6816F8B69685'
         }
     )
-    'janku-v5-illustrious' = @(
+    'janku-illustrious' = @(
         [pscustomobject]@{
-            Name = 'JANKU v5.0 canonical Illustrious/SDXL checkpoint (janxd, Civitai model 1277670, version 1896532)'
-            Url = 'https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true'
-            Path = (Join-Path $ModelRoot 'checkpoints\JANKU_v5_0.safetensors')
+            Name = 'JANKU v7.77 canonical Illustrious/SDXL checkpoint (janxd, Civitai model 1277670, version 2786084)'
+            Url = 'https://huggingface.co/LillyCherry/JANKUTrainedChenkinNoobai_v777/resolve/0226c4f27bfbcfdb744224073ad369288637974c/JANKUTrainedChenkinNoobai_v777.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'checkpoints\JANKU_v7_77.safetensors')
             Bytes = [int64]6938040674
-            Sha256 = '217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5'
+            Sha256 = '88177D224CE97F60CF3E908F87902F913ED4562BD79D237F84238A4354601EFB'
         }
     )
-    'one-obsession-v20-bold' = @(
+    'one-obsession' = @(
         [pscustomobject]@{
-            Name = 'One Obsession v20_BOLD canonical Illustrious/SDXL checkpoint (maxfeifei8, Civitai model 1318945)'
-            Url = 'https://huggingface.co/Quiho/best-from-civitai/resolve/main/oneObsession_v20Bold.safetensors?download=true'
-            Path = (Join-Path $ModelRoot 'checkpoints\OneObsession_v20Bold.safetensors')
+            Name = 'One Obsession v24 canonical Illustrious/SDXL checkpoint (maxfeifei8, Civitai model 1318945, version 3218603)'
+            Url = 'https://huggingface.co/RunningHubAI/rh-one-obsession-v24-checkpoint/resolve/372518ef0b955be4cd6de0907e7a1dd9d928c262/oneObsession_v24.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'checkpoints\OneObsession_v24.safetensors')
             Bytes = [int64]6938040682
-            Sha256 = '7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B'
+            Sha256 = '2FAE33D7F0D23920D145897827E6015AC098A2B90CB682D07846AE762213100B'
         }
     )
     'ipadapter-face-sdxl' = @(
@@ -258,7 +265,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

@@ -167,17 +167,17 @@ class AgentContractTests(unittest.TestCase):
         entries = {entry["id"]: entry for entry in catalog["workflows"]}
         models = {model["id"]: model for model in api._read_catalog()["model_registry"]}
         expected = {
-            "janku-v5-illustrious": (
-                "janku-v5",
-                "JANKU_v5_0.safetensors",
+            "janku-illustrious": (
+                "janku-v7-77",
+                "JANKU_v7_77.safetensors",
                 6938040674,
-                "217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5",
+                "88177D224CE97F60CF3E908F87902F913ED4562BD79D237F84238A4354601EFB",
             ),
-            "one-obsession-v20-bold": (
-                "one-obsession-v20-bold",
-                "OneObsession_v20Bold.safetensors",
+            "one-obsession": (
+                "one-obsession-v24",
+                "OneObsession_v24.safetensors",
                 6938040682,
-                "7CE890BD4225CAE66B73F5291D47DFC07C60012630DBA21CD0536D041254CD8B",
+                "2FAE33D7F0D23920D145897827E6015AC098A2B90CB682D07846AE762213100B",
             ),
         }
         downloader = (ROOT / "scripts" / "download_models.ps1").read_text(encoding="utf-8")
@@ -208,11 +208,12 @@ class AgentContractTests(unittest.TestCase):
             prepared = api._prepare_graph(entry, {"parameters": {"prompt": "1girl, solo, SFW anime portrait"}})
             self.assertEqual(api._binding_value(prepared, entry, "width"), 1024)
             self.assertEqual(api._binding_value(prepared, entry, "height"), 1536)
-            self.assertEqual(api._binding_value(prepared, entry, "steps"), 30)
+            self.assertEqual(api._binding_value(prepared, entry, "steps"), entry["defaults"]["steps"])
+            self.assertEqual(api._find_workflow(entry["previous_ids"][0])["id"], workflow_id)
             with self.assertRaises(api.ApiError):
                 api._prepare_graph(entry, {"parameters": {"prompt": "portrait", "unknown": True}})
         self.assertIn(
-            "'janku-v5-illustrious', 'one-obsession-v20-bold', 'ipadapter-face-sdxl'",
+            "'janku-illustrious', 'one-obsession', 'ipadapter-face-sdxl'",
             downloader,
         )
 
@@ -220,8 +221,8 @@ class AgentContractTests(unittest.TestCase):
         entries = {entry["id"]: entry for entry in catalog["workflows"]}
         models = {model["id"]: model for model in api._read_catalog()["model_registry"]}
         for workflow_id, model_id in (
-            ("janku-v5-illustrious", "janku-v5"),
-            ("one-obsession-v20-bold", "one-obsession-v20-bold"),
+            ("janku-illustrious", "janku-v7-77"),
+            ("one-obsession", "one-obsession-v24"),
         ):
             entry = copy.deepcopy(entries[workflow_id])
             model = copy.deepcopy(models[model_id])
@@ -235,15 +236,15 @@ class AgentContractTests(unittest.TestCase):
 
     def test_content_mode_preferences_preserve_sfw_default_and_prefer_janku_for_nsfw(self):
         entries = {entry["id"]: entry for entry in catalog["workflows"]}
-        janku = entries["janku-v5-illustrious"]
-        one_obsession = entries["one-obsession-v20-bold"]
+        janku = entries["janku-illustrious"]
+        one_obsession = entries["one-obsession"]
         anima = entries["anima-turbo-v1-1"]
         sfw = {"domain": "anime", "content_mode": "sfw"}
         nsfw = {"domain": "anime", "content_mode": "nsfw"}
         self.assertLess(api._route_score(janku, sfw)[0], api._route_score(anima, sfw)[0])
         self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0])
-        self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v5"}))
-        self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v20 BOLD"}))
+        self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v7.77"}))
+        self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v24"}))
 
     def test_readiness_includes_registry_eligibility_nodes_and_size(self):
         model_file = self.root / "model.bin"

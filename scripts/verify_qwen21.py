@@ -54,7 +54,7 @@ def main():
             ({"domain": "qwen", "input_mode": "text-to-image"}, "qwen-image-2.1-t2i"),
             ({"domain": "qwen", "input_mode": "image-to-image"}, "qwen-image-2.1-edit"),
             ({"domain": "anime"}, "anima-turbo-v1-1"),
-            ({"domain": "anime", "content_mode": "nsfw"}, "janku-v5-illustrious"),
+            ({"domain": "anime", "content_mode": "nsfw"}, "janku-illustrious"),
         ]:
             result = http("/project/resolve", query)
             assert result["selected_workflow"] == expected, result
@@ -62,7 +62,7 @@ def main():
 
         for index, workflow in enumerate([
             "anima-turbo-v1-1", "qwen-image-2.1-t2i", "qwen-image-2.1-edit",
-            "janku-v5-illustrious", "qwen-image-2.1-t2i", "anima-turbo-v1-1",
+            "janku-illustrious", "qwen-image-2.1-t2i", "anima-turbo-v1-1",
         ]):
             params = {"prompt": 'A blue ceramic teapot on a wooden table beside a card with the text "QWEN 2.1", soft daylight.',
                       "seed": 921 + index, "filename_prefix": prefix + "_" + str(index)}

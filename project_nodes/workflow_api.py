@@ -109,12 +109,17 @@ def _read_catalog() -> dict[str, Any]:
     return catalog
 
 
+def _is_workflow(entry: dict[str, Any], workflow_id: Any) -> bool:
+    # previous_ids keep renamed routes callable by their old ids.
+    return entry.get("id") == workflow_id or workflow_id in entry.get("previous_ids", [])
+
+
 def _find_workflow(workflow_id: str) -> dict[str, Any]:
     if not isinstance(workflow_id, str) or not workflow_id:
         raise ApiError(400, "workflow must be a non-empty workflow id")
     catalog = _read_catalog()
     for entry in catalog["workflows"]:
-        if isinstance(entry, dict) and entry.get("id") == workflow_id:
+        if isinstance(entry, dict) and _is_workflow(entry, workflow_id):
             return entry
     raise ApiError(404, f"Unknown workflow: {workflow_id}", route=workflow_id,
                    expected=[entry["id"] for entry in catalog["workflows"]])
@@ -229,6 +234,7 @@ def _public_entry(
 ) -> dict[str, Any]:
     public_keys = (
         "id",
+        "previous_ids",
         "name",
         "description",
         "family",
@@ -977,9 +983,9 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
     routing = entry.get("routing", {})
     if not isinstance(routing, dict):
         routing = {}
-    if query.get("workflow") and query["workflow"] != entry.get("id"):
+    if query.get("workflow") and not _is_workflow(entry, query["workflow"]):
         return None
-    explicit_workflow = query.get("workflow") == entry.get("id")
+    explicit_workflow = bool(query.get("workflow")) and _is_workflow(entry, query["workflow"])
     required_selectors = routing.get("required_selectors", [])
     if isinstance(required_selectors, list) and not explicit_workflow:
         for selector in required_selectors:
@@ -2597,7 +2603,7 @@ async def get_workflow(request: web.Request) -> web.Response:
             (
                 item
                 for item in catalog["workflows"]
-                if isinstance(item, dict) and item.get("id") == workflow_id
+                if isinstance(item, dict) and _is_workflow(item, workflow_id)
             ),
             None,
         )
@@ -2683,7 +2689,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if not public["ready"]:
             raise ApiError(409, "Workflow dependencies are unavailable", public)
         result = await _enqueue(PromptServer.instance, graph, client_id, workflow_id, resources, valid)
-        result["workflow"] = workflow_id
+        result["workflow"] = entry["id"]
         result["prompt_granularity"] = requested_granularity
         result["job_url"] = f"/project/jobs/{result['prompt_id']}"
         result["effective_parameters"] = effective
