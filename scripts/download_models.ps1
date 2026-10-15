@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -189,6 +189,15 @@ $AssetSets = @{
             Sha256 = '88177D224CE97F60CF3E908F87902F913ED4562BD79D237F84238A4354601EFB'
         }
     )
+    'janku-v5-illustrious' = @(
+        [pscustomobject]@{
+            Name = 'JANKU v5.0 canonical Illustrious/SDXL checkpoint (janxd, Civitai model 1277670, version 1896532)'
+            Url = 'https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'checkpoints\JANKU_v5_0.safetensors')
+            Bytes = [int64]6938040674
+            Sha256 = '217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5'
+        }
+    )
     'one-obsession' = @(
         [pscustomobject]@{
             Name = 'One Obsession v24 canonical Illustrious/SDXL checkpoint (maxfeifei8, Civitai model 1318945, version 3218603)'
@@ -265,7 +274,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

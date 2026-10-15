@@ -5037,8 +5037,8 @@
     },
     {
       "id": "janku-illustrious",
-      "name": "JANKU v7.77 — Polished Illustrious Anime",
-      "description": "Pinned JANKU v7.77 (JANKU + Chenkin v0.2 base) single-file SDXL/Illustrious workflow for polished, vibrant anime illustration with thick clean linework, detailed backgrounds and strong character-tag knowledge.",
+      "name": "JANKU v7.77 — Mainstream Anime Illustration",
+      "description": "JANKU v7.77 (JANKU + Chenkin v0.2 base) for mainstream modern anime illustration: thicker clean linework, detailed backgrounds, cinematic lighting and a more mature default face. Default JANKU route; use janku-v5-illustrious for a visual-novel look.",
       "family": "sdxl-illustrious",
       "resident_group": "sdxl-illustrious-janku",
       "tags": [
@@ -5047,8 +5047,8 @@
         "sdxl",
         "illustrious",
         "janku",
-        "glossy",
-        "vibrant",
+        "mainstream-anime",
+        "detailed-background",
         "nsfw-capable"
       ],
       "content_class": "anime-illustration-nsfw-capable",
@@ -5078,29 +5078,28 @@
         "aliases": [
           "JANKU",
           "JANKU v7.77",
+          "JANKU v7",
           "JANKU Illustrious",
-          "NoobAI RouWei",
-          "NoobAI + RouWei",
-          "Chenkin",
-          "JANKU Chenkin"
+          "JANKU Chenkin",
+          "Chenkin"
         ],
         "styles": [
           "JANKU",
           "JANKU v7.77",
-          "JANKU Illustrious",
-          "NoobAI RouWei",
-          "NoobAI + RouWei",
+          "JANKU v7",
+          "JANKU Chenkin",
+          "Chenkin",
           "Illustrious",
-          "glossy anime",
-          "shiny anime",
-          "vibrant anime",
-          "sharp anime linework",
-          "polished character illustration",
+          "mainstream anime",
+          "modern anime",
+          "TV anime",
+          "anime key visual",
+          "cinematic anime",
+          "detailed background",
+          "thick linework",
           "anime",
           "illustration",
-          "anime portrait",
-          "Chenkin",
-          "JANKU Chenkin"
+          "anime portrait"
         ],
         "content_modes": [
           "sfw",
@@ -5155,11 +5154,12 @@
           "anime",
           "illustration",
           "illustrious",
-          "glossy anime",
-          "shiny anime",
-          "vibrant anime",
-          "sharp anime linework",
-          "polished character illustration"
+          "mainstream anime",
+          "modern anime",
+          "anime key visual",
+          "detailed background",
+          "cinematic lighting",
+          "thick clean linework"
         ],
         "subjects": [
           "anime characters",
@@ -5183,8 +5183,8 @@
           "maximum": "expert"
         },
         "natural_language": false,
-        "character_identity": "strong character-tag knowledge without a required trigger word; the author notes less artist-tag knowledge than earlier JANKU versions",
-        "style_control": "strong for polished, vibrant, glossy anime illustration",
+        "character_identity": "strong character-tag knowledge without a trigger word; more mature default face; weaker artist-tag knowledge than v5 (author note)",
+        "style_control": "strong for mainstream modern anime with detailed, cinematic backgrounds",
         "outfit_control": "medium through tags",
         "composition_control": "medium through tags",
         "recommended_resolutions": [
@@ -5254,13 +5254,14 @@
       },
       "selection": {
         "best_for": [
-          "explicit JANKU or JANKU v7.77 requests",
-          "generic NSFW anime when no specialized capability is requested",
-          "polished Illustrious anime",
-          "vibrant color, strong contrast and glossy/shiny rendering",
-          "thick, clean anime linework and detailed backgrounds"
+          "generic NSFW anime when no specialized capability or style is requested (default JANKU route)",
+          "mainstream modern anime: TV-anime and key-visual look",
+          "scenes where background and lighting matter: detailed environments, cinematic light",
+          "characters whose default face should read as an adult",
+          "thick, clean linework"
         ],
         "not_for": [
+          "visual novel / galge / bishoujo-game CG look, soft delicate faces or artist-tag-driven styles (use janku-v5-illustrious)",
           "explicit Blue Archive or NIKKE identity/style routes",
           "face-reference, OpenPose or inpaint requests",
           "requests requiring optional detailers, embeddings or LoRAs"
@@ -5268,13 +5269,12 @@
         "priority_signals": [
           "JANKU",
           "JANKU v7.77",
-          "JANKU Illustrious",
-          "NoobAI RouWei",
-          "glossy anime",
-          "shiny anime",
-          "vibrant anime",
-          "sharp anime linework",
-          "Chenkin"
+          "Chenkin",
+          "mainstream anime",
+          "modern anime",
+          "anime key visual",
+          "detailed background",
+          "cinematic anime"
         ],
         "specific_route_precedence": [
           "blue-archive-character-illustrious-xl",
@@ -5283,11 +5283,17 @@
           "sdxl-face-reference-ipadapter",
           "sdxl-openpose-controlnet",
           "moody-anima-inpaint"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "janku-v5-illustrious",
+            "when": "the request asks for a visual novel, galge or bishoujo-game CG look; a soft, delicate, shy or gentle character; pale glossy colouring with blush; or depends on 'by artistname' tags"
+          }
         ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Use normal Illustrious quality tags, ordered Danbooru/NoobAI tags, character and appearance tags, optional artist tags using the 'by artistname' convention, then pose, camera, scene and lighting. No trigger word is required.",
+        "prompt_scope": "Use normal Illustrious quality tags, then ordered Danbooru/NoobAI tags: subject count, character, appearance, outfit, pose, camera, scene and lighting. Describe the background; this model renders detailed environments well. Artist tags work less reliably than on v5. If output drifts semi-realistic, add 'realistic, photorealistic, 3d' to the negative prompt. No trigger word is required.",
         "optional_fields": [
           "character",
           "series",
@@ -5329,7 +5335,8 @@
         "JANKU v7.77 is a new JANKU + Chenkin v0.2 base exposed through the canonical single-file SDXL/Illustrious checkpoint loader (epsilon prediction).",
         "The author notes thicker linework, more detailed backgrounds and less artist knowledge than earlier JANKU versions; artist tags may have weaker effect than on v5.",
         "No trigger word, optional embedding, detailer or LoRA is required by the route.",
-        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
+        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text.",
+        "JANKU v5.0 stays available as janku-v5-illustrious with a different house style (visual novel); selection.prefer_instead says when to switch."
       ],
       "prompting": {
         "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
@@ -5369,12 +5376,12 @@
         "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
         "examples": [
           {
-            "purpose": "JANKU v7.77 SFW glossy portrait",
-            "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, anime portrait, vibrant colors, glossy hair, sharp linework, looking at viewer, upper body, sunlit garden, soft rim light"
+            "purpose": "JANKU v7.77 SFW mainstream anime scene",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, silver hair, long hair, blue eyes, school uniform, cardigan, holding umbrella, rainy street at night, city lights, reflections on wet pavement, looking at viewer, upper body, soft rim light"
           },
           {
-            "purpose": "JANKU v7.77 SFW artist-tag prompt",
-            "prompt": "masterpiece, best quality, 1girl, solo, by artistname, elegant anime character, detailed outfit, three-quarter view, dramatic colorful lighting"
+            "purpose": "JANKU v7.77 SFW key-visual composition",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult, black hair, ponytail, white blouse, cafe interior, morning sunlight through window, detailed background, depth of field, looking at viewer, upper body"
           }
         ]
       },
@@ -5457,10 +5464,459 @@
         "face_reference": false,
         "controlnet": false,
         "image_to_image": true
+      }
+    },
+    {
+      "id": "janku-v5-illustrious",
+      "name": "JANKU v5.0 — Visual Novel Style Anime",
+      "description": "JANKU v5.0 (RouWei v0.8 merge + fine-tune) for a visual novel / bishoujo-game CG look: soft, delicate faces with thin linework, gentle or shy expressions, pale glossy colouring with blush, and character-focused framing. Strongest artist- and character-tag knowledge of the JANKU routes.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-janku-v5",
+      "tags": [
+        "anime",
+        "illustration",
+        "sdxl",
+        "illustrious",
+        "janku",
+        "visual-novel",
+        "galge",
+        "glossy",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-illustration-nsfw-capable",
+      "file": "janku_v5_illustrious.json",
+      "model_ids": [
+        "janku-v5"
+      ],
+      "required_files": [
+        "models/checkpoints/JANKU_v5_0.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "anime",
+          "illustration",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "aliases": [
+          "JANKU v5",
+          "JANKU v5.0",
+          "JANKU RouWei",
+          "NoobAI RouWei",
+          "NoobAI + RouWei",
+          "RouWei"
+        ],
+        "styles": [
+          "JANKU v5",
+          "JANKU v5.0",
+          "JANKU RouWei",
+          "RouWei",
+          "visual novel",
+          "visual novel CG",
+          "VN style",
+          "galge",
+          "bishoujo game",
+          "bishoujo game CG",
+          "eroge CG",
+          "soft anime",
+          "delicate anime",
+          "moe",
+          "glossy anime",
+          "shiny anime",
+          "artist-tag style",
+          "anime",
+          "anime portrait",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 90,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 29,
+        "fallback": false,
+        "exclusive": false,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Do not use this generic route for explicit Blue Archive, NIKKE, face-reference, OpenPose or inpaint requirements; those capability-specific routes take precedence."
+        ]
       },
-      "previous_ids": [
-        "janku-v5-illustrious"
-      ]
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "visual novel CG",
+          "galge",
+          "bishoujo game CG",
+          "soft delicate faces",
+          "glossy anime",
+          "pale palette with blush",
+          "thin linework"
+        ],
+        "subjects": [
+          "anime characters",
+          "anime portraits",
+          "illustration"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": false,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "strongest character and artist-tag knowledge of the JANKU routes (RouWei tag set, by artistname); default face reads young",
+        "style_control": "strong for the soft, glossy visual-novel character look",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "named-API-and-native-latent-I2I-graph",
+        "probes": [
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "job_id": "8934dddc-1e36-4899-987d-050659812e4a",
+            "prompt_class": "sfw",
+            "date": "2026-09-18",
+            "resolution": "512x512",
+            "steps": 8,
+            "seed": 917,
+            "elapsed_ms": 8750,
+            "output": "focused_janku-v5-illustrious_00001_.png",
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
+          },
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-15",
+            "resolution": "1024x1536",
+            "steps": 30,
+            "cfg": 5.0,
+            "seeds": [
+              2026,
+              777,
+              31
+            ],
+            "scope": "Same-seed comparison with JANKU v7.77 on three SFW prompts; v5 consistently drew a softer, rounder, younger-reading face with thinner lines."
+          }
+        ],
+        "limitations": [
+          "The SFW probe validates graph execution and checkpoint loading, not visual quality, character likeness, NSFW quality or prompt fidelity."
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "visual novel, galge or bishoujo-game CG style",
+          "soft, delicate, shy or gentle character looks with pale glossy colouring and blush",
+          "character-focused portraits where the face matters more than the background",
+          "requests that rely on artist tags (by artistname) or many named characters"
+        ],
+        "not_for": [
+          "mainstream modern anime or scenes needing detailed backgrounds (use janku-illustrious)",
+          "generic NSFW anime with no style request (janku-illustrious is the default)",
+          "explicit Blue Archive or NIKKE identity/style routes",
+          "face-reference, OpenPose or inpaint requests",
+          "requests requiring optional detailers, embeddings or LoRAs"
+        ],
+        "priority_signals": [
+          "JANKU v5",
+          "visual novel",
+          "galge",
+          "bishoujo game CG",
+          "soft anime",
+          "delicate anime",
+          "glossy anime",
+          "by artistname"
+        ],
+        "specific_route_precedence": [
+          "blue-archive-character-illustrious-xl",
+          "blue-archive-style-sdxl",
+          "animagine-xl-3.1-nsfw",
+          "sdxl-face-reference-ipadapter",
+          "sdxl-openpose-controlnet",
+          "moody-anima-inpaint"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "janku-illustrious",
+            "when": "the request asks for a mainstream modern anime / TV-anime or key-visual look, a detailed or cinematic background, thicker linework, or a character whose default face should read as an adult"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Use Illustrious quality tags, then ordered Danbooru/NoobAI tags: subject count, character, series, appearance, outfit, pose, camera, scene and lighting. Artist tags work well here ('by artistname'). The default face reads young (author note): when a character is an adult, and always for NSFW content, say so with tags such as 'adult, mature female' instead of relying on the default face. No trigger word is required.",
+        "optional_fields": [
+          "character",
+          "series",
+          "artist",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "avoid": [
+          "injecting sexual terms into a caller prompt",
+          "using this generic route for explicit capability-specific requests",
+          "adding optional LoRAs or embeddings that are not declared by this route",
+          "relying on the default face for adult characters; state adulthood explicitly"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "lighting"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-30 steps, CFG 3-5, Euler or Euler A/euler_ancestral with the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            30
+          ],
+          "cfg": [
+            3,
+            5
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms."
+      },
+      "compatibility_notes": [
+        "JANKU v5.0 is exposed through the canonical single-file SDXL/Illustrious checkpoint loader.",
+        "Kept deliberately alongside JANKU v7.77 (janku-illustrious): same family, different house style. v6.0+ made the default face more mature and v7.77 rebased on Chenkin v0.2 with thicker lines (author notes).",
+        "No trigger word, optional embedding, detailer or LoRA is required by the route.",
+        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "JANKU v5 SFW visual-novel portrait",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, silver hair, long hair, blue eyes, blush, gentle expression, school uniform, cardigan, holding umbrella, rainy street at night, looking at viewer, upper body, soft rim light"
+          },
+          {
+            "purpose": "JANKU v5 SFW artist-tag prompt",
+            "prompt": "masterpiece, best quality, 1girl, solo, adult, mature female, by artistname, elegant outfit, three-quarter view, soft lighting, simple background"
+          }
+        ]
+      },
+      "source": {
+        "creator": "janxd",
+        "civitai_model_id": 1277670,
+        "civitai_version_id": 1896532,
+        "mirror_url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true",
+        "reference_repository": "https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl",
+        "canonical_file": "JANKUTrainedNoobaiRouwei_v50.safetensors",
+        "local_file": "JANKU_v5_0.safetensors"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "2",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "width": {
+          "node": "4",
+          "input": "width"
+        },
+        "height": {
+          "node": "4",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "4",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "5",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "5",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "5",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "5",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "5",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "5",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "7",
+          "input": "filename_prefix"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "janku_v5_illustrious"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      }
     },
     {
       "id": "one-obsession",

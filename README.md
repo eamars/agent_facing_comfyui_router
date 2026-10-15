@@ -29,7 +29,8 @@
 | Animagine XL 3.1 + NIKKE LoRA | NIKKE 风格；可选 Rapi 角色适配 | 文生图、图生图 | `animagine-xl-3.1-nsfw` |
 | Animagine XL 3.1 + Blue Archive 风格 LoRA | 蔚蓝档案游戏 CG 风格 | 文生图、图生图 | `blue-archive-style-sdxl` |
 | Illustrious XL v0.1 + Asuna LoRA | 一之濑明日奈及其服装表现 | 文生图、图生图 | `blue-archive-character-illustrious-xl` |
-| JANKU v7.77 · Illustrious/NoobAI + Chenkin 系 | 色彩鲜明、线条较粗、背景细致的动漫插画 | 文生图、图生图 | `janku-illustrious` |
+| JANKU v7.77 · Illustrious/NoobAI + Chenkin 系 | 主流动画风：线条较粗、背景细致、电影感光影，默认脸型偏成熟 | 文生图、图生图 | `janku-illustrious` |
+| JANKU v5.0 · Illustrious/NoobAI + RouWei 系 | 视觉小说（Galgame）风：脸型柔和精致、线条细、浅色光泽与腮红，画师标签最强 | 文生图、图生图 | `janku-v5-illustrious` |
 | One Obsession v24 · Illustrious 系 | 纹理、戏剧性光影与 2.5D 风格 | 文生图、图生图 | `one-obsession` |
 
 动漫路由和 Qwen-Image-2.1 Uncensored 路由均声明支持 SFW / NSFW 内容模式。内容模式用于路由选择，具体画面由调用方的提示词决定。
@@ -48,7 +49,7 @@
 
 ### 如何选择
 
-通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU。明确指定 NIKKE、Blue Archive 或模型风格时，路由器优先匹配对应组合。Asuna 角色工作流需要显式指定工作流 ID。
+通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、Blue Archive 或模型风格时，路由器优先匹配对应组合。Asuna 角色工作流需要显式指定工作流 ID。
 
 使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
 
@@ -78,6 +79,7 @@
 | Blue Archive 风格 | `blue-archive-style-sdxl` |
 | Asuna 角色 | `blue-archive-character-illustrious-xl` |
 | JANKU v7.77 | `janku-illustrious` |
+| JANKU v5.0 | `janku-v5-illustrious` |
 | One Obsession v24 | `one-obsession` |
 | SDXL 人物参考附加组件 | `ipadapter-face-sdxl` |
 | SDXL 姿态控制附加组件 | `controlnet-openpose-sdxl` |

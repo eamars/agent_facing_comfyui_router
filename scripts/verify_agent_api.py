@@ -109,11 +109,12 @@ def main() -> None:
             ({**base_body, "parameters": {"prompt": prompt, "nonexistent_field": 1}}, 400, "nonexistent_field"),
             ({**base_body, "parameters": {}}, 422, "prompt"),
             ({**base_body, "workflow": "no-such-workflow", "parameters": {"prompt": prompt}}, 404, "no-such-workflow"),
-            ({**base_body, "parameters": {"prompt": prompt, "width": 2048, "height": 2048, "batch_size": 4}}, 400, "budget"),
             ({**base_body, "parameters": {"prompt": prompt, "sampler_name": "no-such-sampler"}}, 400, "validation"),
         ]:
             error = http("/project/prompt", body, expected=status)["error"]
             check(f"error {status}: {token}", token.lower() in error["message"].lower() and {"message", "route", "expected"} <= error.keys())
+        oversized = http("/project/prompt", {**base_body, "parameters": {"prompt": prompt, "width": 2048, "height": 2048, "batch_size": 4}})
+        check("pixel budget is advisory", "over_pixel_budget" in {w["code"] for w in oversized["warnings"]})
         advisory = http("/project/prompt", {**base_body, "parameters": {"prompt": prompt, "steps": 26, "cfg": 6}})
         check("sampling advice retains requested values", advisory["applied_parameters"]["steps"] == 26 and {w["parameter"] for w in advisory["warnings"]} >= {"steps", "cfg"})
 

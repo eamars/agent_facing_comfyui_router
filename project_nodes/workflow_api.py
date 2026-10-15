@@ -1054,9 +1054,13 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
     requested_style = query.get("style")
     if isinstance(requested_style, str) and requested_style:
         style_values = _route_values(entry, "style")
-        if _route_value_matches(requested_style, style_values):
+        if _normalise_match_text(requested_style) in style_values:
             score += 30
             reasons.append("style matched")
+        elif _route_value_matches(requested_style, style_values):
+            # A generic word inside the request ("anime" in "mainstream anime") must not tie an exact match.
+            score += 15
+            reasons.append("style partially matched")
         elif routing.get("strict_style", False) and not explicit_workflow:
             return None
         elif routing.get("exclusive", False) and requested_domain:
@@ -1138,6 +1142,8 @@ def _resolve_routes(
         selection_status = "ambiguous"
         guidance = "Provide domain or an explicit workflow because multiple model/workflow routes are plausible."
     matches = matches[:limit]
+    # Sibling routes of one family (e.g. two JANKU versions) differ in house style, not score; surface the hand-off.
+    prefer_instead = selected["workflow"].get("selection", {}).get("prefer_instead", []) if selected else []
     return {
         "schema_version": 1,
         "request": query,
@@ -1149,6 +1155,7 @@ def _resolve_routes(
             "fallback": bool(selected and "generic fallback route" in selected["reasons"]),
             "total_matches": total_matches,
             "guidance": guidance,
+            "prefer_instead": prefer_instead,
         },
     }
 
@@ -1220,6 +1227,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         "instructions": [
             "Read /.well-known/agent-manifest.json first; the root path is the native ComfyUI UI, not the preferred agent entrypoint.",
             "Call POST /project/resolve with domain, content_mode, style, input_type, input_mode, optional family and prompt_granularity when the route is not already known.",
+            "Before generating, read selection.prefer_instead in the resolve response: if its 'when' matches the request, use that workflow instead. Pass a style selector (e.g. 'visual novel' or 'mainstream anime') when the requester describes a look.",
             "Choose only an entry with ready=true and use the selected workflow's models, capabilities, routing and agent_hints together.",
             "Treat compatibility_notes, selection.not_for, model compatibility and prompting as constraints, not optional suggestions.",
             "Match the prompt dialect and granularity to the selected workflow; do not copy tag triggers from another model family.",

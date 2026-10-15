@@ -2249,7 +2249,7 @@
       "tensor_dtypes": [
         "F16"
       ],
-      "description": "Pinned JANKU v7.77 (JANKU + Chenkin v0.2 base) single-file SDXL/Illustrious checkpoint for polished, vibrant anime illustration with thick linework and detailed backgrounds.",
+      "description": "Pinned JANKU v7.77 (JANKU + Chenkin v0.2 base) single-file SDXL/Illustrious checkpoint for mainstream modern anime: thicker linework, detailed backgrounds, more mature default face.",
       "capabilities": {
         "domains": [
           "anime",
@@ -2273,11 +2273,11 @@
           "anime",
           "illustration",
           "illustrious",
-          "glossy anime",
-          "shiny anime",
-          "vibrant anime",
-          "thick clean anime linework",
-          "polished character illustration"
+          "mainstream anime",
+          "modern anime",
+          "detailed background",
+          "cinematic lighting",
+          "thick clean linework"
         ],
         "content_modes": [
           "sfw",
@@ -2381,6 +2381,158 @@
       ],
       "file_sizes": {
         "models/checkpoints/JANKU_v7_77.safetensors": 6938040674
+      }
+    },
+    {
+      "id": "janku-v5",
+      "name": "JANKU v5.0",
+      "kind": "checkpoint",
+      "status": "installed",
+      "routeable": true,
+      "family": "sdxl-illustrious",
+      "architecture": "sdxl",
+      "base_model": "SDXL 1.0 / Illustrious",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Pinned JANKU v5.0 (RouWei v0.8 merge + fine-tune) single-file SDXL/Illustrious checkpoint with a visual novel / bishoujo-game CG house style: soft, delicate faces, thin linework, pale glossy colouring. Kept alongside v7.77.",
+      "capabilities": {
+        "domains": [
+          "anime",
+          "illustration",
+          "anime-portrait",
+          "anime-illustration"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "visual novel CG",
+          "galge",
+          "soft delicate faces",
+          "glossy anime",
+          "thin linework"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "nsfw_capable": true,
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "strongest character and artist-tag knowledge of the JANKU checkpoints; default face reads young, so state adulthood explicitly for adult characters",
+        "style_strength": "strong for vibrant, glossy anime illustration",
+        "composition_strength": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "prompting": {
+        "dialect": "Illustrious/NoobAI Danbooru-style tags",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_granularity": "detailed",
+        "recommended_structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "notes": [
+          "Normal Illustrious quality tags and artist tags work well.",
+          "Use the by artistname convention when an artist tag is desired.",
+          "No trigger word is required; final prompt text remains caller-controlled."
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "sdxl-illustrious"
+        ],
+        "adapter_families": [
+          "illustrious-xl",
+          "sdxl"
+        ],
+        "base_models": [
+          "SDXL 1.0",
+          "Illustrious",
+          "NoobAI"
+        ],
+        "known_limits": [
+          "This profile intentionally uses the canonical single-file checkpoint; the John6666 Diffusers conversion is not a router dependency.",
+          "No optional embeddings, detailers or LoRAs are bundled by this route."
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/Quiho/best-from-civitai/resolve/main/JANKUTrainedNoobaiRouwei_v50.safetensors?download=true",
+        "repository": "https://huggingface.co/Quiho/best-from-civitai",
+        "reference_repository": "https://huggingface.co/John6666/janku-v5-nsfw-trained-noobai-rou-wei-illustrious-xl-v50-sdxl",
+        "type": "Hugging Face public single-file mirror",
+        "creator": "janxd",
+        "civitai_model_id": 1277670,
+        "civitai_version_id": 1896532,
+        "file_name": "JANKUTrainedNoobaiRouwei_v50.safetensors",
+        "canonical_file_name": "JANKUTrainedNoobaiRouwei_v50.safetensors",
+        "bytes": 6938040674,
+        "sha256": "217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5",
+        "loading_note": "Use the single-file checkpoint loader; do not download the reference Diffusers directory."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "single-file SDXL/Illustrious checkpoint in named API graph",
+        "probes": [
+          {
+            "mode": "text-to-image-named-API",
+            "status": "success",
+            "job_id": "8934dddc-1e36-4899-987d-050659812e4a",
+            "prompt_class": "sfw",
+            "date": "2026-09-18",
+            "resolution": "512x512",
+            "steps": 8,
+            "seed": 917,
+            "elapsed_ms": 8750,
+            "output": "focused_janku-v5-illustrious_00001_.png",
+            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
+          }
+        ],
+        "limitations": [
+          "The SFW execution probe establishes graph/model loading, not visual quality, character likeness or NSFW quality."
+        ]
+      },
+      "required_file": "models/checkpoints/JANKU_v5_0.safetensors",
+      "route_roles": [
+        "generic-nsfw-anime-preference",
+        "glossy-anime-base",
+        "illustrious-anime-base"
+      ],
+      "file_sizes": {
+        "models/checkpoints/JANKU_v5_0.safetensors": 6938040674
       }
     },
     {

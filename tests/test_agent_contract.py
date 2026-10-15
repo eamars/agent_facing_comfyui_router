@@ -173,6 +173,12 @@ class AgentContractTests(unittest.TestCase):
                 6938040674,
                 "88177D224CE97F60CF3E908F87902F913ED4562BD79D237F84238A4354601EFB",
             ),
+            "janku-v5-illustrious": (
+                "janku-v5",
+                "JANKU_v5_0.safetensors",
+                6938040674,
+                "217DAAE812DDC3E501C1E972F88E01D5F3BAE8A4C3EAD2F087E8A9CD4B4CDED5",
+            ),
             "one-obsession": (
                 "one-obsession-v24",
                 "OneObsession_v24.safetensors",
@@ -209,11 +215,12 @@ class AgentContractTests(unittest.TestCase):
             self.assertEqual(api._binding_value(prepared, entry, "width"), 1024)
             self.assertEqual(api._binding_value(prepared, entry, "height"), 1536)
             self.assertEqual(api._binding_value(prepared, entry, "steps"), entry["defaults"]["steps"])
-            self.assertEqual(api._find_workflow(entry["previous_ids"][0])["id"], workflow_id)
+            for previous_id in entry.get("previous_ids", []):
+                self.assertEqual(api._find_workflow(previous_id)["id"], workflow_id)
             with self.assertRaises(api.ApiError):
                 api._prepare_graph(entry, {"parameters": {"prompt": "portrait", "unknown": True}})
         self.assertIn(
-            "'janku-illustrious', 'one-obsession', 'ipadapter-face-sdxl'",
+            "'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl'",
             downloader,
         )
 
@@ -245,6 +252,18 @@ class AgentContractTests(unittest.TestCase):
         self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0])
         self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v7.77"}))
         self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v24"}))
+
+    def test_janku_versions_split_by_style_and_point_at_each_other(self):
+        ready = {"workflows": catalog["workflows"]}
+        with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):
+            generic = api._resolve_routes(ready, {"domain": "anime", "content_mode": "nsfw"})
+            novel = api._resolve_routes(ready, {"domain": "anime", "content_mode": "nsfw", "style": "visual novel"})
+            mainstream = api._resolve_routes(ready, {"domain": "anime", "content_mode": "nsfw", "style": "mainstream anime"})
+        self.assertEqual(generic["selected_workflow"], "janku-illustrious")
+        self.assertEqual(novel["selected_workflow"], "janku-v5-illustrious")
+        self.assertEqual(mainstream["selected_workflow"], "janku-illustrious")
+        self.assertEqual([p["workflow"] for p in generic["selection"]["prefer_instead"]], ["janku-v5-illustrious"])
+        self.assertEqual([p["workflow"] for p in novel["selection"]["prefer_instead"]], ["janku-illustrious"])
 
     def test_readiness_includes_registry_eligibility_nodes_and_size(self):
         model_file = self.root / "model.bin"
