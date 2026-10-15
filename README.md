@@ -130,6 +130,8 @@ Qwen 文生图默认使用 1024×1024、25 步、Euler/simple、CFG 1。各工�
 
 生成响应提供 `job_id` 和 `job_url`。轮询 `job_url`，直到状态为 `succeeded` 或 `failed`；成功时通过 `outputs[].url` 获取图片。请求顶层添加 `"dry_run": true` 可检查参数和依赖而不生成图像，响应会说明工作流是否就绪及图是否通过验证。
 
+请求超过工作流的 `max_total_pixels` 时不会被拒绝，响应 `warnings` 中会出现 `over_pixel_budget`，任务照常运行。若任务因内存或显存不足失败，`error.code` 为 `out_of_memory`。请把错误和 `GET /project/resources` 的当前空闲内存告诉请求者，由其释放内存或缩小尺寸后再重新提交。
+
 ### 上传图片并编辑
 
 先上传参考图：

@@ -459,8 +459,6 @@ def _resource_limits(entry: dict[str, Any]) -> dict[str, Any]:
     return {
         "max_total_pixels": 2_359_296,
         "max_input_pixels": MAX_INPUT_PIXELS,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         **entry.get("resource_limits", {}),
     }
 
@@ -482,12 +480,6 @@ def _resource_request(graph: dict[str, Any], entry: dict[str, Any]) -> dict[str,
             width, height = (max(32, round(value / 32) * 32) for value in (width, height))
     limits = _resource_limits(entry)
     total = width * height * batch
-    if total > limits["max_total_pixels"]:
-        raise ApiError(400, "Requested dimensions and batch exceed this workflow's pixel budget", {
-            "width": width, "height": height, "batch_size": batch,
-            "total_pixels": total, "max_total_pixels": limits["max_total_pixels"],
-            "next_step": "Reduce dimensions or batch_size; deployment limits are configured in workflows/catalog.json.",
-        })
     inputs = {}
     for node in graph.values():
         if node.get("class_type") in {"LoadImage", "LoadImageMask"}:
@@ -1190,7 +1182,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "native_comfyui_api": "available",
         },
         "resources": {"endpoint": "/project/resources", "max_pending_jobs": MAX_PROJECT_QUEUE,
-                      "admission": "Each workflow exposes resource_limits; total pixels include batch and image inputs. These limits reduce OOM risk but cannot guarantee a fit alongside other processes."},
+                      "admission": "Each workflow exposes resource_limits. max_total_pixels (width * height * batch, or the reference size for edits) is advisory: exceeding it adds an over_pixel_budget warning but the job still runs. There is no free-memory pre-check: a job that actually runs out of RAM/VRAM fails with error.code out_of_memory."},
         "input_files": {
             "directory": "ComfyUI/input",
             "lifecycle": "Persistent across restarts. No project TTL or automatic cleanup; only explicit DELETE or external/manual cleanup removes inputs. Keep referenced files unchanged until jobs finish.",
@@ -1227,11 +1219,12 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "Match the prompt dialect and granularity to the selected workflow; do not copy tag triggers from another model family.",
             "Use parameter_schema for allowed fields, required inputs and actual defaults. The Asuna-specific workflow is explicit-only; do not use it for arbitrary Blue Archive characters. The Pony-trained Rapi adapter is disabled by default on Animagine.",
             "Supply parameters.prompt explicitly (empty string is allowed); subject is a compatibility alias. Suggested subject/appearance details are prompt-writing advice, not separate required API fields. Seed is random when omitted.",
-            "Responses include identical prompt_id/job_id, applied_parameters, ignored_parameters (empty; unknown fields are rejected), effective_parameters, resource budgets and advisory sampling warnings. dry_run validates without executing.",
+            "Responses include identical prompt_id/job_id, applied_parameters, ignored_parameters (empty; unknown fields are rejected), effective_parameters, resource budgets and advisory warnings (sampling ranges, over_pixel_budget); warnings never block a job. dry_run validates without executing.",
             "Check capabilities.input_types, capabilities.input_modes and input_contract before building parameters; never send input_image to a route that does not declare image support.",
             "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then use the returned relative name in the selected contract: input_image for latent image-to-image/inpaint, face_image for face reference, or control_image for OpenPose control.",
             "Use a unique basename for each new upload. With overwrite=false, the native ComfyUI endpoint may return an existing same-name file; delete only input names that this caller owns.",
             "GET /project/resources returns an advisory selected-device memory snapshot and configured queue/input limits; it is diagnostic information, not a reservation.",
+            "If a job fails with error.code out_of_memory, report it to the requester with the current GET /project/resources snapshot before resubmitting.",
             "For inpaint, upload a source image and a same-size mask. RGB white/red pixels are redrawn; alpha masks redraw transparent pixels. Unmasked original pixels are composited back after decode.",
             "For face-reference, use the face_image contract and the face-centric IPAdapter route; it controls face appearance more than outfit, pose or background and is not FaceID recognition.",
             "For openpose-control, use control_image with the OpenPose route; the route preprocesses the supplied source/control image before applying the SDXL ControlNet.",
@@ -2042,9 +2035,13 @@ def _history_error(entry: dict[str, Any]) -> dict[str, Any] | None:
         if event in {"execution_error", "execution_interrupted"}:
             result = {key: data.get(key) for key in ("node_id", "node_type", "exception_type", "exception_message")}
             result["event"] = event
-            if "out of memory" in str(data.get("exception_message", "")).lower() or "OutOfMemory" in str(data.get("exception_type", "")):
+            message = str(data.get("exception_message", "")).lower()
+            exception_type = str(data.get("exception_type", ""))
+            # GPU OOM, CPU allocator failure, Python MemoryError, Windows pagefile exhaustion (os error 1455).
+            if any(text in message for text in ("out of memory", "not enough memory", "paging file is too small")) \
+                    or any(name in exception_type for name in ("OutOfMemory", "MemoryError")):
                 result["code"] = "out_of_memory"
-                result["next_step"] = "Reduce dimensions or batch size, or release other GPU/RAM workloads, then submit a new job."
+                result["next_step"] = "Tell the requester the job ran out of RAM/VRAM (GET /project/resources shows current free memory). Resubmit after they free memory elsewhere or choose smaller dimensions or batch size."
             return result
     return None
 
@@ -2654,6 +2651,10 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if entry.get("lora_bindings"):
             applied["loras"] = {name: _binding_value(graph, entry, spec["strength_model"]) for name, spec in entry["lora_bindings"].items()}
         warnings = []
+        if resources["total_pixels"] > resources["limits"]["max_total_pixels"]:
+            warnings.append({"code": "over_pixel_budget", "parameter": "total_pixels",
+                             "value": resources["total_pixels"], "recommended": [0, resources["limits"]["max_total_pixels"]],
+                             "message": f"{resources['total_pixels']} total pixels exceeds the tested budget of {resources['limits']['max_total_pixels']} for {workflow_id}; the job was kept but may be slow or fail with out_of_memory."})
         if effective.get("cfg") == 1 and "negative_prompt" in entry["bindings"]:
             warnings.append({"code": "negative_prompt_inactive", "parameter": "negative_prompt", "message": "At CFG 1 the sampler skips negative conditioning; negative_prompt has no effect at this setting."})
         for name, interval in entry.get("agent_hints", {}).get("recommended", {}).items():

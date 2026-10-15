@@ -91,22 +91,6 @@ def install(execution_module: Any, notify_phase: Any, validate_inputs: Any) -> N
             if workflow:
                 resources = extra_data["project_resources"]
                 validate_inputs(resources)
-                snapshot = memory_snapshot()
-                limits = resources["limits"]
-                if snapshot["free_ram_bytes"] < limits["min_free_ram_gib"] * 1024**3:
-                    executor.reset()
-                    release_models()
-                    snapshot = memory_snapshot()
-                    if snapshot["free_ram_bytes"] < limits["min_free_ram_gib"] * 1024**3:
-                        raise RuntimeError("Insufficient free system RAM; close other workloads before retrying.")
-                free_vram = snapshot["free_vram_bytes"]
-                if free_vram is not None and free_vram < limits["min_free_vram_gib"] * 1024**3:
-                    # Same-workflow caches may be reclaimable; retry only the
-                    # memory check, never silently change the user's generation.
-                    executor.reset()
-                    release_models()
-                    if memory_snapshot()["free_vram_bytes"] < limits["min_free_vram_gib"] * 1024**3:
-                        raise RuntimeError("Insufficient free VRAM headroom on the selected device; release other GPU workloads before retrying.")
                 notify_phase(prompt_id, "generation")
             original(executor, prompt, prompt_id, extra_data, execute_outputs)
         except Exception as exc:

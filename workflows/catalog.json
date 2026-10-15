@@ -165,9 +165,7 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 20,
-        "min_free_vram_gib": 2,
-        "basis": "RTX 4090 admission budget with CPU VAE and RAM offload; runtime fit must be measured."
+        "basis": "RTX 4090 pixel budget with CPU VAE and RAM offload; runtime fit must be measured."
       },
       "control_ports": {
         "inpaint": false,
@@ -383,9 +381,7 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 20,
-        "min_free_vram_gib": 2,
-        "basis": "RTX 4090 admission budget with CPU VAE and RAM offload; runtime fit must be measured."
+        "basis": "RTX 4090 pixel budget with CPU VAE and RAM offload; runtime fit must be measured."
       },
       "control_ports": {
         "inpaint": false,
@@ -824,8 +820,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -1243,8 +1237,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -1655,8 +1647,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -2085,8 +2075,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -2423,8 +2411,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 1048576,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -2852,8 +2838,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -3250,8 +3234,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -3734,8 +3716,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -4137,8 +4117,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -4574,8 +4552,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -4988,8 +4964,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
       },
       "control_ports": {
@@ -5411,8 +5385,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
       },
       "control_ports": {
@@ -5832,8 +5804,6 @@
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
-        "min_free_ram_gib": 4,
-        "min_free_vram_gib": 2,
         "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
       },
       "control_ports": {

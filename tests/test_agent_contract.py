@@ -128,7 +128,8 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual((repeat["class_type"], repeat["inputs"]["amount"]), ("RepeatLatentBatch", 2))
         graph = self.graph(input_image="source.png", width=640)
         self.assertEqual(api._resource_request(graph, self.entry)["height"], 768)
-        self.assertBad(width=2048, height=2048, batch_size=4)
+        oversized = api._resource_request(self.graph(width=2048, height=2048, batch_size=4), self.entry)
+        self.assertGreater(oversized["total_pixels"], oversized["limits"]["max_total_pixels"])
         self.assertBad(input_image="source.png", width="oops")
         self.assertBad(width=float("inf"))
 
@@ -295,14 +296,25 @@ class WorkerGuardTests(unittest.TestCase):
                 self.success = prompt_id != "failure"
 
         runtime_guard.install(types.SimpleNamespace(PromptExecutor=Executor), lambda *args: None, lambda r: None)
-        snapshot = {"free_ram_bytes": 10 * 1024**3, "free_vram_bytes": 10 * 1024**3}
-        limits = {"min_free_ram_gib": 4, "min_free_vram_gib": 2}
-        named = {"project_workflow": "anima", "project_resources": {"limits": limits}}
+        named = {"project_workflow": "anima", "project_resources": {}}
         instance = Executor()
-        with patch.object(runtime_guard, "memory_snapshot", return_value=snapshot), patch.object(runtime_guard, "release_models", side_effect=lambda: events.append("release")):
+        with patch.object(runtime_guard, "release_models", side_effect=lambda: events.append("release")):
             for label, data in [("native-1", {}), ("named-1", named), ("named-2", named), ("native-2", {}), ("failure", named), ("recovered", named)]:
                 instance.execute({}, label, data, [])
         self.assertEqual(events, ["native-1", "reset", "release", "named-1", "named-2", "reset", "release", "native-2", "reset", "release", "failure", "reset", "release", "reset", "release", "recovered"])
+
+    def test_real_memory_failures_are_reported_as_out_of_memory(self):
+        failures = [
+            ("torch.OutOfMemoryError", "CUDA out of memory. Tried to allocate 2.00 GiB"),
+            ("RuntimeError", "[enforce fail at alloc_cpu.cpp:117] data. DefaultCPUAllocator: not enough memory: you tried to allocate 17592186044416 bytes."),
+            ("OSError", "The paging file is too small for this operation to complete. (os error 1455)"),
+            ("MemoryError", ""),
+        ]
+        for exception_type, message in failures:
+            error = api._history_error({"status": {"messages": [("execution_error", {"exception_type": exception_type, "exception_message": message})]}})
+            self.assertEqual(error["code"], "out_of_memory", exception_type)
+        error = api._history_error({"status": {"messages": [("execution_error", {"exception_type": "ValueError", "exception_message": "bad input"})]}})
+        self.assertNotIn("code", error)
 
 
 class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
