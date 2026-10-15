@@ -54,21 +54,14 @@
     }
   },
   "8": {
-    "class_type": "VAEEncodeForInpaint",
+    "class_type": "GrowMask",
     "inputs": {
-      "pixels": [
-        "6",
-        0
-      ],
-      "vae": [
-        "3",
-        0
-      ],
       "mask": [
         "7",
         0
       ],
-      "grow_mask_by": 6
+      "expand": 6,
+      "tapered_corners": true
     }
   },
   "9": {
@@ -79,7 +72,7 @@
       "cfg": 1.0,
       "sampler_name": "er_sde",
       "scheduler": "simple",
-      "denoise": 0.65,
+      "denoise": 1.0,
       "model": [
         "1",
         0
@@ -93,7 +86,7 @@
         0
       ],
       "latent_image": [
-        "8",
+        "15",
         0
       ]
     }
@@ -139,6 +132,32 @@
       "x": 0,
       "y": 0,
       "resize_source": false
+    }
+  },
+  "14": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "6",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "15": {
+    "class_type": "SetLatentNoiseMask",
+    "inputs": {
+      "samples": [
+        "14",
+        0
+      ],
+      "mask": [
+        "8",
+        0
+      ]
     }
   }
 }

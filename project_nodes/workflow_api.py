@@ -11,6 +11,7 @@ import asyncio
 import copy
 import json
 import logging
+import math
 import secrets
 import re
 import time
@@ -21,7 +22,7 @@ from typing import Any
 from urllib.parse import urlencode
 
 from aiohttp import web
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 import execution
 import folder_paths
@@ -37,6 +38,8 @@ MAX_TEXT_LENGTH = 16_000
 MAX_PROMPT_LENGTH = 8_000
 MAX_INPUT_IMAGE_LENGTH = 512
 MAX_INPUT_PIXELS = 16_777_216
+INPUT_FIT_MODES = ("downscale", "none")
+FITTED_INPUT_DIR = "_fitted"
 MAX_PROJECT_QUEUE = 32
 MAX_PROJECT_JOB_STATES = 1000
 PROJECT_QUEUE_POLL_SECONDS = 0.2
@@ -53,11 +56,13 @@ PROMPT_GRANULARITY_ALIASES = {
 
 
 class ApiError(Exception):
-    def __init__(self, status: int, message: str, details: Any = None, *, route: str | None = None, expected: list[str] | None = None):
+    def __init__(self, status: int, message: str, details: Any = None, *, route: str | None = None, expected: list[str] | None = None,
+                 code: str | None = None):
         super().__init__(message)
         self.status = status
         self.message = message
         self.details = details
+        self.code = code
         self.route = route
         self.expected = expected
 
@@ -66,6 +71,7 @@ def _json_error(error: ApiError) -> web.Response:
     payload: dict[str, Any] = {
         "error": {
             "type": "project_workflow_api_error",
+            "code": error.code,
             "message": error.message,
             "route": error.route,
             "expected": error.expected or [],
@@ -326,6 +332,13 @@ def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str,
             spec["default"] = _binding_value(graph, entry, name)
     if "seed" in properties:
         properties["seed"]["description"] = "Random when omitted; the effective seed is returned in the response."
+    if _image_inputs(entry):
+        properties["input_fit"] = {
+            "type": "string", "enum": list(INPUT_FIT_MODES), "default": "downscale",
+            "description": "downscale: shrink oversized image inputs to what this route can run and use the first frame of animated "
+                           "input; each change is reported as an input_downscaled/input_resized/input_first_frame warning. "
+                           "none: keep the upload unchanged; inputs the route cannot run are refused with a stable error code.",
+        }
     if entry.get("lora_bindings"):
         properties["loras"] = {"type": "object", "additionalProperties": False, "properties": {
             name: {"type": "number", "minimum": -2, "maximum": 2, "default": spec["default"]}
@@ -428,7 +441,7 @@ def _safe_input_file(value: Any, parameter_name: str) -> str:
         or re.search(r"\[(?:input|output|temp)\]\s*$", normalised)
         or any(part in {"", ".", ".."} for part in normalised.split("/"))
     ):
-        raise ApiError(400, f"{parameter_name} must be a relative filename inside ComfyUI's input directory")
+        raise ApiError(400, f"{parameter_name} must be a relative filename inside ComfyUI's input directory", code="input_invalid_path")
     return normalised
 
 
@@ -439,9 +452,9 @@ def _resolve_input_file(value: Any, parameter_name: str) -> tuple[str, Path]:
     try:
         input_path.relative_to(input_root)
     except ValueError as exc:
-        raise ApiError(400, f"{parameter_name} must remain inside ComfyUI's input directory") from exc
+        raise ApiError(400, f"{parameter_name} must remain inside ComfyUI's input directory", code="input_invalid_path") from exc
     if not input_path.is_file():
-        raise ApiError(400, f"{parameter_name} was not found in ComfyUI's input directory: {file_name}")
+        raise ApiError(400, f"{parameter_name} was not found in ComfyUI's input directory: {file_name}", code="input_not_found")
     return file_name, input_path
 
 
@@ -452,13 +465,99 @@ def _image_info(path: Path, parameter_name: str) -> dict[str, Any]:
             width, height = source.size
             if source.getexif().get(274) in {5, 6, 7, 8}:
                 width, height = height, width
-            if width * height > MAX_INPUT_PIXELS:
-                raise ApiError(400, f"{parameter_name} exceeds the input pixel budget", {"max_pixels": MAX_INPUT_PIXELS})
-            if getattr(source, "n_frames", 1) != 1:
-                raise ApiError(400, f"{parameter_name} must be a single-frame image")
-            return {"width": width, "height": height, "alpha": "A" in source.getbands() or "transparency" in source.info}
-    except (OSError, ValueError, UnidentifiedImageError, Image.DecompressionBombError) as exc:
-        raise ApiError(400, f"{parameter_name} is not a readable image", str(exc)) from exc
+            return {"width": width, "height": height, "frames": getattr(source, "n_frames", 1),
+                    "alpha": "A" in source.getbands() or "transparency" in source.info}
+    except Image.DecompressionBombError as exc:
+        raise ApiError(400, f"{parameter_name} is too large to decode safely", str(exc), code="input_too_large") from exc
+    except (OSError, ValueError, UnidentifiedImageError) as exc:
+        raise ApiError(400, f"{parameter_name} is not a readable image", str(exc), code="input_unreadable") from exc
+
+
+def _fit_size(width: int, height: int, *, max_pixels: int, max_side: int | None = None, multiple: int = 1,
+              min_side: int = 1) -> tuple[int, int]:
+    """Largest size within the limits, aspect kept, each side a multiple of `multiple`."""
+    scale = min(1.0, math.sqrt(max_pixels / (width * height)))
+    if max_side:
+        scale = min(scale, max_side / max(width, height))
+    scale = max(scale, min_side / min(width, height))
+    return tuple(max(min_side, int(value * scale) // multiple * multiple) for value in (width, height))
+
+
+def _write_fitted_input(path: Path, size: tuple[int, int], *, mask: bool) -> str:
+    """Write a first-frame, orientation-applied, resized PNG copy; the original upload is never changed."""
+    with Image.open(path) as source:
+        source.seek(0)
+        image = ImageOps.exif_transpose(source)
+        if image.mode not in {"RGB", "RGBA", "L", "LA"}:
+            image = image.convert("RGBA" if "transparency" in source.info or "A" in image.getbands() else "RGB")
+        if image.size != size:
+            image = image.resize(size, Image.Resampling.BILINEAR if mask else Image.Resampling.LANCZOS)
+        name = f"{FITTED_INPUT_DIR}/{uuid.uuid4().hex}.png"
+        target = Path(folder_paths.get_input_directory()) / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        image.save(target, "PNG")
+    return name
+
+
+def _delete_fitted_inputs(names: list[str]) -> None:
+    for name in names:
+        try:
+            _, path = _resolve_input_file(name, "fitted input")
+            path.unlink()
+        except (ApiError, OSError):
+            logging.warning("Could not delete fitted input %s", name)
+
+
+def _fit_inputs(entry: dict[str, Any], parameters: dict[str, Any], image_info: dict[str, dict[str, Any]],
+                fit_mode: str, report: list[dict[str, Any]]) -> None:
+    """Bring image inputs within what the route can run, recording every change for the caller.
+
+    downscale (default): shrink to the route's limits and take the first frame of animated input.
+    none: keep the upload unchanged and refuse, with a stable code, only what the route cannot run.
+    """
+    budget = _resource_limits(entry)["max_total_pixels"]
+    image_mode = entry.get("input_contract", {}).get("image", {}).get("mode")
+    for name in ("input_image", "mask_image", "face_image", "control_image"):
+        if name not in image_info:
+            continue
+        info = image_info[name]
+        size = (info["width"], info["height"])
+        if image_mode == "inpaint-source" and name == "input_image":
+            target = _fit_size(*size, max_pixels=budget, max_side=2048, multiple=8, min_side=64)
+        elif image_mode == "inpaint-source" and name == "mask_image":
+            source = image_info["input_image"]
+            original = next((r["original_size"] for r in report if r["parameter"] == "input_image"), (source["width"], source["height"]))
+            if abs(size[0] / size[1] - original[0] / original[1]) > 0.01:
+                raise ApiError(400, "mask_image must have the same aspect ratio as input_image",
+                               {"input_image": list(original), "mask_image": list(size)}, code="mask_size_mismatch")
+            target = (source["width"], source["height"])
+            if fit_mode == "none" and size != tuple(original):
+                raise ApiError(400, "mask_image must have the same dimensions as input_image",
+                               {"input_image": list(original), "mask_image": list(size)}, code="mask_size_mismatch")
+        elif image_mode == "qwen-image-2.1-reference" and name == "input_image":
+            target = _fit_size(*size, max_pixels=budget, multiple=32) if size[0] * size[1] > budget else size
+        else:
+            target = _fit_size(*size, max_pixels=MAX_INPUT_PIXELS)
+        animated = info["frames"] > 1
+        if target == size and not animated:
+            continue
+        if fit_mode == "none":
+            if animated:
+                raise ApiError(400, f"{name} is animated; send a still image or use input_fit=downscale to take the first frame",
+                               {"frames": info["frames"]}, code="input_animated")
+            if image_mode == "inpaint-source" and name == "input_image" and target != size:
+                raise ApiError(400, "input_image must be 64-2048 px per side, a multiple of 8 and within the pixel budget for inpaint",
+                               {"size": list(size), "fitted_size": list(target)}, code="input_size_unsupported")
+            if size[0] * size[1] > MAX_INPUT_PIXELS:
+                raise ApiError(400, f"{name} exceeds the input pixel limit", {"size": list(size), "max_pixels": MAX_INPUT_PIXELS},
+                               code="input_too_large")
+            continue
+        _, path = _resolve_input_file(parameters[name], name)
+        fitted = _write_fitted_input(path, target, mask=name == "mask_image")
+        parameters[name] = fitted
+        image_info[name] = {**info, "width": target[0], "height": target[1], "frames": 1}
+        report.append({"parameter": name, "original_size": list(size), "used_size": list(target), "first_frame": animated,
+                       "file": fitted})
 
 
 def _resource_limits(entry: dict[str, Any]) -> dict[str, Any]:
@@ -606,6 +705,7 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
         "control_start_percent",
         "control_end_percent",
         "ipadapter_weight",
+        "input_fit",
         "image",
         "reference_image",
         "source_image",
@@ -631,7 +731,9 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any]:
+def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Bind a request into the route's graph. Fitted input copies are appended to fit_report; the caller deletes them."""
+    fit_report = [] if fit_report is None else fit_report
     graph = copy.deepcopy(_read_workflow(entry))
     parameters = _request_parameters(body)
     allowed = set(entry.get("bindings", {}))
@@ -643,9 +745,15 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
     image_contract = entry.get("input_contract", {}).get("image", {})
     if image_contract.get("supported"):
         allowed.add("input_image")
+    if _image_inputs(entry):
+        allowed.add("input_fit")
     unknown = set(parameters) - allowed
     if unknown:
-        raise ApiError(400, "Workflow does not expose parameter: " + ", ".join(sorted(unknown)), sorted(unknown))
+        raise ApiError(400, "Workflow does not expose parameter: " + ", ".join(sorted(unknown)), sorted(unknown),
+                       code="unsupported_parameter")
+    fit_mode = parameters.pop("input_fit", "downscale")
+    if fit_mode not in INPUT_FIT_MODES:
+        raise ApiError(400, "input_fit must be downscale or none", expected=list(INPUT_FIT_MODES), code="invalid_parameter")
     if "prompt" not in parameters:
         raise ApiError(422, "parameters.prompt (or its subject alias) is required; an empty string is allowed", expected=["prompt", "subject"])
     if "seed" not in parameters:
@@ -656,6 +764,7 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
             normalized, path = _resolve_input_file(parameters[name], name)
             parameters[name] = normalized
             image_info[name] = _image_info(path, name)
+    _fit_inputs(entry, parameters, image_info, fit_mode, fit_report)
     if "input_image" in image_info and image_contract.get("mode") == "latent-img2img":
         source = image_info["input_image"]
         for dimension in ("width", "height"):
@@ -664,6 +773,14 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
         width, height = parameters.get("width"), parameters.get("height")
         if width is None and height is None:
             width, height = source["width"], source["height"]
+            fitted = _fit_size(width, height, max_pixels=_resource_limits(entry)["max_total_pixels"], max_side=2048, multiple=8, min_side=64)
+            if fit_mode == "downscale" and fitted != (width // 8 * 8, height // 8 * 8):
+                fit_report.append({"parameter": "input_image", "original_size": [width, height], "used_size": list(fitted),
+                                   "first_frame": False, "file": None, "scope": "output size"})
+                width, height = fitted
+            elif fit_mode == "none" and max(width, height) > 2048:
+                raise ApiError(400, "input_image is larger than 2048 px per side; pass width/height or use input_fit=downscale",
+                               {"size": [width, height]}, code="input_size_unsupported")
         elif width is None:
             height = _as_int("height", height, 64, 2048, multiple=8)
             width = round(source["width"] * height / source["height"])
@@ -774,13 +891,9 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
     if "input_image" in parameters and "input_image" not in entry.get("bindings", {}):
         _attach_dynamic_image_input(graph, entry, parameters["input_image"])
     if "mask_image" in image_info:
-        source, mask = image_info["input_image"], image_info["mask_image"]
-        if (source["width"], source["height"]) != (mask["width"], mask["height"]):
-            raise ApiError(400, "mask_image must have the same dimensions as input_image")
-        for dimension in ("width", "height"):
-            _as_int(f"input_image.{dimension}", source[dimension], 64, 2048, multiple=8)
-        if _binding_value(graph, entry, "mask_channel") == "alpha" and not mask["alpha"]:
-            raise ApiError(400, "mask_channel=alpha requires a mask with transparency; transparent pixels are redrawn")
+        if _binding_value(graph, entry, "mask_channel") == "alpha" and not image_info["mask_image"]["alpha"]:
+            raise ApiError(400, "mask_channel=alpha requires a mask with transparency; transparent pixels are redrawn",
+                           code="mask_alpha_missing")
     if "control_start_percent" in entry["bindings"]:
         if _binding_value(graph, entry, "control_start_percent") > _binding_value(graph, entry, "control_end_percent"):
             raise ApiError(400, "control_start_percent must not exceed control_end_percent")
@@ -1160,6 +1273,44 @@ def _resolve_routes(
     }
 
 
+def _image_inputs(entry: dict[str, Any]) -> list[str]:
+    """Image parameters _prepare_graph accepts for this route."""
+    bindings = entry.get("bindings", {})
+    accepted = ["input_image"] if entry.get("input_contract", {}).get("image", {}).get("supported") or "input_image" in bindings else []
+    return accepted + [name for name in ("mask_image", "face_image", "control_image") if name in bindings]
+
+
+# Reference-image intents, keyed by the contract mode that implements them.
+_REFERENCE_USES = (
+    ("qwen-image-2.1-reference", "image-edit", "input_image",
+     "Edit an uploaded image by instruction: change a colour, object, material, background or text and keep the rest.",
+     "Output keeps the source size (rounded to multiples of 32). The prompt is the edit instruction."),
+    ("latent-img2img", "image-to-image", "input_image",
+     "Redraw or vary an uploaded image in the route's model style.",
+     "Composition and colours carry over; character identity is not guaranteed. denoise defaults to 0.65; lower keeps more of the source."),
+    ("inpaint-source", "inpaint", "input_image + mask_image",
+     "Repaint only a masked region of an uploaded image.",
+     "Mask must have the source's aspect ratio (it is resized with the source when fitted). denoise 1.0 replaces the region; lower keeps more of the original. Unmasked pixels are composited back unchanged."),
+    ("face-reference", "face-reference", "face_image",
+     "Put the same face/character into a new scene described by the prompt.",
+     "IPAdapter conditioning, not FaceID. Outfit, pose and background come from the prompt at the default weight; on the Anima route weights of 0.8-1.0 copy the reference's outfit and background."),
+    ("openpose-source-image", "openpose-control", "control_image",
+     "Copy the body pose of a person in an uploaded image.",
+     "The route extracts an OpenPose skeleton; clothing, face and scene come from the prompt."),
+)
+
+
+def _reference_uses(workflows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    uses = []
+    for contract_mode, input_mode, parameter, intent, behaviour in _REFERENCE_USES:
+        routes = [entry["id"] for entry in workflows
+                  if any(isinstance(contract, dict) and contract.get("mode") == contract_mode
+                         for contract in entry.get("input_contract", {}).values())]
+        if routes:
+            uses.append({"intent": intent, "input_mode": input_mode, "parameter": parameter, "routes": routes, "behaviour": behaviour})
+    return uses
+
+
 def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
     model_registry = catalog.get("model_registry", [])
     ready_workflows = [
@@ -1180,6 +1331,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         "route_table": [{"id": entry["id"], "family": entry["family"],
                          "control_ports": entry.get("control_ports", {}),
                          "required_fields": entry.get("input_contract", {}).get("required_fields", []),
+                         "image_inputs": _image_inputs(entry),
                          "recommended": entry.get("agent_hints", {}).get("recommended", {}),
                          "explicit_only": entry.get("routing", {}).get("explicit_only", False)} for entry in ready_workflows],
         "discovery": {
@@ -1189,7 +1341,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "agent_startup_rule": "Read the preferred entrypoint before treating the root path as a ComfyUI client surface.",
         },
         "service": {
-            "description": "Named workflow selection, reference-image upload, and text/image-to-image job API for this ComfyUI server.",
+            "description": "Named workflow selection, reference-image upload, and text-to-image, image edit, image-to-image, inpaint, face-reference and pose-control job API for this ComfyUI server.",
             "authentication": "none",
             "api_base": "/project",
             "native_comfyui_api": "available",
@@ -1220,9 +1372,31 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                     "subfolder": "optional relative input subfolder",
                 },
                 "response_fields": ["name", "subfolder", "type"],
-                "use_as": "Combine response subfolder and name with '/' and pass it as parameters.input_image.",
+                "use_as": "Combine response subfolder and name with '/' and pass it as the selected route's image parameter (route_table[].image_inputs): input_image, mask_image, face_image or control_image.",
             },
+            "reference_uses": _reference_uses(ready_workflows),
+            "input_fit": {
+                "parameter": "parameters.input_fit",
+                "values": list(INPUT_FIT_MODES),
+                "default": "downscale",
+                "downscale": "Oversized inputs are shrunk to what the route can run (aspect kept) and animated inputs use their first frame. Each change comes back as a warning with original_size and used_size: input_downscaled, input_resized or input_first_frame. The uploaded file is never modified; the adjusted copy is deleted when the job ends.",
+                "none": "The upload is used unchanged. Inputs the route cannot run are refused with a stable error.code; larger inputs that can run may add an over_pixel_budget warning.",
+            },
+            "text_only_routes": [entry["id"] for entry in ready_workflows if not _image_inputs(entry)],
             "reference_rule": "Upload or discover the reference before submitting /project/prompt; the named API accepts only a relative input-directory filename, never a host path or URL.",
+        },
+        "error_codes": {
+            "input_not_found": "The named input file is not in ComfyUI's input directory; upload it or check GET /project/inputs.",
+            "input_invalid_path": "The input name is not a relative path inside the input directory.",
+            "input_unreadable": "The file is not a readable image.",
+            "input_too_large": "The image cannot be decoded safely, or exceeds max_input_pixels with input_fit=none.",
+            "input_animated": "Animated input with input_fit=none; send a still image or use input_fit=downscale.",
+            "input_size_unsupported": "With input_fit=none the image size cannot run on this route (e.g. inpaint needs 64-2048 px, multiples of 8).",
+            "mask_size_mismatch": "mask_image has a different aspect ratio from input_image (or a different size with input_fit=none).",
+            "mask_alpha_missing": "mask_channel=alpha was requested but the mask has no transparency.",
+            "unsupported_parameter": "The route does not expose this parameter (for example an image sent to a text-only route).",
+            "invalid_parameter": "A parameter value is outside its allowed set.",
+            "out_of_memory": "Job error.code: the job ran out of RAM/VRAM while running.",
         },
         "instructions": [
             "Read /.well-known/agent-manifest.json first; the root path is the native ComfyUI UI, not the preferred agent entrypoint.",
@@ -1234,13 +1408,14 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "Use parameter_schema for allowed fields, required inputs and actual defaults. The Asuna-specific workflow is explicit-only; do not use it for arbitrary Blue Archive characters. The Pony-trained Rapi adapter is disabled by default on Animagine.",
             "Supply parameters.prompt explicitly (empty string is allowed); subject is a compatibility alias. Suggested subject/appearance details are prompt-writing advice, not separate required API fields. Seed is random when omitted.",
             "Responses include identical prompt_id/job_id, applied_parameters, ignored_parameters (empty; unknown fields are rejected), effective_parameters, resource budgets and advisory warnings (sampling ranges, over_pixel_budget); warnings never block a job. dry_run validates without executing.",
-            "Check capabilities.input_types, capabilities.input_modes and input_contract before building parameters; never send input_image to a route that does not declare image support.",
-            "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then use the returned relative name in the selected contract: input_image for latent image-to-image/inpaint, face_image for face reference, or control_image for OpenPose control.",
+            "When the requester supplies an image, first decide what it is for using input_files.reference_uses (instruction edit, restyle/vary, inpaint, face reference or pose), then resolve with that input_mode. Send only the image parameters listed in route_table[].image_inputs; text_only_routes accept none.",
+            "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then pass the returned relative name as the route's image parameter: input_image for instruction edit, image-to-image or the inpaint source, mask_image for the inpaint mask, face_image for face reference, or control_image for OpenPose control.",
+            "Image inputs are fitted automatically (input_fit=downscale). When the response has input_downscaled, input_resized or input_first_frame warnings, tell the requester the image was adjusted and give original_size and used_size. Send input_fit=none only when the requester needs the original size; then relay any refusal's error.code and message.",
             "Use a unique basename for each new upload. With overwrite=false, the native ComfyUI endpoint may return an existing same-name file; delete only input names that this caller owns.",
             "GET /project/resources returns an advisory selected-device memory snapshot and configured queue/input limits; it is diagnostic information, not a reservation.",
             "If a job fails with error.code out_of_memory, report it to the requester with the current GET /project/resources snapshot before resubmitting.",
-            "For inpaint, upload a source image and a same-size mask. RGB white/red pixels are redrawn; alpha masks redraw transparent pixels. Unmasked original pixels are composited back after decode.",
-            "For face-reference, use the face_image contract and the face-centric IPAdapter route; it controls face appearance more than outfit, pose or background and is not FaceID recognition.",
+            "For inpaint, upload a source image and a mask with the same aspect ratio (normally the same size). RGB white/red pixels are redrawn; alpha masks redraw transparent pixels. denoise 1.0 (default) replaces the masked region; lower keeps more of the original inside it. Unmasked original pixels are composited back after decode.",
+            "For face-reference, pass face_image to a face-reference route; it is not FaceID recognition. Use a head-and-shoulders crop. The Anima route encodes the whole reference: keep ipadapter_weight at its 0.6 default unless likeness matters more than the prompted outfit and scene, since 0.8-1.0 copies the reference's outfit and background.",
             "For openpose-control, use control_image with the OpenPose route; the route preprocesses the supplied source/control image before applying the SDXL ControlNet.",
             "After confirming a file is no longer needed, DELETE /project/inputs/{name}; only a single regular input file is removed.",
             "The upload response is an input filename, not an output-job reference; automatic output-to-input bindings are not yet implemented.",
@@ -1373,7 +1548,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                     "overwrite": "optional true/false",
                     "subfolder": "optional relative subfolder",
                 },
-                "response": "Use returned name and subfolder as parameters.input_image.",
+                "response": "Join returned subfolder and name with '/' and pass it as the selected route's image parameter (input_image, mask_image, face_image or control_image).",
             },
             {
                 "id": "list_workflows",
@@ -1802,7 +1977,7 @@ def _openapi_document() -> dict[str, Any]:
                     "in": "query",
                     "schema": {
                         "type": "string",
-                        "enum": ["text-to-image", "image-to-image", "inpaint", "face-reference", "openpose-control"],
+                        "enum": ["text-to-image", "image-edit", "image-to-image", "inpaint", "face-reference", "openpose-control"],
                     },
                 },
                 "PromptGranularityQuery": {
@@ -1856,7 +2031,7 @@ def _openapi_document() -> dict[str, Any]:
                         "input_type": {"type": "string", "enum": ["text", "image"]},
                         "input_mode": {
                             "type": "string",
-                            "enum": ["text-to-image", "image-to-image", "inpaint", "face-reference", "openpose-control"],
+                            "enum": ["text-to-image", "image-edit", "image-to-image", "inpaint", "face-reference", "openpose-control"],
                         },
                         "prompt_granularity": {"$ref": "#/components/schemas/PromptGranularity"},
                         "workflow": {"type": "string"},
@@ -1940,6 +2115,12 @@ def _openapi_document() -> dict[str, Any]:
                             "minimum": 0,
                             "maximum": 1,
                         },
+                        "input_fit": {
+                            "type": "string",
+                            "enum": list(INPUT_FIT_MODES),
+                            "default": "downscale",
+                            "description": "Only on routes with image inputs. downscale shrinks oversized inputs and takes the first frame of animated ones, reporting each change as a warning; none keeps the upload unchanged and refuses what the route cannot run.",
+                        },
                         "ipadapter_weight": {
                             "type": "number",
                             "minimum": -1,
@@ -1962,6 +2143,7 @@ def _openapi_document() -> dict[str, Any]:
         "type": "object", "required": ["error"], "properties": {"error": {
             "type": "object", "required": ["type", "message", "route", "expected"],
             "properties": {"type": {"type": "string"}, "message": {"type": "string"},
+                           "code": {"type": ["string", "null"], "description": "Stable machine-readable reason; see the manifest's error_codes."},
                            "route": {"type": ["string", "null"]},
                            "expected": {"type": "array", "items": {"type": "string"}}, "details": {}},
         }},
@@ -1969,6 +2151,7 @@ def _openapi_document() -> dict[str, Any]:
     schemas["Warning"] = {"type": "object", "required": ["code", "message"], "properties": {
         "code": {"type": "string"}, "message": {"type": "string"}, "parameter": {"type": "string"},
         "value": {"type": "number"}, "recommended": {"type": "array", "items": {"type": "number"}},
+        "original_size": {"type": "array", "items": {"type": "integer"}}, "used_size": {"type": "array", "items": {"type": "integer"}},
     }}
     common = {
         "applied_parameters": {"type": "object", "description": "Canonical graph-bound values including defaults; this describes application to the graph, not model adherence."},
@@ -2299,6 +2482,7 @@ class ProjectWorkflowCoordinator:
                 )
                 logging.exception("Project workflow job %s failed: %s", job.prompt_id, exc)
             finally:
+                _delete_fitted_inputs(job.extra_data.get("project_resources", {}).get("fitted_inputs", []))
                 self._remove_pending(job.prompt_id)
                 self._queue.task_done()
 
@@ -2638,6 +2822,8 @@ def _validate_prompt_granularity(entry: dict[str, Any], body: dict[str, Any]) ->
 async def post_project_prompt(request: web.Request) -> web.Response:
     entry = None
     workflow_id = None
+    fit_report: list[dict[str, Any]] = []
+    queued = False
     try:
         body = await _read_json(request)
         workflow_id = body.get("workflow", body.get("workflow_id"))
@@ -2645,7 +2831,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             raise ApiError(400, "workflow and workflow_id disagree")
         entry = _find_workflow(workflow_id)
         requested_granularity = _validate_prompt_granularity(entry, body)
-        graph = _prepare_graph(entry, body)
+        graph = _prepare_graph(entry, body, fit_report)
         public = _public_entry(entry, _read_catalog().get("model_registry", []))
         client_id = body.get("client_id", "project-workflow-api")
         client_id = _as_text("client_id", client_id, 256)
@@ -2656,6 +2842,8 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if public["ready"]:
             graph, valid = await _validate_graph(PromptServer.instance, graph, client_id, str(uuid.uuid4()))
         resources = _resource_request(graph, entry)
+        resources["input_adjustments"] = fit_report
+        resources["fitted_inputs"] = [record["file"] for record in fit_report if record["file"]]
         effective = {name: _binding_value(graph, entry, name) for name in entry["bindings"]
                      if name in {"seed", "width", "height", "batch_size", "steps", "cfg", "denoise", "sampler_name", "scheduler"}}
         parameter_schema = _parameter_schema(entry, graph)
@@ -2665,6 +2853,17 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if entry.get("lora_bindings"):
             applied["loras"] = {name: _binding_value(graph, entry, spec["strength_model"]) for name, spec in entry["lora_bindings"].items()}
         warnings = []
+        for record in fit_report:
+            original, used, name = record["original_size"], record["used_size"], record["parameter"]
+            if record["first_frame"]:
+                warnings.append({"code": "input_first_frame", "parameter": name,
+                                 "message": f"{name} is animated; only its first frame was used."})
+            if used != original:
+                code = "input_downscaled" if used[0] * used[1] < original[0] * original[1] else "input_resized"
+                target = "the output size" if record.get("scope") == "output size" else name
+                warnings.append({"code": code, "parameter": name, "original_size": original, "used_size": used,
+                                 "message": f"{name} is {original[0]}x{original[1]}; {target} was set to {used[0]}x{used[1]} to fit what "
+                                            f"{workflow_id} can run. Send input_fit=none to keep the original size."})
         if resources["total_pixels"] > resources["limits"]["max_total_pixels"]:
             warnings.append({"code": "over_pixel_budget", "parameter": "total_pixels",
                              "value": resources["total_pixels"], "recommended": [0, resources["limits"]["max_total_pixels"]],
@@ -2697,6 +2896,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if not public["ready"]:
             raise ApiError(409, "Workflow dependencies are unavailable", public)
         result = await _enqueue(PromptServer.instance, graph, client_id, workflow_id, resources, valid)
+        queued = True  # the job now owns its fitted inputs and deletes them when it ends
         result["workflow"] = entry["id"]
         result["prompt_granularity"] = requested_granularity
         result["job_url"] = f"/project/jobs/{result['prompt_id']}"
@@ -2715,6 +2915,9 @@ async def post_project_prompt(request: web.Request) -> web.Response:
     except Exception as exc:  # Keep unexpected details in the server log.
         logging.exception("Project workflow API request failed")
         return _json_error(ApiError(500, "Project workflow API request failed", str(exc), route=workflow_id))
+    finally:
+        if not queued:
+            _delete_fitted_inputs([record["file"] for record in fit_report if record["file"]])
 
 
 def _notify_worker_phase(prompt_id: str, phase: str) -> None:

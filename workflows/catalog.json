@@ -246,6 +246,23 @@
           "default": 1.0,
           "strength_model": "uncensored_strength_model"
         }
+      },
+      "selection": {
+        "best_for": [
+          "natural-language prompts",
+          "legible text inside the image (signs, posters, labels)",
+          "photographic, product and general scenes that do not need an anime house style"
+        ],
+        "not_for": [
+          "editing an uploaded image (use qwen-image-2.1-edit)",
+          "requests for a specific anime model look (JANKU, Anima, One Obsession)"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "qwen-image-2.1-edit",
+            "when": "the requester supplies an image and wants it changed by instruction"
+          }
+        ]
       }
     },
     {
@@ -296,7 +313,7 @@
           "general"
         ],
         "priority": 30,
-        "exclusive": true,
+        "exclusive": false,
         "required_selectors": [
           "input_mode"
         ],
@@ -308,16 +325,21 @@
             "expert"
           ],
           "recommended": "detailed"
-        }
+        },
+        "input_types": [
+          "image"
+        ]
       },
       "capabilities": {
         "modalities": [
           "image-to-image"
         ],
         "input_types": [
+          "text",
           "image"
         ],
         "input_modes": [
+          "image-edit",
           "image-to-image"
         ],
         "output_types": [
@@ -352,7 +374,8 @@
             "comfyui-input",
             "http-upload"
           ],
-          "processing": "Official TextEncodeQwenImage21 with resolution=0; reference conditioning plus source-sized empty latent. One reference exposed by this named route."
+          "processing": "Official TextEncodeQwenImage21 with resolution=0; reference conditioning plus source-sized empty latent. One reference exposed by this named route.",
+          "use_for": "Instruction-based edit of an uploaded photo or illustration: the prompt says what to change (colour, object, material, background, text) and the rest of the image is kept. Not a style transfer and not a face-identity reference."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -444,7 +467,8 @@
         "recommendations_are_advisory": true,
         "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1, denoise 1.",
         "negative_prompt": "Inactive at CFG 1.",
-        "input_image": "Required relative uploaded filename. Reference size determines output size, rounded to multiples of 32; batch is one."
+        "input_image": "Required relative uploaded filename. Reference size determines output size, rounded to multiples of 32; batch is one.",
+        "prompt_scope": "Write the edit as a direct instruction, e.g. 'Change the teapot to cobalt blue. Keep everything else the same.' Name what must stay unchanged when it matters."
       },
       "prompting": {
         "style": "natural-language",
@@ -495,6 +519,29 @@
           "default": 1.0,
           "strength_model": "uncensored_strength_model"
         }
+      },
+      "selection": {
+        "best_for": [
+          "instruction-based edits of an uploaded image that keep everything else (colour, object, material, background or text changes)",
+          "photos, renders and illustrations alike",
+          "adding or replacing legible text in an existing image"
+        ],
+        "not_for": [
+          "redrawing an image in an anime model style (use a latent image-to-image route such as anima-turbo-v1-1 or janku-illustrious)",
+          "putting the same character into a new scene (use a face-reference route)",
+          "repainting only a masked region (use anima-turbo-inpaint or moody-anima-inpaint)",
+          "text-only generation (use qwen-image-2.1-t2i)"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "anima-turbo-face-reference-ipadapter",
+            "when": "the requester wants the same face or character in a new scene rather than an edit of this image"
+          },
+          {
+            "workflow": "anima-turbo-inpaint",
+            "when": "the requester supplies a mask or wants only one region repainted"
+          }
+        ]
       }
     },
     {
@@ -651,7 +698,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -1044,7 +1092,7 @@
             "comfyui-input",
             "http-upload"
           ],
-          "processing": "Source dimensions (multiples of 8) determine output size. VAEEncodeForInpaint performs generic latent masked sampling; the result is composited onto the original image using the supplied mask so pixels outside it remain unchanged.",
+          "processing": "Source dimensions (multiples of 8) determine output size. The source is VAE-encoded and the grown mask is set as a latent noise mask, so only the masked region is resampled; the result is composited onto the original image using the supplied mask so pixels outside it remain unchanged.",
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -1055,7 +1103,8 @@
             "list_endpoint": "/project/inputs",
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
-          "job_output_reference": false
+          "job_output_reference": false,
+          "use_for": "Repaint only the masked region. denoise 1.0 (default) replaces the region with what the prompt describes; 0.5-0.8 keeps the original structure inside the mask and only alters it."
         },
         "mask": {
           "supported": true,
@@ -1151,7 +1200,7 @@
           "cfg"
         ],
         "mask_image": "The mask is executable, not a semantic region label. White/red means redraw and black means preserve; use mask_channel to select the channel.",
-        "denoise": "For clothing replacement use 0.60-0.75 as a starting range; lower values preserve more source detail but may not change the garment.",
+        "denoise": "1.0 replaces the masked region; lower values keep more of the original inside the mask. Draw the mask a little larger than the object; the hard composite edge follows the mask.",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "avoid": [
           "sending a character sheet without 1girl, solo",
@@ -1256,7 +1305,7 @@
         },
         "grow_mask_by": {
           "node": "8",
-          "input": "grow_mask_by"
+          "input": "expand"
         },
         "seed": {
           "node": "9",
@@ -1290,7 +1339,7 @@
       "defaults": {
         "steps": 4,
         "cfg": 1.0,
-        "denoise": 0.65,
+        "denoise": 1.0,
         "sampler_name": "er_sde",
         "scheduler": "simple",
         "grow_mask_by": 6,
@@ -2285,7 +2334,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -2627,7 +2677,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -3057,7 +3108,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -3472,7 +3524,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -3950,7 +4003,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -4383,7 +4437,8 @@
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as parameters.face_image."
           },
           "job_output_reference": false,
-          "processing": "LoadImage -> AnimaIPAdapterApply(ref_image) -> patched Anima DiT cross-attention"
+          "processing": "LoadImage -> AnimaIPAdapterApply(ref_image) -> patched Anima DiT cross-attention",
+          "use_for": "Same face/character in a new scene. The whole reference image is encoded: at weight 0.8-1.0 its outfit, background, props and framing carry over and override the prompt. The default 0.6 keeps the face while the prompt sets outfit and scene. Use a head-and-shoulders crop."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -4456,7 +4511,7 @@
           "cfg"
         ],
         "face_image": "Upload a clear single-person portrait and pass its returned relative filename as face_image. Do not pass input_image for this route.",
-        "ipadapter_weight": "Start at 1.0. Higher values increase reference influence but can reduce prompt control; the route's node also uses fixed SigLIP2/IP CFG defaults validated for this adapter.",
+        "ipadapter_weight": "Default 0.6. Raise toward 0.8 only when likeness matters more than the prompted outfit and scene; at 1.0 the reference scene is copied.",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "strict_face_only_alternative": "For a stricter SDXL face-centric IPAdapter route, use sdxl-face-reference-ipadapter explicitly; it is a separate architecture and is retained alongside this Anima route.",
         "avoid": [
@@ -4485,7 +4540,8 @@
       "compatibility_notes": [
         "This route uses the Anima-specific SigLIP2 IPAdapter custom node pinned by the setup script, not the SDXL ComfyUI_IPAdapter_plus node.",
         "The adapter weights are loaded from the project ipadapter directory; the SigLIP2 vision encoder is kept in its own local model directory and is loaded at reference-encoding time.",
-        "The route is intentionally separate from the generic Turbo route so the scheduler can unload the adapter and vision encoder when switching workflows."
+        "The route is intentionally separate from the generic Turbo route so the scheduler can unload the adapter and vision encoder when switching workflows.",
+        "Verified 2026-10-15 on two references: weight 1.0 and 0.8 copied the reference outfit and background; 0.6 kept the face and followed the prompted scene."
       ],
       "prompting": {
         "style": "detailed Anima-compatible natural language or ordered anime tags",
@@ -4607,7 +4663,7 @@
         "steps": 12,
         "cfg": 1.0,
         "denoise": 1.0,
-        "ipadapter_weight": 1.0,
+        "ipadapter_weight": 0.6,
         "sampler_name": "er_sde",
         "scheduler": "simple",
         "filename_prefix": "anima_turbo_face_reference"
@@ -4773,7 +4829,7 @@
             "comfyui-input",
             "http-upload"
           ],
-          "processing": "Source dimensions (multiples of 8) determine output size. VAEEncodeForInpaint performs generic latent masked sampling; the result is composited onto the original image using the supplied mask so pixels outside it remain unchanged.",
+          "processing": "Source dimensions (multiples of 8) determine output size. The source is VAE-encoded and the grown mask is set as a latent noise mask, so only the masked region is resampled; the result is composited onto the original image using the supplied mask so pixels outside it remain unchanged.",
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -4784,7 +4840,8 @@
             "list_endpoint": "/project/inputs",
             "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
           },
-          "job_output_reference": false
+          "job_output_reference": false,
+          "use_for": "Repaint only the masked region. denoise 1.0 (default) replaces the region with what the prompt describes; 0.5-0.8 keeps the original structure inside the mask and only alters it."
         },
         "mask": {
           "supported": true,
@@ -4899,7 +4956,8 @@
             1
           ]
         },
-        "recommendations_are_advisory": true
+        "recommendations_are_advisory": true,
+        "denoise": "1.0 replaces the masked region; lower values keep more of the original inside the mask. Draw the mask a little larger than the object; the hard composite edge follows the mask."
       },
       "compatibility_notes": [
         "This route uses ComfyUI's core VAEEncodeForInpaint node and KSampler noise_mask; no separate inpaint checkpoint is required.",
@@ -4983,7 +5041,7 @@
         },
         "grow_mask_by": {
           "node": "8",
-          "input": "grow_mask_by"
+          "input": "expand"
         },
         "seed": {
           "node": "9",
@@ -5017,7 +5075,7 @@
       "defaults": {
         "steps": 12,
         "cfg": 1.0,
-        "denoise": 0.65,
+        "denoise": 1.0,
         "sampler_name": "er_sde",
         "scheduler": "simple",
         "grow_mask_by": 6,
@@ -5220,7 +5278,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -5657,7 +5716,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -6097,7 +6157,8 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
-          "default_denoise": 0.65
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
         },
         "parameter_aliases": {
           "subject": "prompt"

@@ -155,9 +155,13 @@ curl.exe -X POST http://127.0.0.1:8191/upload/image `
 }
 ```
 
-Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取整，不接受宽高或批量数量覆盖。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘。
+Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取整，不接受宽高或批量数量覆盖。
 
-局部重绘需要原图和同尺寸蒙版，宽高均为 8 的倍数。默认读取蒙版红色通道：白色区域重绘、黑色区域保留。人物参考使用 `face_image`，姿态参考使用 `control_image`。
+参考图过大或为动图时不会被拒绝：默认 `input_fit` 为 `downscale`，服务会按工作流能处理的尺寸等比缩小（不修改原上传文件，缩小后的副本在任务结束时删除），动图取第一帧，并在响应 `warnings` 中以 `input_downscaled`、`input_resized` 或 `input_first_frame` 报告原始尺寸与实际尺寸。传 `input_fit: "none"` 则保持原图；工作流无法处理时以稳定的 `error.code` 拒绝（如 `input_too_large`、`input_animated`、`input_size_unsupported`、`mask_size_mismatch`），完整列表见 agent manifest 的 `error_codes`。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘。
+
+局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，姿态参考使用 `control_image`。Anima 人物参考会编码整张参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
+
+参考图有五种用途：按指令修改（`input_mode` 为 `image-edit`，Qwen 编辑）、按模型画风重绘（`image-to-image`，保留构图与配色但不保证人物一致）、局部重绘（`inpaint`）、人物参考（`face-reference`）和姿态参考（`openpose-control`）。agent manifest 的 `input_files.reference_uses` 列出每种用途对应的工作流，`route_table[].image_inputs` 列出各工作流接受的图片参数。
 
 图片参数接受已上传的相对文件名，不接受主机绝对路径或 URL。上传图片跨重启保留，可通过输入列表查询并按文件名删除；生成结果如需作为下一次输入，需要重新上传。
 

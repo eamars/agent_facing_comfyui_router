@@ -91,9 +91,12 @@ class AgentContractTests(unittest.TestCase):
                 continue
             self.assertIsNone(api._route_score(entry, {"domain": "anime"}))
             self.assertIsNone(api._route_score(entry, {"domain": "blue archive"}))
-            self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw"}))
-            mode = "image-to-image" if entry["id"].endswith("edit") else "text-to-image"
+            mode = "image-edit" if entry["id"].endswith("edit") else "text-to-image"
+            self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw", "input_mode": mode}))
             self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "input_mode": mode}))
+        edit = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-edit")
+        self.assertIsNotNone(api._route_score(edit, {"input_type": "image", "input_mode": "image-edit"}))
+        self.assertIsNotNone(api._route_score(edit, {"domain": "qwen", "input_mode": "image-to-image"}))
 
     def test_prompt_is_explicit_and_verbatim(self):
         with self.assertRaises(api.ApiError):
@@ -149,7 +152,63 @@ class AgentContractTests(unittest.TestCase):
             api._validate_queued_inputs(resources)
         frame = Image.new("RGB", (128, 128))
         frame.save(self.root / "input/movie.gif", save_all=True, append_images=[Image.new("RGB", (128, 128), "red")])
-        self.assertBad(input_image="movie.gif")
+        report = []
+        graph = api._prepare_graph(self.entry, {"parameters": {"prompt": "x", "input_image": "movie.gif"}}, report)
+        self.assertTrue(report[0]["first_frame"])
+        with Image.open(self.root / "input" / report[0]["file"]) as fitted:
+            self.assertEqual(fitted.n_frames, 1)
+        with self.assertRaises(api.ApiError) as caught:
+            self.graph(input_image="movie.gif", input_fit="none")
+        self.assertEqual(caught.exception.code, "input_animated")
+
+    def test_oversized_inputs_are_fitted_and_reported(self):
+        entries = {e["id"]: e for e in catalog["workflows"]}
+        Image.open(ROOT / "tests/fixtures/reference_character.webp").save(self.root / "input/reference.webp")
+        Image.new("RGB", (1116, 2000), "white").save(self.root / "input/ref_mask.png")
+        Image.new("RGB", (2000, 1116), "white").save(self.root / "input/wide_mask.png")
+        Image.new("RGB", (3000, 4000), "navy").save(self.root / "input/big.png")
+        Image.new("RGB", (5000, 4000), "navy").save(self.root / "input/huge.png")
+
+        def fit(workflow, **params):
+            report = []
+            graph = api._prepare_graph(entries[workflow], {"parameters": {"prompt": "x", **params}}, report)
+            return graph, report
+
+        # inpaint: 1116 wide is not a multiple of 8; source and mask are fitted together
+        graph, report = fit("anima-turbo-inpaint", input_image="reference.webp", mask_image="ref_mask.png")
+        used = report[0]["used_size"]
+        self.assertTrue(all(v % 8 == 0 for v in used) and used[0] * used[1] <= 2_359_296)
+        self.assertEqual(report[1]["used_size"], used)
+        with self.assertRaises(api.ApiError) as caught:
+            fit("anima-turbo-inpaint", input_image="reference.webp", mask_image="wide_mask.png")
+        self.assertEqual(caught.exception.code, "mask_size_mismatch")
+        with self.assertRaises(api.ApiError) as caught:
+            fit("anima-turbo-inpaint", input_image="reference.webp", mask_image="ref_mask.png", input_fit="none")
+        self.assertEqual(caught.exception.code, "input_size_unsupported")
+
+        # qwen edit: output follows the source, so an over-budget source is shrunk to multiples of 32
+        _, report = fit("qwen-image-2.1-edit", input_image="big.png")
+        w, h = report[0]["used_size"]
+        self.assertTrue(w % 32 == 0 and h % 32 == 0 and w * h <= 2_359_296 and abs(w / h - 0.75) < 0.02)
+        _, report = fit("qwen-image-2.1-edit", input_image="reference.webp")
+        self.assertEqual(report, [])
+        _, report = fit("qwen-image-2.1-edit", input_image="big.png", input_fit="none")
+        self.assertEqual(report, [])
+
+        # latent img2img: the source file is kept, the default output size is fitted
+        graph, report = fit("janku-illustrious", input_image="big.png")
+        self.assertEqual(report[0]["scope"], "output size")
+        self.assertLessEqual(api._binding_value(graph, entries["janku-illustrious"], "width") * api._binding_value(graph, entries["janku-illustrious"], "height"), 2_359_296)
+
+        # face reference: only the decode limit applies
+        _, report = fit("anima-turbo-face-reference-ipadapter", face_image="huge.png")
+        self.assertLessEqual(report[0]["used_size"][0] * report[0]["used_size"][1], api.MAX_INPUT_PIXELS)
+        with self.assertRaises(api.ApiError) as caught:
+            fit("anima-turbo-face-reference-ipadapter", face_image="huge.png", input_fit="none")
+        self.assertEqual(caught.exception.code, "input_too_large")
+        with self.assertRaises(api.ApiError) as caught:
+            fit("qwen-image-2.1-t2i", input_image="big.png")
+        self.assertEqual(caught.exception.code, "unsupported_parameter")
 
     def test_route_scope_and_exact_capabilities(self):
         entries = {e["id"]: e for e in catalog["workflows"]}
@@ -252,6 +311,23 @@ class AgentContractTests(unittest.TestCase):
         self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0])
         self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v7.77"}))
         self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v24"}))
+
+    def test_image_inputs_match_what_prepare_graph_accepts(self):
+        workflows = catalog["workflows"]
+        uses = {use["input_mode"]: use["routes"] for use in api._reference_uses(workflows)}
+        self.assertEqual(uses["image-edit"], ["qwen-image-2.1-edit"])
+        self.assertEqual(set(uses["face-reference"]), {"sdxl-face-reference-ipadapter", "anima-turbo-face-reference-ipadapter"})
+        self.assertEqual(uses["openpose-control"], ["sdxl-openpose-controlnet"])
+        self.assertEqual(set(uses["inpaint"]), {"moody-anima-inpaint", "anima-turbo-inpaint"})
+        text_only = [e["id"] for e in workflows if not api._image_inputs(e)]
+        self.assertEqual(text_only, ["qwen-image-2.1-t2i"])
+        for entry in workflows:
+            for name in api._image_inputs(entry):
+                if name != "input_image":
+                    self.assertIn(name, entry["bindings"], entry["id"])
+            if "input_image" not in api._image_inputs(entry):
+                with self.assertRaises(api.ApiError):
+                    api._prepare_graph(entry, {"parameters": {"prompt": "x", "input_image": "missing.png"}})
 
     def test_janku_versions_split_by_style_and_point_at_each_other(self):
         ready = {"workflows": catalog["workflows"]}
