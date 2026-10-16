@@ -98,6 +98,33 @@ class AgentContractTests(unittest.TestCase):
         self.assertIsNotNone(api._route_score(edit, {"input_type": "image", "input_mode": "image-edit"}))
         self.assertIsNotNone(api._route_score(edit, {"domain": "qwen", "input_mode": "image-to-image"}))
 
+    def test_moss_is_explicit_and_binds_layout_prompts_verbatim(self):
+        moss = next(e for e in catalog["workflows"] if e["id"] == "moss-image-sft-t2i")
+        for query in ({"domain": "anime"}, {"domain": "qwen"}, {"input_mode": "text-to-image"},
+                      {"domain": "layout", "content_mode": "nsfw"}):
+            self.assertIsNone(api._route_score(moss, query), query)
+        for query in ({"domain": "moss"}, {"domain": "layout", "input_mode": "text-to-image"}, {"style": "MOSS-Image"}):
+            self.assertIsNotNone(api._route_score(moss, query), query)
+        # Benchmark-driven split of the heavy general-purpose bucket (docs/moss-image-integration.md).
+        workflows = catalog["workflows"]
+
+        def selected(query):
+            scored = [(api._route_score(e, query), e["id"]) for e in workflows]
+            return max((s[0], i) for s, i in scored if s is not None)[1]
+        for domain in ("photo", "product", "landscape", "poster", "realistic"):
+            self.assertEqual(selected({"domain": domain}), "qwen-image-2.1-t2i", domain)
+        self.assertEqual(selected({"style": "photorealistic"}), "qwen-image-2.1-t2i")
+        for domain in ("layout", "ui mockup"):
+            self.assertEqual(selected({"domain": domain}), "moss-image-sft-t2i", domain)
+        self.assertEqual(selected({"domain": "anime"}), "anima-turbo-v1-1")
+        self.assertNotIn("minimal", api._route_prompt_granularity(moss)["accepted"])
+        layout = json.dumps({"summary": {"caption": "poster"}, "items": [], "bbox_format": "yxyx",
+                             "bbox_coord_space": "abs_centralized"})
+        graph = api._prepare_graph(moss, {"parameters": {"prompt": layout, "seed": 7}})
+        self.assertEqual(graph["4"]["inputs"]["text"], layout)
+        self.assertEqual(graph["1"]["inputs"]["model_path"], "models/moss-image/MOSS-Image-SFT")
+        self.assertEqual((graph["16"]["inputs"]["steps"], graph["16"]["inputs"]["cfg"], graph["15"]["inputs"]["shift"]), (50, 3, 5))
+
     def test_prompt_is_explicit_and_verbatim(self):
         with self.assertRaises(api.ApiError):
             api._prepare_graph(self.entry, {})
@@ -320,7 +347,7 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(uses["openpose-control"], ["sdxl-openpose-controlnet"])
         self.assertEqual(set(uses["inpaint"]), {"moody-anima-inpaint", "anima-turbo-inpaint"})
         text_only = [e["id"] for e in workflows if not api._image_inputs(e)]
-        self.assertEqual(text_only, ["qwen-image-2.1-t2i"])
+        self.assertEqual(text_only, ["qwen-image-2.1-t2i", "moss-image-sft-t2i"])
         for entry in workflows:
             for name in api._image_inputs(entry):
                 if name != "input_image":

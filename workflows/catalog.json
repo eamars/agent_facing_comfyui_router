@@ -34,7 +34,21 @@
         "domains": [
           "qwen",
           "qwen image",
-          "qwen image 2.1"
+          "qwen image 2.1",
+          "photo",
+          "photography",
+          "realistic",
+          "photorealistic",
+          "real world",
+          "product",
+          "product photo",
+          "landscape",
+          "nature",
+          "architecture",
+          "food",
+          "poster",
+          "typography",
+          "text rendering"
         ],
         "aliases": [
           "Qwen-Image-2.1",
@@ -43,7 +57,12 @@
         ],
         "styles": [
           "qwen",
-          "qwen image 2.1"
+          "qwen image 2.1",
+          "photo",
+          "photorealistic",
+          "realistic",
+          "documentary photo",
+          "cinematic photo"
         ],
         "content_modes": [
           "sfw",
@@ -236,6 +255,14 @@
             "elapsed_ms": 56360,
             "output": "qwen_image_2_1_00008.png",
             "scope": "uncensored LoRA 1.0 vs 0.0 at the same seed: mean absolute pixel difference 1.05/255, 2.1% of pixels changed by more than 10. All LoRA keys loaded."
+          },
+          {
+            "mode": "head-to-head",
+            "status": "success",
+            "date": "2026-10-16",
+            "seed": 4242,
+            "scope": "12 shared prompts vs moss-image-sft-t2i plus one layout-JSON prompt, all 25 jobs succeeded. MOSS won UI mock-up, long 12-detail scene and layout JSON; Qwen won short prompt, real-place landscape, Chinese poster (MOSS invented a garbled subtitle) and 2 MP macro realism; portrait, product label, menu text, composition, anime and natural-language layout tied. Mean 1 MP time: MOSS 50.0 s, Qwen 47.5 s; 1456 square: MOSS 109.8 s, Qwen 87.3 s.",
+            "report": "docs/moss-image-integration.md"
           }
         ]
       },
@@ -249,9 +276,10 @@
       },
       "selection": {
         "best_for": [
-          "natural-language prompts",
-          "legible text inside the image (signs, posters, labels)",
-          "photographic, product and general scenes that do not need an anime house style"
+          "general-purpose SFW and NSFW images of real-world subjects: photos, products, food, landscapes, architecture",
+          "short or terse prompts (it stays anatomically clean where MOSS-Image does not)",
+          "recognisable real places and regional detail",
+          "posters and legible text inside the image, including Chinese calligraphy, without invented extra text"
         ],
         "not_for": [
           "editing an uploaded image (use qwen-image-2.1-edit)",
@@ -261,6 +289,10 @@
           {
             "workflow": "qwen-image-2.1-edit",
             "when": "the requester supplies an image and wants it changed by instruction"
+          },
+          {
+            "workflow": "moss-image-sft-t2i",
+            "when": "the requester needs exact placement or sizes of text and objects (layout JSON) or a UI/app mock-up"
           }
         ]
       }
@@ -540,6 +572,303 @@
           {
             "workflow": "anima-turbo-inpaint",
             "when": "the requester supplies a mask or wants only one region repainted"
+          }
+        ]
+      }
+    },
+    {
+      "id": "moss-image-sft-t2i",
+      "name": "MOSS-Image-SFT Text and Layout to Image",
+      "description": "OpenMOSS MOSS-Image-SFT 5B DiT with its Qwen3.5 9B encoder, 1024 square, 50 Euler/sgm_uniform steps, CFG 3, shift 5 and negative-branch layer skip at 22.",
+      "family": "moss-image",
+      "resident_group": "moss-image-sft-t2i",
+      "tags": [
+        "moss-image",
+        "natural-language",
+        "layout",
+        "text-rendering",
+        "text-to-image"
+      ],
+      "content_class": "general",
+      "file": "moss_image_sft.json",
+      "model_ids": [
+        "moss-image-sft-transformer",
+        "moss-image-sft-text-encoder",
+        "moss-image-sft-vae"
+      ],
+      "required_files": [
+        "models/moss-image/MOSS-Image-SFT/transformer/config.json",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model.safetensors.index.json",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00001-of-00003.safetensors",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00002-of-00003.safetensors",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00003-of-00003.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/config.json",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model.safetensors.index.json",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00001-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00002-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00003-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00004-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/tokenizer/tokenizer.json",
+        "models/moss-image/MOSS-Image-SFT/tokenizer/tokenizer_config.json",
+        "models/moss-image/MOSS-Image-SFT/tokenizer/chat_template.jinja",
+        "models/moss-image/MOSS-Image-SFT/vae/config.json",
+        "models/moss-image/MOSS-Image-SFT/vae/diffusion_pytorch_model.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "domains": [
+          "moss",
+          "moss image",
+          "layout",
+          "layout to image",
+          "ui",
+          "ui mockup",
+          "app mockup",
+          "interface mockup"
+        ],
+        "aliases": [
+          "MOSS-Image",
+          "MOSS-Image-SFT",
+          "OpenMOSS"
+        ],
+        "styles": [
+          "moss image",
+          "layout",
+          "ui mockup",
+          "flat ui"
+        ],
+        "content_modes": [
+          "sfw",
+          "general"
+        ],
+        "priority": 30,
+        "exclusive": true,
+        "prompt_granularity": {
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "recommended": "detailed"
+        }
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image"
+        ],
+        "input_types": [
+          "text"
+        ],
+        "input_modes": [
+          "text-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "natural_language": true,
+        "prompt_dialect": "natural-language",
+        "prompt_dialects": [
+          "natural-language",
+          "tags",
+          "layout-json"
+        ],
+        "content_modes": [
+          "sfw",
+          "general"
+        ],
+        "nsfw_capable": false,
+        "lora_support": false,
+        "recommended_resolutions": [
+          "1024x1024",
+          "1456x1456",
+          "1216x832",
+          "832x1216"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "A detailed natural-language description, a tag sequence, or a layout JSON object serialised into the prompt string. Quote desired text literally; use line breaks to control text lines. Avoid one- or two-word prompts."
+        },
+        "image": {
+          "supported": false
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ]
+      },
+      "bindings": {
+        "prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "5",
+          "input": "text"
+        },
+        "seed": {
+          "node": "16",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "16",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "16",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "16",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "16",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "16",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "18",
+          "input": "filename_prefix"
+        },
+        "width": {
+          "node": "6",
+          "input": "width"
+        },
+        "height": {
+          "node": "6",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "6",
+          "input": "batch_size"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1,
+        "steps": 50,
+        "cfg": 3,
+        "denoise": 1,
+        "sampler_name": "euler",
+        "scheduler": "sgm_uniform",
+        "filename_prefix": "moss_image_sft"
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Publisher recommends 1M-2M pixels; RTX 4090 fit with ComfyUI offload must be measured."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": false
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "recommended": {
+          "steps": [
+            50,
+            50
+          ],
+          "cfg": [
+            3,
+            4
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "sampling": "Publisher defaults: 50 Euler steps, CFG 3, shift 5, negative-branch skip-layer guidance at layer 22. Fewer steps degrade quality; short prompts may need a higher CFG.",
+        "negative_prompt": "Active at CFG 3. Empty by default; the publisher suggests 'worst quality, bad anatomy, watermark, jpeg artifact'.",
+        "size": "Width and height should be multiples of 16; other values are floored to 16 by the latent node.",
+        "layout": "For exact placement, pass a JSON object as the prompt string: {\"summary\": {\"caption\": ...}, \"items\": [{\"label\", \"caption\", \"text\"?, \"bbox\": [y_min, x_min, y_max, x_max]}], \"bbox_format\": \"yxyx\", \"bbox_coord_space\": \"abs_centralized\"}. Coordinates are integer pixels with the canvas centre as origin (x right, y down), so a 1024 square spans -512..512 on both axes.",
+        "prompt_length": "Write at least one full descriptive sentence (subject, setting, lighting, style). Terse prompts underperform at CFG 3; the publisher notes they may need a higher CFG."
+      },
+      "prompting": {
+        "style": "natural-language",
+        "recommended": {
+          "steps": 50,
+          "cfg": 3,
+          "sampler_name": "euler",
+          "scheduler": "sgm_uniform"
+        },
+        "negative_prompt_effective_at_default": true,
+        "language": "English has the most training data; Chinese is supported, including rendered Chinese text."
+      },
+      "compatibility_notes": [
+        "Loaded by the MOSS-Image node pack (OpenMOSS/MOSS-Image comfyui/moss-image, pinned in setup_comfyui.ps1) straight from the Hugging Face component directory; native ComfyUI sampling and skip-layer guidance.",
+        "ComfyUI runs the Qwen3.5 encoder in FP16 on this deployment; the probe showed no overflow artefacts.",
+        "The native sgm_uniform schedule does not snap to the training grid like the publisher's diffusers pipeline, so seeds do not reproduce diffusers images exactly.",
+        "Each step runs two transformer passes (CFG 3), so a step costs about twice a CFG-1 route.",
+        "Shares the existing named-job coordinator and worker model-unload boundary.",
+        "NSFW behaviour is unverified and not advertised."
+      ],
+      "source": {
+        "workflow_url": "https://github.com/OpenMOSS/MOSS-Image/blob/599a039ec6f8108eecdd0d8c107ceade6863145e/comfyui/moss-image/example_workflows/moss-image-api.json",
+        "model_url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT",
+        "revision": "daf706d2e1c7a6369c17b6d1658671aee6db1ebe"
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "RTX 4090 named API; 1024x1024 50-step T2I with a plain bilingual-text prompt and a layout JSON prompt; layout boxes landed within about 10 px of the requested coordinates and both English and Chinese text rendered correctly; hot switch to Anima Turbo afterwards succeeded.",
+        "date": "2026-10-16",
+        "job_id": "05157d9b-99eb-4b70-9405-89d4159b7c89",
+        "elapsed_ms": 53750,
+        "report": "ComfyUI/.codex-runtime/moss-image-probe.json",
+        "probes": [
+          {
+            "mode": "text-to-image",
+            "status": "success",
+            "prompt_class": "sfw",
+            "resolution": "1024x1024",
+            "seed": 1016,
+            "elapsed_ms": 59953,
+            "output": "moss_probe_543ff714_plain_00001.png",
+            "scope": "Includes cold load of the transformer and text encoder; minimum sampled free VRAM 1.6 GiB."
+          },
+          {
+            "mode": "layout-to-image",
+            "status": "success",
+            "prompt_class": "sfw",
+            "resolution": "1024x1024",
+            "seed": 1016,
+            "elapsed_ms": 53750,
+            "output": "moss_probe_543ff714_layout_00001.png",
+            "scope": "Four-item yxyx abs_centralized layout (title, bicycle, plant, Chinese caption); minimum sampled free VRAM 2.0 GiB."
+          },
+          {
+            "mode": "head-to-head",
+            "status": "success",
+            "date": "2026-10-16",
+            "seed": 4242,
+            "scope": "12 shared prompts vs qwen-image-2.1-t2i plus one layout-JSON prompt, all 25 jobs succeeded. MOSS won UI mock-up, long 12-detail scene and layout JSON; Qwen won short prompt, real-place landscape, Chinese poster (MOSS invented a garbled subtitle) and 2 MP macro realism; portrait, product label, menu text, composition, anime and natural-language layout tied. Mean 1 MP time: MOSS 50.0 s, Qwen 47.5 s; 1456 square: MOSS 109.8 s, Qwen 87.3 s.",
+            "report": "docs/moss-image-integration.md"
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "exact placement and size of text and objects from a layout JSON (posters, covers, slides)",
+          "UI and app screen mock-ups with correct labels",
+          "long, densely specified scenes where every listed detail must appear"
+        ],
+        "not_for": [
+          "short prompts: a bare subject such as 'a cat' can produce deformed anatomy; use qwen-image-2.1-t2i or expand the prompt",
+          "editing an uploaded image (use qwen-image-2.1-edit)",
+          "everyday anime (the anime routes are 5-10x faster and NSFW-capable)",
+          "NSFW requests (not advertised)"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "qwen-image-2.1-t2i",
+            "when": "a general photo, product, landscape or poster request with no layout or UI requirement, or a short prompt"
           }
         ]
       }

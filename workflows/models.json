@@ -119,6 +119,138 @@
       }
     },
     {
+      "id": "moss-image-sft-transformer",
+      "name": "MOSS-Image-SFT transformer",
+      "kind": "diffusion-model",
+      "status": "installed",
+      "routeable": true,
+      "family": "moss-image",
+      "architecture": "moss-image",
+      "precision": "BF16",
+      "required_files": [
+        "models/moss-image/MOSS-Image-SFT/transformer/config.json",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model.safetensors.index.json",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00001-of-00003.safetensors",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00002-of-00003.safetensors",
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00003-of-00003.safetensors"
+      ],
+      "file_sizes": {
+        "models/moss-image/MOSS-Image-SFT/transformer/config.json": 240,
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model.safetensors.index.json": 40298,
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00001-of-00003.safetensors": 4991978016,
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00002-of-00003.safetensors": 4983137016,
+        "models/moss-image/MOSS-Image-SFT/transformer/diffusion_pytorch_model-00003-of-00003.safetensors": 189549184
+      },
+      "description": "OpenMOSS MOSS-Image-SFT 5B flow-matching DiT (42 layers, dim 3072), supervised fine-tune of MOSS-Image-Base. Read in place from the Hugging Face component directory by the pinned MOSS-Image ComfyUI node pack.",
+      "capabilities": {
+        "text_to_image": true,
+        "layout_to_image": true,
+        "text_rendering": true,
+        "languages": [
+          "en",
+          "zh"
+        ],
+        "max_prompt_tokens": 4096
+      },
+      "compatibility": {
+        "workflow_families": [
+          "moss-image"
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT",
+        "revision": "daf706d2e1c7a6369c17b6d1658671aee6db1ebe",
+        "sha256": "Per-file SHA-256 pinned in scripts/download_models.ps1 (profile moss-image-sft)."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SHA-256 verified; named plain and layout T2I succeeded on RTX 4090.",
+        "date": "2026-10-16"
+      }
+    },
+    {
+      "id": "moss-image-sft-text-encoder",
+      "name": "MOSS-Image-SFT Qwen3.5 9B text encoder",
+      "kind": "text-encoder",
+      "status": "installed",
+      "routeable": true,
+      "family": "moss-image",
+      "architecture": "qwen3.5",
+      "precision": "BF16",
+      "required_files": [
+        "models/moss-image/MOSS-Image-SFT/text_encoder/config.json",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model.safetensors.index.json",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00001-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00002-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00003-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00004-of-00004.safetensors",
+        "models/moss-image/MOSS-Image-SFT/tokenizer/tokenizer.json",
+        "models/moss-image/MOSS-Image-SFT/tokenizer/tokenizer_config.json",
+        "models/moss-image/MOSS-Image-SFT/tokenizer/chat_template.jinja"
+      ],
+      "file_sizes": {
+        "models/moss-image/MOSS-Image-SFT/text_encoder/config.json": 2813,
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model.safetensors.index.json": 64641,
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00001-of-00004.safetensors": 4973910744,
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00002-of-00004.safetensors": 4988364288,
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00003-of-00004.safetensors": 4954202112,
+        "models/moss-image/MOSS-Image-SFT/text_encoder/model-00004-of-00004.safetensors": 1869001848,
+        "models/moss-image/MOSS-Image-SFT/tokenizer/tokenizer.json": 19989325,
+        "models/moss-image/MOSS-Image-SFT/tokenizer/tokenizer_config.json": 1123,
+        "models/moss-image/MOSS-Image-SFT/tokenizer/chat_template.jinja": 7756
+      },
+      "description": "Frozen Qwen3.5 9B encoder and tokenizer shipped with MOSS-Image; prompts are wrapped in its chat template and capped at 4096 tokens.",
+      "compatibility": {
+        "workflow_families": [
+          "moss-image"
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT",
+        "revision": "daf706d2e1c7a6369c17b6d1658671aee6db1ebe",
+        "sha256": "Per-file SHA-256 pinned in scripts/download_models.ps1 (profile moss-image-sft)."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SHA-256 verified; named plain and layout T2I succeeded on RTX 4090.",
+        "date": "2026-10-16"
+      }
+    },
+    {
+      "id": "moss-image-sft-vae",
+      "name": "MOSS-Image-SFT FLUX.2 small-decoder VAE",
+      "kind": "vae",
+      "status": "installed",
+      "routeable": true,
+      "family": "moss-image",
+      "architecture": "flux2",
+      "precision": "FP32 at runtime",
+      "required_files": [
+        "models/moss-image/MOSS-Image-SFT/vae/config.json",
+        "models/moss-image/MOSS-Image-SFT/vae/diffusion_pytorch_model.safetensors"
+      ],
+      "file_sizes": {
+        "models/moss-image/MOSS-Image-SFT/vae/config.json": 838,
+        "models/moss-image/MOSS-Image-SFT/vae/diffusion_pytorch_model.safetensors": 249521372
+      },
+      "description": "AutoencoderKLFlux2 with the FLUX.2 small decoder, 128 latent channels at 1/16 scale; the loader runs it in FP32.",
+      "compatibility": {
+        "workflow_families": [
+          "moss-image"
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT",
+        "revision": "daf706d2e1c7a6369c17b6d1658671aee6db1ebe",
+        "sha256": "Per-file SHA-256 pinned in scripts/download_models.ps1 (profile moss-image-sft)."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "SHA-256 verified; named plain and layout T2I succeeded on RTX 4090.",
+        "date": "2026-10-16"
+      }
+    },
+    {
       "id": "moody-anima-mix-checkpoint",
       "name": "Moody Anima Mix v1.0",
       "kind": "diffusion-model",

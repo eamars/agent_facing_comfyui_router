@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'moss-image-sft', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -10,6 +10,9 @@ $Comfy = Join-Path $Root 'ComfyUI'
 $ModelRoot = Join-Path $Comfy 'models'
 $SigLIP2Root = Join-Path $ModelRoot 'siglip2\siglip2-base-patch16-512'
 $ControlNetAuxAnnotators = Join-Path $Comfy 'custom_nodes\comfyui_controlnet_aux\ckpts\lllyasviel\Annotators'
+# MOSS-Image ships as a Hugging Face component directory; its ComfyUI HF loader reads it in place.
+$MossImageRoot = Join-Path $ModelRoot 'moss-image\MOSS-Image-SFT'
+$MossImageRevision = 'daf706d2e1c7a6369c17b6d1658671aee6db1ebe'
 
 $AssetSets = @{
     'qwen-image-2.1' = @(
@@ -42,6 +45,33 @@ $AssetSets = @{
             Sha256 = '00EE2CB7F00A37B097640C1880ED0D17E368E30599F34BB348FEE0E8C2CC4CA1'
         }
     )
+    'moss-image-sft' = @(
+        # Transformer (BF16 DiT), Qwen3.5 9B text encoder, tokenizer and FLUX.2 small VAE, pinned to one revision.
+        @('transformer/config.json', 240, '3291C3A1C7ADC22B8182A0DE25CA8EC97474D72715CE84ADBAB09CC0BE24F666'),
+        @('transformer/diffusion_pytorch_model.safetensors.index.json', 40298, 'B609327FC75DBE5080E7E095D8B727D74D728B4F98E8B047133B0082CFA2FB03'),
+        @('transformer/diffusion_pytorch_model-00001-of-00003.safetensors', 4991978016, 'E40D3444940A0B0FD7CD45BA7959A5BD3D5EFD7DDF87AAE5CE4D87CE8AA03D01'),
+        @('transformer/diffusion_pytorch_model-00002-of-00003.safetensors', 4983137016, 'D106DA790EC2924FFD8AF04B4FFA8F8DE281A974B58E55649C3EC596DC8EF033'),
+        @('transformer/diffusion_pytorch_model-00003-of-00003.safetensors', 189549184, '11F637AB17C7093344A6110A1E87FFDA8E56558DC55183D8E790222CFCDCF52D'),
+        @('text_encoder/config.json', 2813, 'B31EE18A242BCFCCCBE740F825F6B1D3AE231B0655EEECB5DE3E98D504B7D68C'),
+        @('text_encoder/model.safetensors.index.json', 64641, '0AF6FA3FA36BA8DCBB6B7AD0325A36C5B1B69862A9A1F1486B1B80385BD8F5EE'),
+        @('text_encoder/model-00001-of-00004.safetensors', 4973910744, 'ABFAA3D3A8612508C85EE8F6DA9C734B862F10298B903765C4AD384177C32B0B'),
+        @('text_encoder/model-00002-of-00004.safetensors', 4988364288, '9112637FA6BF4D07BAFD6AE268852B18D3D0C1242F4EE901C5579006E5BD4894'),
+        @('text_encoder/model-00003-of-00004.safetensors', 4954202112, '956F1EF51D0CFE610B0D22987C0B7821C36E3CE228ABCECCEF523518BCF079DC'),
+        @('text_encoder/model-00004-of-00004.safetensors', 1869001848, '9E21D20E8ADDE88C3E0B65D4A0D251F143D98EE9D52DB36B4348361091E4E208'),
+        @('tokenizer/tokenizer.json', 19989325, '06B9509352D2AF50381AB2247E083B80D32D5C0ABA91C272CA9FF729B6A0E523'),
+        @('tokenizer/tokenizer_config.json', 1123, 'BEE8EBA30F0EB4AF73C0FE2CD06D0F89B657D7819941C438157EC42F7C80EA87'),
+        @('tokenizer/chat_template.jinja', 7756, 'A4AEE8AFCF2E0711942CF848899BE66016F8D14A889FF9EDE07BCA099C28F715'),
+        @('vae/config.json', 838, 'CC77F3F0CE0357039C71018DC19EDAA4FCCEB0C2F7488FDC2B9C0580D6BAAFA1'),
+        @('vae/diffusion_pytorch_model.safetensors', 249521372, 'C3BDF94DC67EC69B30EA9FE1FA8340085679CAE64D019F7C7E4A9921F1A7F17A')
+    ) | ForEach-Object {
+        [pscustomobject]@{
+            Name = "MOSS-Image-SFT $($_[0])"
+            Url = "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT/resolve/$MossImageRevision/$($_[0])?download=true"
+            Path = (Join-Path $MossImageRoot $_[0].Replace('/', '\'))
+            Bytes = [int64]$_[1]
+            Sha256 = $_[2]
+        }
+    }
     'moody-anima-mix' = @(
         [pscustomobject]@{
             Name = 'Moody Anima Mix v1.0 checkpoint (Civitai model 2700077, file 2911005)'
@@ -274,7 +304,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

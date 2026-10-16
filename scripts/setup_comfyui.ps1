@@ -6,7 +6,8 @@ param(
     [string]$KJCommit = 'dcfcb5d',
     [string]$IPAdapterCommit = 'b188a6cb39b512a9c6da7235b880af42c78ccd0d',
     [string]$ControlNetAuxCommit = '59b1fc411ede8623b2997855b8018f0b3b6cf49f',
-    [string]$AnimaIPAdapterCommit = '6b77cd0c367d76402174ace2be50d3cb6aa77855'
+    [string]$AnimaIPAdapterCommit = '6b77cd0c367d76402174ace2be50d3cb6aa77855',
+    [string]$MossImageCommit = '599a039ec6f8108eecdd0d8c107ceade6863145e'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -136,6 +137,26 @@ if (Test-Path -LiteralPath $ControlNetAuxRequirements) {
     & $Python -m pip install -r $ControlNetAuxRequirements
     if ($LASTEXITCODE -ne 0) { throw "ControlNet Aux dependency installation failed with exit code $LASTEXITCODE" }
 }
+
+# The MOSS-Image plugin lives in a subfolder of the model repository, so check out only that
+# folder at the pinned commit and copy it in as a plain node directory. It has no extra Python deps.
+$MossImageSource = Join-Path $Comfy '.vendor\MOSS-Image'
+if (-not (Test-Path -LiteralPath $MossImageSource)) {
+    git clone --filter=blob:none --no-checkout https://github.com/OpenMOSS/MOSS-Image.git $MossImageSource
+    if ($LASTEXITCODE -ne 0) { throw "MOSS-Image clone failed with exit code $LASTEXITCODE" }
+    git -C $MossImageSource sparse-checkout set comfyui/moss-image
+    if ($LASTEXITCODE -ne 0) { throw "MOSS-Image sparse checkout failed with exit code $LASTEXITCODE" }
+} else {
+    Write-Host '  MOSS-Image source already exists - reusing checkout.'
+    git -C $MossImageSource fetch origin $MossImageCommit
+    if ($LASTEXITCODE -ne 0) { throw "MOSS-Image fetch failed with exit code $LASTEXITCODE" }
+}
+git -C $MossImageSource checkout --detach $MossImageCommit
+if ($LASTEXITCODE -ne 0) { throw "MOSS-Image checkout failed with exit code $LASTEXITCODE" }
+$MossImage = Join-Path $NodesDir 'moss-image'
+if (Test-Path -LiteralPath $MossImage) { Remove-Item -LiteralPath $MossImage -Recurse -Force }
+Copy-Item -LiteralPath (Join-Path $MossImageSource 'comfyui\moss-image') -Destination $MossImage -Recurse
+Write-Host "  Installed the MOSS-Image node pack at $MossImageCommit."
 
 $ProjectApiSource = Join-Path $Root 'project_nodes\comfyui_shim.py'
 $ProjectApiTarget = Join-Path $NodesDir 'project_workflow_api.py'

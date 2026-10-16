@@ -6,7 +6,8 @@
 
 ## 能做什么
 
-- **图像生成**：使用 Qwen-Image、Anima、Flux.2/Klein 和 SDXL/Illustrious 系列模型生成写实图像、动漫人物和插画。
+- **图像生成**：使用 Qwen-Image、MOSS-Image、Anima、Flux.2/Klein 和 SDXL/Illustrious 系列模型生成写实图像、动漫人物和插画。
+- **布局控制**：通过 MOSS-Image 的布局 JSON 指定文字和物体在画面中的位置与内容。
 - **参考图编辑**：通过 Qwen-Image-2.1 输入一张图片和自然语言指令，修改颜色、服装、场景等内容。
 - **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
 - **人物与姿态参考**：通过 IPAdapter 参考人物外观，通过 OpenPose ControlNet 控制身体姿态。
@@ -23,6 +24,7 @@
 | 模型 / 组合 | 主要用途 | 支持方式 | 工作流 ID |
 | --- | --- | --- | --- |
 | Qwen-Image-2.1 · Uncensored GGUF Q4_K_M | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑，SFW / NSFW 路由 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
+| MOSS-Image-SFT · 官方 BF16 | 布局 JSON 精确排版、长提示词、图中中英文文字 | 文生图（自然语言 / 标签 / 布局 JSON），SFW | `moss-image-sft-t2i` |
 | Anima Turbo v1.1 · 官方 BF16 | 通用动漫、人物与插画 | 文生图、图生图 | `anima-turbo-v1-1` |
 | Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
 | Moody Desire Mix v3.0 · Flux.2/Klein | 动漫、人物肖像 | 文生图、图生图 | `moody-desire-v30` |
@@ -51,7 +53,7 @@
 
 通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、Blue Archive 或模型风格时，路由器优先匹配对应组合。Asuna 角色工作流需要显式指定工作流 ID。
 
-使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
+使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
 
 全部工作流、默认参数和输入要求见 [工作流目录](workflows/catalog.json)；模型组件、来源与文件信息见 [模型表](workflows/models.json)。运行时可查询 `GET /project/workflows` 获取实际可用状态。
 
@@ -72,6 +74,7 @@
 | 所需模型 / 功能 | 下载 Profile |
 | --- | --- |
 | Qwen-Image-2.1 Uncensored GGUF Q4_K_M 生成与编辑 | `qwen-image-2.1` |
+| MOSS-Image-SFT 文生图与布局生成（约 27 GB） | `moss-image-sft` |
 | Anima Turbo、局部重绘与 Anima 人物参考 | `anima-turbo` |
 | Moody Anima Mix 与局部重绘 | `moody-anima-mix` |
 | Moody Desire Mix | `moody-desire-v30` |
@@ -87,6 +90,8 @@
 SDXL 人物参考与姿态控制还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
 
 Qwen-Image-2.1 使用 abenzerps 发布的 Uncensored Q4_K_M GGUF 扩散模型，叠加同一发布者的 uncensored LoRA（默认强度 1.0，可通过 `loras.uncensored` 调整或设为 0 关闭），并配套 Qwen3VL INT8 文本编码器与 BF16 VAE。`setup_comfyui.ps1` 会安装固定版本的 ComfyUI-GGUF 节点；目标模型及配套文件由 Qwen profile 下载并校验。原官方 INT8 扩散文件保留在本地作回滚，不再被命名工作流加载。部署细节见 [Qwen 2.1 替换记录](docs/qwen-image-2.1-uncensored-migration.md)。
+
+MOSS-Image-SFT 使用 OpenMOSS 发布的 5B DiT、Qwen3.5 9B 文本编码器和 FLUX.2 小解码器 VAE，按 Hugging Face 目录原样存放在 `ComfyUI/models/moss-image/MOSS-Image-SFT/`，由 `setup_comfyui.ps1` 固定版本安装的官方 MOSS-Image 节点直接读取。默认 1024×1024、50 步、Euler/sgm_uniform、CFG 3、shift 5，并在负向分支跳过第 22 层；每步计算两次；4090 上 1024×1024 约 55 秒，与 Qwen 文生图相当。
 
 查看状态或停止服务：
 
@@ -133,6 +138,19 @@ Qwen 文生图默认使用 1024×1024、25 步、Euler/simple、CFG 1。各工�
 生成响应提供 `job_id` 和 `job_url`。轮询 `job_url`，直到状态为 `succeeded` 或 `failed`；成功时通过 `outputs[].url` 获取图片。请求顶层添加 `"dry_run": true` 可检查参数和依赖而不生成图像，响应会说明工作流是否就绪及图是否通过验证。
 
 请求超过工作流的 `max_total_pixels` 时不会被拒绝，响应 `warnings` 中会出现 `over_pixel_budget`，任务照常运行。若任务因内存或显存不足失败，`error.code` 为 `out_of_memory`。请把错误和 `GET /project/resources` 的当前空闲内存告诉请求者，由其释放内存或缩小尺寸后再重新提交。
+
+### 用布局 JSON 生成
+
+MOSS-Image 接受把布局 JSON 序列化后直接作为 `prompt` 字符串。坐标为整数像素，以画布中心为原点（x 向右、y 向下），`bbox` 顺序为 `[y_min, x_min, y_max, x_max]`；1024×1024 画布两轴范围均为 -512 到 512：
+
+```json
+{
+  "workflow": "moss-image-sft-t2i",
+  "parameters": {
+    "prompt": "{\"summary\": {\"caption\": \"A minimalist poster on a cream background.\"}, \"items\": [{\"label\": \"text\", \"caption\": \"Bold title at the top.\", \"text\": \"EXPLORE\", \"bbox\": [-460, -400, -330, 400]}], \"bbox_format\": \"yxyx\", \"bbox_coord_space\": \"abs_centralized\"}"
+  }
+}
+```
 
 ### 上传图片并编辑
 

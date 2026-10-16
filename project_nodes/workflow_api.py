@@ -1333,7 +1333,11 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                          "required_fields": entry.get("input_contract", {}).get("required_fields", []),
                          "image_inputs": _image_inputs(entry),
                          "recommended": entry.get("agent_hints", {}).get("recommended", {}),
-                         "explicit_only": entry.get("routing", {}).get("explicit_only", False)} for entry in ready_workflows],
+                         "explicit_only": entry.get("routing", {}).get("explicit_only", False),
+                         # The words /project/resolve matches, so agents choose from a menu instead of guessing.
+                         "selectors": {"domains": entry.get("routing", {}).get("domains", []),
+                                       "styles": entry.get("routing", {}).get("styles", [])},
+                         "best_for": entry.get("selection", {}).get("best_for", [])} for entry in ready_workflows],
         "discovery": {
             "preferred_entrypoint": "/.well-known/agent-manifest.json",
             "alternate_entrypoints": ["/project/agent-manifest", "/project/openapi.json"],
@@ -1401,6 +1405,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         "instructions": [
             "Read /.well-known/agent-manifest.json first; the root path is the native ComfyUI UI, not the preferred agent entrypoint.",
             "Call POST /project/resolve with domain, content_mode, style, input_type, input_mode, optional family and prompt_granularity when the route is not already known.",
+            "Take domain and style words from route_table[].selectors and match the request to route_table[].best_for; requests that match no selector fall back to the anime routes. Real-world photos, products, landscapes and posters: domain 'photo', 'product', 'landscape' or 'poster' (Qwen-Image). Exact layout or UI mock-ups: domain 'layout' or 'ui mockup' (MOSS-Image).",
             "Before generating, read selection.prefer_instead in the resolve response: if its 'when' matches the request, use that workflow instead. Pass a style selector (e.g. 'visual novel' or 'mainstream anime') when the requester describes a look.",
             "Choose only an entry with ready=true and use the selected workflow's models, capabilities, routing and agent_hints together.",
             "Treat compatibility_notes, selection.not_for, model compatibility and prompting as constraints, not optional suggestions.",
