@@ -90,7 +90,7 @@ class AgentContractTests(unittest.TestCase):
             if not entry["id"].startswith("qwen-image-2.1-"):
                 continue
             self.assertIsNone(api._route_score(entry, {"domain": "anime"}))
-            self.assertIsNone(api._route_score(entry, {"domain": "blue archive"}))
+            self.assertIsNone(api._route_score(entry, {"domain": "deepseek"}))
             mode = "image-edit" if entry["id"].endswith("edit") else "text-to-image"
             self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw", "input_mode": mode}))
             self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "input_mode": mode}))
@@ -239,9 +239,9 @@ class AgentContractTests(unittest.TestCase):
 
     def test_route_scope_and_exact_capabilities(self):
         entries = {e["id"]: e for e in catalog["workflows"]}
-        self.assertIsNone(api._route_score(entries["blue-archive-character-illustrious-xl"], {"domain": "blue archive"}))
-        self.assertIsNone(api._route_score(entries["blue-archive-style-sdxl"], {"domain": "bathroom"}))
-        self.assertIsNone(api._route_score(entries["blue-archive-style-sdxl"], {"input_type": "text"}))
+        self.assertIsNone(api._route_score(entries["deepseek-whale-girl-janku"], {"domain": "anime"}))
+        self.assertIsNone(api._route_score(entries["deepseek-whale-girl-anima-turbo"], {"domain": "bathroom"}))
+        self.assertIsNone(api._route_score(entries["deepseek-whale-girl-anima-turbo"], {"input_type": "text"}))
         self.assertIsNotNone(api._route_score(entries["moody-anima-inpaint"], {"workflow": "moody-anima-inpaint"}))
         self.assertIsNone(api._route_score(self.entry, {"input_mode": "image"}))
         self.assertIsNotNone(api._route_score(self.entry, {"domain": "anime", "prompt_granularity": "expert"}))
@@ -306,7 +306,7 @@ class AgentContractTests(unittest.TestCase):
             with self.assertRaises(api.ApiError):
                 api._prepare_graph(entry, {"parameters": {"prompt": "portrait", "unknown": True}})
         self.assertIn(
-            "'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl'",
+            "'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ipadapter-face-sdxl'",
             downloader,
         )
 
@@ -338,6 +338,31 @@ class AgentContractTests(unittest.TestCase):
         self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0])
         self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v7.77"}))
         self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v24"}))
+
+    def test_deepseek_lora_routes_split_by_content_and_bind_their_loras(self):
+        entries = {entry["id"]: entry for entry in catalog["workflows"]}
+        models = {model["id"]: model for model in api._read_catalog()["model_registry"]}
+        janku, anima = entries["deepseek-whale-girl-janku"], entries["deepseek-whale-girl-anima-turbo"]
+        for alias in ("deepseek", "大肥鱼", "DeepSeek娘", "deepseek whale girl"):
+            sfw, nsfw = {"domain": alias, "content_mode": "sfw"}, {"domain": alias, "content_mode": "nsfw"}
+            self.assertGreater(api._route_score(anima, sfw)[0], api._route_score(janku, sfw)[0], alias)
+            self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0], alias)
+            self.assertGreater(api._route_score(anima, {"domain": alias})[0], api._route_score(janku, {"domain": alias})[0], alias)
+        downloader = (ROOT / "scripts" / "download_models.ps1").read_text(encoding="utf-8")
+        for entry, node, loader in ((janku, "2", "LoraLoader"), (anima, "2", "LoraLoaderModelOnly")):
+            (lora_id,) = [m for m in entry["model_ids"] if m.startswith("deepseek-")]
+            model = models[lora_id]
+            self.assertIn(model["required_file"], entry["required_files"])
+            self.assertIn(model["source"]["sha256"], downloader)
+            graph = api._read_workflow(entry)
+            self.assertEqual(graph[node]["class_type"], loader)
+            self.assertEqual(graph[node]["inputs"]["lora_name"], Path(model["required_file"]).name)
+            self.assertEqual(entry["lora_bindings"]["deepseek"]["file"], Path(model["required_file"]).name)
+            prepared = api._prepare_graph(entry, {"parameters": {"prompt": "1girl", "loras": {"deepseek": 0.5}}})
+            self.assertEqual(prepared[node]["inputs"]["strength_model"], 0.5)
+            default = api._prepare_graph(entry, {"parameters": {"prompt": "1girl"}})
+            self.assertEqual(default[node]["inputs"]["strength_model"], entry["defaults"]["loras"]["deepseek"])
+        self.assertNotIn("blue-archive", downloader)
 
     def test_image_inputs_match_what_prepare_graph_accepts(self):
         workflows = catalog["workflows"]

@@ -92,11 +92,11 @@ def main() -> None:
         source_name, mask_name = upload("source", source), upload("mask", mask)
         references = {"input_image": source_name, "face_image": source_name, "control_image": source_name, "mask_image": mask_name}
         routes = [
-            ({"domain": "blue archive"}, "blue-archive-style-sdxl"),
+            ({"domain": "大肥鱼", "content_mode": "sfw"}, "deepseek-whale-girl-anima-turbo"),
             ({"domain": "bathroom"}, "anima-turbo-v1-1"),
             ({"domain": "anime", "input_mode": "inpaint"}, "anima-turbo-inpaint"),
             ({"domain": "anime", "input_mode": "face-reference", "family": "sdxl-ipadapter"}, "sdxl-face-reference-ipadapter"),
-            ({"workflow": "blue-archive-character-illustrious-xl"}, "blue-archive-character-illustrious-xl"),
+            ({"domain": "deepseek", "content_mode": "nsfw"}, "deepseek-whale-girl-janku"),
             ({"domain": "anime", "content_mode": "nsfw"}, "janku-illustrious"),
         ]
         for query, expected in routes:

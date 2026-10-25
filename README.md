@@ -29,11 +29,11 @@
 | Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
 | Moody Desire Mix v3.0 · Flux.2/Klein | 动漫、人物肖像 | 文生图、图生图 | `moody-desire-v30` |
 | Animagine XL 3.1 + NIKKE LoRA | NIKKE 风格；可选 Rapi 角色适配 | 文生图、图生图 | `animagine-xl-3.1-nsfw` |
-| Animagine XL 3.1 + Blue Archive 风格 LoRA | 蔚蓝档案游戏 CG 风格 | 文生图、图生图 | `blue-archive-style-sdxl` |
-| Illustrious XL v0.1 + Asuna LoRA | 一之濑明日奈及其服装表现 | 文生图、图生图 | `blue-archive-character-illustrious-xl` |
 | JANKU v7.77 · Illustrious/NoobAI + Chenkin 系 | 主流动画风：线条较粗、背景细致、电影感光影，默认脸型偏成熟 | 文生图、图生图 | `janku-illustrious` |
 | JANKU v5.0 · Illustrious/NoobAI + RouWei 系 | 视觉小说（Galgame）风：脸型柔和精致、线条细、浅色光泽与腮红，画师标签最强 | 文生图、图生图 | `janku-v5-illustrious` |
 | One Obsession v24 · Illustrious 系 | 纹理、戏剧性光影与 2.5D 风格 | 文生图、图生图 | `one-obsession` |
+| Anima Turbo v1.1 + DeepSeek 鲸鱼娘 LoRA（ZipZipPipe 画风） | 大肥鱼女仆装形象，SFW 优先 | 文生图、图生图 | `deepseek-whale-girl-anima-turbo` |
+| JANKU v7.77 + DeepSeek 鲸鱼娘 LoRA（Chenkin 系训练） | 大肥鱼原版白蓝露肩裙形象，NSFW 优先 | 文生图、图生图 | `deepseek-whale-girl-janku` |
 
 动漫路由和 Qwen-Image-2.1 Uncensored 路由均声明支持 SFW / NSFW 内容模式。内容模式用于路由选择，具体画面由调用方的提示词决定。
 
@@ -51,7 +51,7 @@
 
 ### 如何选择
 
-通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、Blue Archive 或模型风格时，路由器优先匹配对应组合。Asuna 角色工作流需要显式指定工作流 ID。
+通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、DeepSeek 鲸鱼娘（`domain: "deepseek"`，别名含“大肥鱼”“DeepSeek娘”）或模型风格时，路由器优先匹配对应组合；DeepSeek 鲸鱼娘的 SFW 请求走 Anima Turbo，NSFW 请求走 JANKU。角色一律按成年女性描写。
 
 使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
 
@@ -79,11 +79,10 @@
 | Moody Anima Mix 与局部重绘 | `moody-anima-mix` |
 | Moody Desire Mix | `moody-desire-v30` |
 | Animagine XL 3.1 / NIKKE | `animagine-xl-3.1-nsfw` |
-| Blue Archive 风格 | `blue-archive-style-sdxl` |
-| Asuna 角色 | `blue-archive-character-illustrious-xl` |
 | JANKU v7.77 | `janku-illustrious` |
 | JANKU v5.0 | `janku-v5-illustrious` |
 | One Obsession v24 | `one-obsession` |
+| DeepSeek 鲸鱼娘 LoRA（两个，需 `CIVITAI_TOKEN`） | `deepseek-whale-girl` |
 | SDXL 人物参考附加组件 | `ipadapter-face-sdxl` |
 | SDXL 姿态控制附加组件 | `controlnet-openpose-sdxl` |
 

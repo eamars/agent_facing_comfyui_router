@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'moss-image-sft', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'moss-image-sft', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -185,31 +185,6 @@ $AssetSets = @{
             Sha256 = 'FE9F99F0C9908673C3F5B227C91BCCD7744FC3FCC95A4ED1E3842F44A82B55A0'
         }
     )
-    'blue-archive-style-sdxl' = @(
-        [pscustomobject]@{
-            Name = 'Blue Archive Game CG Style LoCon (Animagine 3.1)'
-            Url = 'https://huggingface.co/licyk/sd-lora/resolve/main/sdxl/style/ag31_style_ba_v1-000016.safetensors?download=true'
-            Path = (Join-Path $ModelRoot 'loras\BlueArchive_GameCG_Style_Animagine31.safetensors')
-            Bytes = [int64]21995392
-            Sha256 = 'D2E9468E1FE6B2134F58C883C984E9845FA197E65EF5B2CF54716C251DCDF589'
-        }
-    )
-    'blue-archive-character-illustrious-xl' = @(
-        [pscustomobject]@{
-            Name = 'Illustrious XL v0.1 checkpoint for the Asuna character route'
-            Url = 'https://huggingface.co/OnomaAIResearch/Illustrious-xl-early-release-v0/resolve/main/Illustrious-XL-v0.1.safetensors?download=true'
-            Path = (Join-Path $ModelRoot 'checkpoints\Illustrious_XL_v0.1.safetensors')
-            Bytes = [int64]6938040760
-            Sha256 = '3E15BA00387DB678AB4A099F75771C4F5AC67FDA9E7100A01D263EAF30145AA9'
-        },
-        [pscustomobject]@{
-            Name = 'Asuna Ichinose Blue Archive 4-outfit IllustriousXL LoRA'
-            Url = 'https://huggingface.co/Muapi/asuna-ichinose-blue-archive-4-outfits-illustriousxl/resolve/main/asuna-ichinose-blue-archive-4-outfits-illustriousxl.safetensors?download=true'
-            Path = (Join-Path $ModelRoot 'loras\Asuna_Ichinose_IllustriousXL.safetensors')
-            Bytes = [int64]76036486
-            Sha256 = '24E04396471196283291B664FFB3DE9E59B770F4CBF99FF6573E6816F8B69685'
-        }
-    )
     'janku-illustrious' = @(
         [pscustomobject]@{
             Name = 'JANKU v7.77 canonical Illustrious/SDXL checkpoint (janxd, Civitai model 1277670, version 2786084)'
@@ -235,6 +210,23 @@ $AssetSets = @{
             Path = (Join-Path $ModelRoot 'checkpoints\OneObsession_v24.safetensors')
             Bytes = [int64]6938040682
             Sha256 = '2FAE33D7F0D23920D145897827E6015AC098A2B90CB682D07846AE762213100B'
+        }
+    )
+    'deepseek-whale-girl' = @(
+        # Civitai-only files with no Hugging Face mirror; set CIVITAI_TOKEN before downloading.
+        [pscustomobject]@{
+            Name = 'DeepSeek whale girl JANKU LoRA (yrx0110121, Civitai model 2595806, version 2915962)'
+            Url = 'https://civitai.com/api/download/models/2915962?fileId=2794189'
+            Path = (Join-Path $ModelRoot 'loras\DeepSeek_WhaleGirl_ChenkinNoobXL.safetensors')
+            Bytes = [int64]228452020
+            Sha256 = '54A721895A0AA6A38F1A48C232916A091A9C881941D024779E3C12A061344AEF'
+        },
+        [pscustomobject]@{
+            Name = 'DeepSeek whale girl ZipZipPipe-style Anima 2B LoRA (HermitST, Civitai model 2919135, version 3302634)'
+            Url = 'https://civitai.com/api/download/models/3302634?fileId=3187626'
+            Path = (Join-Path $ModelRoot 'loras\DeepSeek_WhaleGirl_ZipZipPipe_Anima2B.safetensors')
+            Bytes = [int64]183628056
+            Sha256 = 'B7CEDCC806C20A788DA2A8E1DD06EBAE1A1F6B2FF710FE92FB5706648779C45D'
         }
     )
     'ipadapter-face-sdxl' = @(
@@ -293,7 +285,8 @@ function Download-Verified($Asset) {
     } else {
         $resume = if ($existing) { 'resume' } else { 'new' }
         Write-Host "[download/$resume] $($Asset.Name)"
-        & curl.exe -L --fail --retry 10 --retry-delay 5 --continue-at - -A 'Mozilla/5.0' -o $Asset.Path $Asset.Url
+        $auth = if ($Asset.Url -like 'https://civitai.com/*' -and $env:CIVITAI_TOKEN) { @('-H', "Authorization: Bearer $env:CIVITAI_TOKEN") } else { @() }
+        & curl.exe -L --fail --retry 10 --retry-delay 5 --continue-at - -A 'Mozilla/5.0' @auth -o $Asset.Path $Asset.Url
         if ($LASTEXITCODE -ne 0) { throw "Download failed for $($Asset.Name) with exit code $LASTEXITCODE" }
     }
     $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $Asset.Path).Hash.ToUpperInvariant()
@@ -304,7 +297,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'blue-archive-style-sdxl', 'blue-archive-character-illustrious-xl', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

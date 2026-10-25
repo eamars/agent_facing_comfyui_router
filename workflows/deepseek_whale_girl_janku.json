@@ -2,15 +2,15 @@
   "1": {
     "class_type": "CheckpointLoaderSimple",
     "inputs": {
-      "ckpt_name": "Animagine_XL_3.1.safetensors"
+      "ckpt_name": "JANKU_v7_77.safetensors"
     }
   },
   "2": {
     "class_type": "LoraLoader",
     "inputs": {
-      "lora_name": "BlueArchive_GameCG_Style_Animagine31.safetensors",
-      "strength_model": 0.8,
-      "strength_clip": 0.8,
+      "lora_name": "DeepSeek_WhaleGirl_ChenkinNoobXL.safetensors",
+      "strength_model": 1.0,
+      "strength_clip": 1.0,
       "model": [
         "1",
         0
@@ -24,7 +24,7 @@
   "3": {
     "class_type": "CLIPTextEncode",
     "inputs": {
-      "text": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, blue archive, halo, blush, long hair, school uniform, puffy sleeves, soft smile, simple background, game CG illustration",
+      "text": "masterpiece, best quality, very aesthetic, absurdres, deepseek whalegirl, 1girl, solo, adult, white dress, blue dress, layered dress, blue eyes, standing, looking at viewer, light smile, beach at sunset, waves, cowboy shot, soft rim light",
       "clip": [
         "2",
         1
@@ -34,7 +34,7 @@
   "4": {
     "class_type": "CLIPTextEncode",
     "inputs": {
-      "text": "worst quality, low quality, bad hands, bad face, mutated hands and fingers, extra legs, extra arms, cropped, text, bad anatomy, jpeg artifacts, signature, watermark, username, duplicate, multiple view, long body, malformed, disfigured, bad proportions, ugly, monochrome",
+      "text": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
       "clip": [
         "2",
         1
@@ -44,8 +44,8 @@
   "5": {
     "class_type": "EmptyLatentImage",
     "inputs": {
-      "width": 832,
-      "height": 1216,
+      "width": 1024,
+      "height": 1536,
       "batch_size": 1
     }
   },
@@ -53,10 +53,10 @@
     "class_type": "KSampler",
     "inputs": {
       "seed": 425418,
-      "steps": 36,
+      "steps": 30,
       "cfg": 5.0,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "karras",
+      "sampler_name": "euler_ancestral",
+      "scheduler": "normal",
       "denoise": 1.0,
       "model": [
         "2",
@@ -92,7 +92,7 @@
   "8": {
     "class_type": "SaveImage",
     "inputs": {
-      "filename_prefix": "blue_archive_style_sdxl",
+      "filename_prefix": "deepseek_whale_girl_janku",
       "images": [
         "7",
         0

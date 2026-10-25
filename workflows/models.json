@@ -314,7 +314,7 @@
           "Anima"
         ],
         "known_limits": [
-          "No dedicated Blue Archive or NIKKE identity adapter is bundled; route those explicit domains to their specialized workflows."
+          "No dedicated DeepSeek whale girl or NIKKE identity adapter is bundled; route those explicit domains to their specialized workflows."
         ]
       },
       "source": {
@@ -913,14 +913,13 @@
       "tensor_dtypes": [
         "F16"
       ],
-      "description": "Anime-focused SDXL checkpoint used by the NIKKE and Blue Archive style routes.",
+      "description": "Anime-focused SDXL checkpoint used by the NIKKE, SDXL face-reference and OpenPose routes.",
       "required_file": "models/checkpoints/Animagine_XL_3.1.safetensors",
       "capabilities": {
         "domains": [
           "anime",
           "character-illustration",
-          "nikke",
-          "blue-archive-style"
+          "nikke"
         ],
         "input_types": [
           "text",
@@ -1015,32 +1014,13 @@
             "status": "success",
             "job_id": "548c1c01-f453-4af1-a08b-17aa8703f6c2",
             "prompt_class": "sfw"
-          },
-          {
-            "mode": "text-to-image-with-Blue-Archive-style-LoCon",
-            "status": "success",
-            "job_id": "3b4470ed-c45d-4ef1-8e1b-9edb7e17d2b9",
-            "prompt_class": "sfw"
-          },
-          {
-            "mode": "image-to-image-with-Blue-Archive-style-LoCon-native-graph",
-            "status": "success",
-            "job_id": "c3722d65-1868-42d8-9e43-307390368e4b",
-            "prompt_class": "sfw"
-          },
-          {
-            "mode": "image-to-image-with-Blue-Archive-style-LoCon-named-API",
-            "status": "success",
-            "job_id": "045e5159-d8fb-489b-b742-bb043034a442",
-            "prompt_class": "sfw"
           }
         ],
         "visual_fidelity": "not benchmarked as a general identity or style metric"
       },
       "route_roles": [
         "anime-base",
-        "nikke-base",
-        "blue-archive-style-base"
+        "nikke-base"
       ],
       "file_sizes": {
         "models/checkpoints/Animagine_XL_3.1.safetensors": 6938325776
@@ -1250,433 +1230,6 @@
       ],
       "file_sizes": {
         "models/loras/NIKKES_Rapi.safetensors": 114474060
-      }
-    },
-    {
-      "id": "blue-archive-gamecg-style-animagine31",
-      "name": "Blue Archive Game CG Style — Animagine3.1 LoCon",
-      "kind": "locon",
-      "status": "installed",
-      "routeable": true,
-      "family": "blue-archive-style",
-      "architecture": "sdxl",
-      "base_model": "Animagine XL 3.1 / SDXL",
-      "precision": "fp16",
-      "tensor_dtypes": [
-        "F16"
-      ],
-      "description": "Style adapter for bright flat-color Blue Archive-like game CG; it is not a character identity adapter.",
-      "required_file": "models/loras/BlueArchive_GameCG_Style_Animagine31.safetensors",
-      "capabilities": {
-        "domains": [
-          "blue-archive",
-          "blue-archive-style"
-        ],
-        "input_types": [
-          "conditioning"
-        ],
-        "input_modes": [
-          "adapter-conditioning"
-        ],
-        "output_types": [
-          "adapted-conditioning"
-        ],
-        "styles": [
-          "game-cg",
-          "flat-color",
-          "gacha illustration",
-          "anime"
-        ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "non-explicit"
-        ],
-        "nsfw_capable": true,
-        "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "structured",
-          "maximum": "expert"
-        },
-        "identity_strength": "none; style-only",
-        "style_strength": "strong",
-        "outfit_strength": "medium through tags"
-      },
-      "prompting": {
-        "dialect": "anime/game-CG tags",
-        "trigger_words": [],
-        "recommended_strength": 0.8,
-        "recommended_granularity": "structured",
-        "notes": [
-          "The published Animagine3.1 variant specifies no trigger word; adjust strength rather than adding one."
-        ]
-      },
-      "compatibility": {
-        "workflow_families": [
-          "sdxl"
-        ],
-        "base_models": [
-          "Animagine XL 3.1"
-        ],
-        "known_limits": [
-          "The source training notes warn that compatibility with other bases can be limited."
-        ]
-      },
-      "source": {
-        "url": "https://huggingface.co/licyk/sd-lora/blob/main/sdxl/style/ag31_style_ba_v1-000016.safetensors",
-        "type": "Hugging Face"
-      },
-      "validation": {
-        "status": "verified-by-runtime-probe",
-        "scope": "Animagine-Blue-Archive-style-stack",
-        "probes": [
-          {
-            "mode": "adapter-load-and-generation",
-            "status": "success",
-            "job_id": "3b4470ed-c45d-4ef1-8e1b-9edb7e17d2b9",
-            "prompt_class": "sfw",
-            "adapter_strength": 0.8
-          },
-          {
-            "mode": "adapter-load-in-native-latent-I2I-graph",
-            "status": "success",
-            "job_id": "c3722d65-1868-42d8-9e43-307390368e4b",
-            "prompt_class": "sfw"
-          }
-        ],
-        "visual_fidelity": "style route only; exact character fidelity requires a character adapter or stronger base"
-      },
-      "route_roles": [
-        "blue-archive-style"
-      ],
-      "file_sizes": {
-        "models/loras/BlueArchive_GameCG_Style_Animagine31.safetensors": 21995392
-      }
-    },
-    {
-      "id": "illustrious-xl-v0-1-checkpoint",
-      "name": "Illustrious XL v0.1",
-      "kind": "checkpoint",
-      "status": "installed",
-      "routeable": true,
-      "family": "illustrious-xl",
-      "architecture": "sdxl",
-      "base_model": "SDXL 1.0",
-      "precision": "fp16",
-      "tensor_dtypes": [
-        "F16"
-      ],
-      "description": "Illustrious XL v0.1 SDXL checkpoint used by the Blue Archive character-identity route.",
-      "capabilities": {
-        "domains": [
-          "anime",
-          "blue-archive",
-          "character-illustration"
-        ],
-        "input_types": [
-          "text",
-          "image"
-        ],
-        "input_modes": [
-          "text-to-image",
-          "image-to-image"
-        ],
-        "output_types": [
-          "image",
-          "latent"
-        ],
-        "styles": [
-          "anime",
-          "illustration",
-          "gacha",
-          "illustrious",
-          "character illustration"
-        ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
-        "prompt_dialect": "illustrious-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
-        "natural_language": false,
-        "character_identity": "base model; identity is supplied by a compatible character LoRA",
-        "style_strength": "strong for modern anime illustration",
-        "outfit_strength": "strong through compatible adapters and tags",
-        "composition_strength": "medium through tags"
-      },
-      "prompting": {
-        "dialect": "Illustrious XL Danbooru-style tags",
-        "trigger_words": [],
-        "recommended_granularity": "detailed",
-        "recommended_structure": [
-          "quality",
-          "subject count",
-          "identity trigger",
-          "series",
-          "appearance",
-          "outfit",
-          "pose",
-          "camera",
-          "scene",
-          "lighting"
-        ],
-        "notes": [
-          "Use the matching character adapter's trained words; do not use Animagine-only or Pony-only trigger recipes."
-        ]
-      },
-      "compatibility": {
-        "workflow_families": [
-          "sdxl-illustrious"
-        ],
-        "adapter_families": [
-          "illustrious-xl"
-        ],
-        "known_limits": [
-          "Do not mix Illustrious-only adapters into Animagine or Pony routes."
-        ]
-      },
-      "source": {
-        "url": "https://huggingface.co/OnomaAIResearch/Illustrious-xl-early-release-v0",
-        "type": "Hugging Face"
-      },
-      "validation": {
-        "status": "verified-by-runtime-probe",
-        "scope": "Illustrious-base-and-Asuna-stack",
-        "probes": [
-          {
-            "mode": "text-to-image-without-Asuna-adapter",
-            "status": "success",
-            "job_id": "38d5b63f-8d7e-4760-b38b-23acd6629978",
-            "prompt_class": "sfw"
-          },
-          {
-            "mode": "image-to-image-with-Asuna-adapter-native-graph",
-            "status": "success",
-            "job_id": "a7a0f143-120f-4e36-be14-8827f4476cc5",
-            "prompt_class": "sfw"
-          },
-          {
-            "mode": "image-to-image-with-Asuna-adapter-named-API",
-            "status": "success",
-            "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4",
-            "prompt_class": "sfw"
-          }
-        ],
-        "visual_fidelity": "base style observed; identity fidelity is adapter- and prompt-dependent"
-      },
-      "required_file": "models/checkpoints/Illustrious_XL_v0.1.safetensors",
-      "route_roles": [
-        "blue-archive-character-base"
-      ],
-      "file_sizes": {
-        "models/checkpoints/Illustrious_XL_v0.1.safetensors": 6938040760
-      }
-    },
-    {
-      "id": "blue-archive-asuna-illustriousxl-lora",
-      "name": "Asuna Ichinose — Blue Archive 4 outfits [IllustriousXL]",
-      "kind": "lora",
-      "status": "installed",
-      "routeable": true,
-      "family": "blue-archive-character",
-      "architecture": "illustrious-xl",
-      "base_model": "Illustrious XL v0.1",
-      "precision": "fp16",
-      "tensor_dtypes": [
-        "F16"
-      ],
-      "description": "Character adapter for Asuna Ichinose with four documented outfit tag blocks.",
-      "capabilities": {
-        "domains": [
-          "blue-archive"
-        ],
-        "input_types": [
-          "conditioning"
-        ],
-        "input_modes": [
-          "adapter-conditioning"
-        ],
-        "output_types": [
-          "adapted-conditioning"
-        ],
-        "characters": [
-          "Asuna Ichinose",
-          "一之瀬アスナ",
-          "一之濑明日奈"
-        ],
-        "outfits": [
-          "maid",
-          "bunny",
-          "school",
-          "sports"
-        ],
-        "styles": [
-          "anime",
-          "illustration",
-          "gacha",
-          "illustrious",
-          "character illustration"
-        ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
-        "prompt_dialect": "illustrious-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
-        "natural_language": false,
-        "identity_strength": "character-specific when 1chn is included",
-        "outfit_strength": "strong when one documented outfit block is selected"
-      },
-      "prompting": {
-        "dialect": "Illustrious XL tags with 1chn identity token and one outfit block",
-        "trigger_words": [
-          "1chn"
-        ],
-        "recommended_strength": 1.0,
-        "recommended_granularity": "detailed",
-        "trained_words": {
-          "identity": [
-            "1chn",
-            "blue halo",
-            "blue eyes",
-            "blonde hair",
-            "hair over one eye",
-            "very long hair",
-            "hair ribbon",
-            "blue ribbon",
-            "single hair bun",
-            "bun with braided base"
-          ],
-          "maid": [
-            "maid headdress",
-            "white headdress",
-            "headphones",
-            "black choker",
-            "black dress",
-            "pleated dress",
-            "frilled dress",
-            "puffy short sleeves",
-            "cleavage",
-            "white apron",
-            "waist apron",
-            "single garter strap",
-            "white thighhighs",
-            "black ankle bow",
-            "black shoes",
-            "mary janes",
-            "white elbow gloves",
-            "white hairband"
-          ],
-          "bunny": [
-            "fake animal ears",
-            "playboy bunny",
-            "blue leotard",
-            "highleg leotard",
-            "detached collar",
-            "blue traditional bowtie",
-            "white elbow gloves",
-            "thighband pantyhose",
-            "black pantyhose",
-            "white shoes",
-            "high heels",
-            "black choker"
-          ],
-          "school": [
-            "white collared shirt",
-            "shirt tucked in",
-            "button gap",
-            "sleeves rolled up",
-            "blue loose bowtie",
-            "blue pleated skirt",
-            "blue wrist scrunchie",
-            "black socks",
-            "kneehighs",
-            "black shoes",
-            "loafers",
-            "black choker",
-            "high ponytail",
-            "sticker on face",
-            "star sticker",
-            "white detached collar"
-          ],
-          "sports": [
-            "two-tone sports bra",
-            "blue sports bra",
-            "white sports bra",
-            "halterneck",
-            "bare shoulders",
-            "midriff",
-            "miniskirt",
-            "two-tone skirt",
-            "blue skirt",
-            "white skirt",
-            "white sneakers"
-          ]
-        },
-        "notes": [
-          "Use 1chn once and select one outfit block. The model card documents the trained words as tags rather than separate named trigger tokens."
-        ]
-      },
-      "compatibility": {
-        "workflow_families": [
-          "sdxl-illustrious"
-        ],
-        "base_models": [
-          "Illustrious XL v0.1"
-        ],
-        "known_limits": [
-          "Do not load this adapter in the Animagine or Pony routes; use the dedicated Illustrious workflow."
-        ]
-      },
-      "source": {
-        "url": "https://huggingface.co/Muapi/asuna-ichinose-blue-archive-4-outfits-illustriousxl",
-        "type": "Hugging Face"
-      },
-      "validation": {
-        "status": "verified-by-runtime-probe",
-        "scope": "Illustrious-Asuna-stack",
-        "probes": [
-          {
-            "mode": "adapter-load-and-Asuna-identity-generation",
-            "status": "success",
-            "job_id": "d364dcee-70d3-44ad-a1e5-ac483dafabf7",
-            "prompt_class": "sfw",
-            "adapter_strength": 1.0
-          },
-          {
-            "mode": "adapter-load-in-native-latent-I2I-graph",
-            "status": "success",
-            "job_id": "a7a0f143-120f-4e36-be14-8827f4476cc5",
-            "prompt_class": "sfw"
-          },
-          {
-            "mode": "adapter-load-in-named-API-I2I",
-            "status": "success",
-            "job_id": "a39cebcd-0bef-4d56-b76c-f6af865c92d4",
-            "prompt_class": "sfw"
-          }
-        ],
-        "visual_fidelity": "Asuna identity was visually observed in the SFW text probe; image-to-image probe was load/path validation at 1 step"
-      },
-      "required_file": "models/loras/Asuna_Ichinose_IllustriousXL.safetensors",
-      "route_roles": [
-        "blue-archive-character-asuna"
-      ],
-      "file_sizes": {
-        "models/loras/Asuna_Ichinose_IllustriousXL.safetensors": 76036486
       }
     },
     {
@@ -2815,6 +2368,205 @@
       ],
       "file_sizes": {
         "models/checkpoints/OneObsession_v24.safetensors": 6938040682
+      }
+    },
+    {
+      "id": "deepseek-whale-girl-chenkin-lora",
+      "name": "Deepseek whalegirl v1.0 — Chenkin NoobXL LoRA",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "deepseek-whale-girl-character",
+      "architecture": "sdxl",
+      "base_model": "NoobAI / Chenkin NoobXL v0.3",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "SDXL kohya LoRA (rank 32, 88 images) of the DeepSeek whale girl in her original white/blue off-shoulder dress, trained on chenkinNoobXLCKXL_v03.",
+      "capabilities": {
+        "domains": [
+          "deepseek"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "DeepSeek whale girl",
+          "DeepSeek娘",
+          "大肥鱼"
+        ],
+        "outfits": [
+          "original white/blue layered off-shoulder dress"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "deepseek whalegirl"
+        ],
+        "recommended_strength": 1.0,
+        "notes": [
+          "Author range 0.8-1.2; the LoRA carries hair, whale motifs and body shape, so do not restate them.",
+          "Adds a white lace eye mask by default; to show her eyes use strength 0.8, '(blue eyes:1.3)' and weighted 'blindfold, covered eyes, eye mask' negatives."
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "sdxl-illustrious"
+        ],
+        "base_models": [
+          "Chenkin NoobXL",
+          "NoobAI",
+          "Illustrious"
+        ],
+        "known_limits": [
+          "Use with JANKU v7.77 (same Chenkin line); not for Anima or Flux graphs."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2595806?modelVersionId=2915962",
+        "type": "Civitai",
+        "creator": "yrx0110121",
+        "model_version_id": 2915962,
+        "file_name": "Deepseek whalegirl-000010.safetensors",
+        "bytes": 228452020,
+        "sha256": "54A721895A0AA6A38F1A48C232916A091A9C881941D024779E3C12A061344AEF",
+        "license_note": "Character design CC BY-NC-SA 4.0; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "required_file": "models/loras/DeepSeek_WhaleGirl_ChenkinNoobXL.safetensors",
+      "route_roles": [
+        "deepseek-whale-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/DeepSeek_WhaleGirl_ChenkinNoobXL.safetensors": 228452020
+      }
+    },
+    {
+      "id": "deepseek-whale-girl-zipzippipe-anima-lora",
+      "name": "DeepSeek Whale Girl — ZipZipPipe style (Anima 2B) LoRA",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "deepseek-whale-girl-character",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0 (2B)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Anima 2B LoRA (rank 32, 98 images) trained on ZipZipPipe's art of the DeepSeek whale girl, with a separate maid-outfit trigger.",
+      "capabilities": {
+        "domains": [
+          "deepseek"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "DeepSeek whale girl",
+          "DeepSeek娘",
+          "大肥鱼"
+        ],
+        "outfits": [
+          "navy maid dress (deepseek_maid_outfit_zipzippipe)"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "deepseek_whale_girl_zipzippipe"
+        ],
+        "recommended_strength": 0.9,
+        "notes": [
+          "Author range 0.7-1.0; use one skirt-length tag; outfit trigger deepseek_maid_outfit_zipzippipe."
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima"
+        ],
+        "base_models": [
+          "Anima"
+        ],
+        "known_limits": [
+          "Anima 2B only; the author notes it does not load on Anima 2.9B."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2919135?modelVersionId=3302634",
+        "type": "Civitai",
+        "creator": "HermitST",
+        "model_version_id": 3302634,
+        "file_name": "DeepSeek_ZipZipPipe_style_anima2b.safetensors",
+        "bytes": 183628056,
+        "sha256": "B7CEDCC806C20A788DA2A8E1DD06EBAE1A1F6B2FF710FE92FB5706648779C45D",
+        "license_note": "Character design CC BY-NC-SA 4.0; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 0.9
+          }
+        ]
+      },
+      "required_file": "models/loras/DeepSeek_WhaleGirl_ZipZipPipe_Anima2B.safetensors",
+      "route_roles": [
+        "deepseek-whale-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/DeepSeek_WhaleGirl_ZipZipPipe_Anima2B.safetensors": 183628056
       }
     }
   ]

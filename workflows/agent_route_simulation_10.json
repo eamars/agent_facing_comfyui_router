@@ -6,46 +6,46 @@
   "agent_flow": ["user_request", "agent_route_query", "project_resolve", "agent_prompt", "no_generation"],
   "prompts": [
     {
-      "id": "ba-sfw-kazusa",
-      "label": "Blue Archive — Kazusa school portrait",
-      "user_request": "请生成一张《碧蓝档案》杏山和纱的校园肖像，保持明亮的游戏 CG 风格，她穿校服并拿着贝斯箱，下午校园背景，内容保持 SFW。",
+      "id": "deepseek-sfw-maid-cafe",
+      "label": "DeepSeek whale girl — maid cafe portrait",
+      "user_request": "请画一张大肥鱼（DeepSeek 鲸鱼娘）穿女仆装在咖啡店端茶的插画，成年女性，温暖午后光线，内容保持 SFW。",
       "agent_route_query": {
-        "domain": "blue archive",
+        "domain": "大肥鱼",
         "content_mode": "sfw",
-        "style": "game cg",
+        "style": "anime",
         "prompt_granularity": "structured"
       },
-      "prompt": "masterpiece, best quality, 1girl, solo, 杏山和纱, Blue Archive, short dark hair, cat ears, school uniform, holding a bass case, soft afternoon light, school courtyard, game CG illustration",
-      "negative_prompt": "worst quality, low quality, bad hands, bad face, bad anatomy, text, watermark, nsfw",
-      "expected_workflow": "blue-archive-style-sdxl"
+      "prompt": "masterpiece, best quality, deepseek_whale_girl_zipzippipe, 1girl, solo, adult, blue hair, very long hair, gradient blue hair, whale fin ears, blue hair bows, cetacean tail, blue eyes, deepseek_maid_outfit_zipzippipe, maid, maid headdress, long skirt, smile, holding a teacup, cozy cafe interior, warm afternoon light, upper body",
+      "negative_prompt": "worst quality, low quality, bad hands, bad anatomy, text, watermark, nsfw",
+      "expected_workflow": "deepseek-whale-girl-anima-turbo"
     },
     {
-      "id": "ba-sfw-aru",
-      "label": "Blue Archive — Aru city scene",
-      "user_request": "我想要一张《碧蓝档案》陆八魔阿露的城市街景插画，像抽卡卡面一样的平涂二次元风格，夕阳和自信的姿态，SFW。",
+      "id": "deepseek-sfw-beach",
+      "label": "DeepSeek whale girl — beach at sunset",
+      "user_request": "Draw the DeepSeek whale girl as an adult standing on a beach at sunset, original white dress, looking at the viewer. Keep it SFW.",
       "agent_route_query": {
-        "domain": "Blue Archive",
+        "domain": "DeepSeek whale girl",
         "content_mode": "sfw",
-        "style": "gacha illustration",
+        "style": "anime illustration",
+        "prompt_granularity": "structured"
+      },
+      "prompt": "masterpiece, best quality, deepseek_whale_girl_zipzippipe, 1girl, solo, adult, blue hair, very long hair, gradient blue hair, whale fin ears, cetacean tail, blue eyes, white dress, off shoulder, barefoot, beach at sunset, waves, looking at viewer, full body",
+      "negative_prompt": "worst quality, low quality, bad hands, bad anatomy, text, watermark, nsfw",
+      "expected_workflow": "deepseek-whale-girl-anima-turbo"
+    },
+    {
+      "id": "deepseek-nsfw-glamour",
+      "label": "DeepSeek whale girl NSFW — adult glamour study",
+      "user_request": "请为成年版 DeepSeek 娘制作一张成人向写真：海边别墅、丝质睡袍、柔和灯光，非露骨但具有明显 NSFW 氛围。",
+      "agent_route_query": {
+        "domain": "DeepSeek娘",
+        "content_mode": "nsfw",
+        "style": "anime",
         "prompt_granularity": "detailed"
       },
-      "prompt": "masterpiece, best quality, 1girl, solo, 陸八魔アル, Blue Archive, halo, long dark hair, school blazer, confident smile, holding a briefcase, city street at sunset, warm rim light, bright flat-color gacha game CG",
-      "negative_prompt": "worst quality, low quality, bad hands, bad face, bad anatomy, cropped, text, watermark, nsfw",
-      "expected_workflow": "blue-archive-style-sdxl"
-    },
-    {
-      "id": "ba-sfw-group",
-      "label": "Blue Archive — academy rooftop group",
-      "user_request": "请画两名《碧蓝档案》学生在学院屋顶聊天，夏季校服、光环和晴朗天空，做成干净的游戏 CG，非露骨。",
-      "agent_route_query": {
-        "domain": "碧蓝档案",
-        "content_mode": "non-explicit",
-        "style": "flat color",
-        "prompt_granularity": "structured"
-      },
-      "prompt": "masterpiece, best quality, 2girls, Blue Archive, academy rooftop, circular halos, summer uniforms, wind in their hair, friendly conversation, bright blue sky, clean flat-color game CG illustration",
-      "negative_prompt": "worst quality, low quality, bad hands, bad face, bad anatomy, duplicate, multiple view, text, watermark, nsfw",
-      "expected_workflow": "blue-archive-style-sdxl"
+      "prompt": "masterpiece, best quality, very aesthetic, absurdres, deepseek whalegirl, 1girl, solo, adult, mature adult woman, sheer silk robe, seated by a seaside villa window, tasteful implied nudity, glamour editorial, soft evening light",
+      "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, blurry, text, watermark, logo, signature",
+      "expected_workflow": "deepseek-whale-girl-janku"
     },
     {
       "id": "nikke-sfw-rapi",
