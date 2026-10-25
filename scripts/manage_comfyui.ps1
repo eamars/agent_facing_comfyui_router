@@ -84,7 +84,8 @@ if ($Action -eq 'stop') {
         Show-Status
         exit 0
     }
-    $verified = @($listeners | ForEach-Object { Get-VerifiedProcess $_ }) | Where-Object { $_ }
+    # Keep the array: Windows PowerShell 5.1 gives a lone CimInstance no .Count.
+    $verified = @(@($listeners | ForEach-Object { Get-VerifiedProcess $_ }) | Where-Object { $_ })
     if ($verified.Count -ne $listeners.Count) { throw 'Stop refused: port listener is not this project ComfyUI process.' }
     foreach ($proc in $verified) {
         if ($PSCmdlet.ShouldProcess("PID $($proc.ProcessId)", 'Stop project ComfyUI')) { Stop-Process -Id $proc.ProcessId -Force }

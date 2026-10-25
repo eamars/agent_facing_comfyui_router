@@ -38,7 +38,13 @@ def main() -> int:
     devices = dict(line.strip().split(", ", 1) for line in result.stdout.splitlines() if line.strip())
     if "RTX 4090" not in devices.get(GPU_UUID, ""):
         raise SystemExit(f"Required RTX 4090 is unavailable: {GPU_UUID}")
-    environment = {**os.environ, "CUDA_VISIBLE_DEVICES": GPU_UUID}
+    # torch's CPU allocator (mimalloc 2.1 in c10.dll) ignores a failed commit on
+    # memory it reserved for an arena and then writes into it, so a commit-limit
+    # miss kills the server with an access violation instead of raising "not
+    # enough memory". Without arenas every segment is reserved and committed in
+    # one VirtualAlloc, which fails cleanly. SHOW_ERRORS logs such misses.
+    environment = {**os.environ, "CUDA_VISIBLE_DEVICES": GPU_UUID,
+                   "MIMALLOC_DISALLOW_ARENA_ALLOC": "1", "MIMALLOC_SHOW_ERRORS": "1"}
 
     cmd = [
         str(VENV_PY),
