@@ -34,7 +34,7 @@
   "4": {
     "class_type": "CLIPTextEncode",
     "inputs": {
-      "text": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts, nsfw, underwear, panties, lingerie, see-through",
+      "text": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
       "clip": [
         "2",
         1

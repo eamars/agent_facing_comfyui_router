@@ -1409,6 +1409,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "Before generating, read selection.prefer_instead in the resolve response: if its 'when' matches the request, use that workflow instead. Pass a style selector (e.g. 'visual novel' or 'mainstream anime') when the requester describes a look.",
             "Choose only an entry with ready=true and use the selected workflow's models, capabilities, routing and agent_hints together.",
             "Treat compatibility_notes, selection.not_for, model compatibility and prompting as constraints, not optional suggestions.",
+            "When the selected route has prompting.content_modes, apply the line for the requested content_mode; other routes leave content to the prompt.",
             "Match the prompt dialect and granularity to the selected workflow; do not copy tag triggers from another model family.",
             "Use parameter_schema for allowed fields, required inputs and actual defaults. The AI-mascot character routes (domains 'deepseek', 'claude girl', 'chatgpt', 'qwen girl', 'gemini girl' and aliases such as 大肥鱼, Claude娘, 千问娘, 哈基米) carry character LoRAs tuned with loras.character; use them only for that character and write her as an adult. The Pony-trained Rapi adapter is disabled by default on Animagine.",
             "Supply parameters.prompt explicitly (empty string is allowed); subject is a compatibility alias. Suggested subject/appearance details are prompt-writing advice, not separate required API fields. Seed is random when omitted.",

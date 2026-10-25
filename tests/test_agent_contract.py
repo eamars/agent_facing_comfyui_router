@@ -383,6 +383,17 @@ class AgentContractTests(unittest.TestCase):
                 self.assertIsNone(api._route_score(entries[f"{slug}-{side}"], {"domain": domain}), domain)
         self.assertNotIn("blue-archive", downloader)
 
+    def test_content_mode_lines_only_where_rating_tags_were_seen_to_work(self):
+        # JANKU v7.77 showed a visible SFW/NSFW effect from rating tags; Anima Turbo at CFG 1 did not.
+        for entry in catalog["workflows"]:
+            is_janku = entry["id"] == "janku-illustrious" or (entry["id"].endswith("-janku") and "character-lora" in entry["tags"])
+            self.assertEqual("content_modes" in entry.get("prompting", {}), is_janku, entry["id"])
+            if is_janku:
+                self.assertEqual(set(entry["prompting"]["content_modes"]), {"sfw", "nsfw"})
+                # NSFW is the main use: the default negative must not suppress it.
+                default_negative = api._binding_value(api._read_workflow(entry), entry, "negative_prompt")
+                self.assertNotIn("nsfw", default_negative, entry["id"])
+
     def test_image_inputs_match_what_prepare_graph_accepts(self):
         workflows = catalog["workflows"]
         uses = {use["input_mode"]: use["routes"] for use in api._reference_uses(workflows)}

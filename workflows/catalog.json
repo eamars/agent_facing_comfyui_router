@@ -6963,7 +6963,11 @@
             "purpose": "JANKU v7.77 SFW key-visual composition",
             "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult, black hair, ponytail, white blouse, cafe interior, morning sunlight through window, detailed background, depth of field, looking at viewer, upper body"
           }
-        ]
+        ],
+        "content_modes": {
+          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
+        }
       },
       "source": {
         "creator": "janxd",
@@ -7259,7 +7263,7 @@
           }
         ],
         "limitations": [
-          "Without an outfit tag and an SFW negative prompt the route drifts into lingerie even for SFW prompts."
+          "Without a rating tag or named outfit the LoRA can drift suggestive; see prompting.content_modes."
         ]
       },
       "selection": {
@@ -7287,7 +7291,7 @@
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Start with the quality tags, then 'deepseek whalegirl', 1girl, solo, adult, then outfit, pose, camera, scene and lighting. The LoRA carries her hair, whale-fin ears, tail and a white lace eye mask. Name an outfit (her own: 'white dress, blue dress, layered dress'); without one JANKU drifts into lingerie. For SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. To show her eyes use all three: loras.character 0.8, '(blue eyes:1.3), looking at viewer' in the prompt, and '(blindfold:1.5), (covered eyes:1.5), (eye mask:1.5), lace blindfold' in the negative prompt; negatives alone at strength 1.0 do not remove the mask. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "prompt_scope": "Start with the quality tags, then 'deepseek whalegirl', 1girl, solo, adult, then outfit, pose, camera, scene and lighting. The LoRA carries her hair, whale-fin ears, tail and a white lace eye mask. Name an outfit (her own: 'white dress, blue dress, layered dress'). To show her eyes use all three: loras.character 0.8, '(blue eyes:1.3), looking at viewer' in the prompt, and '(blindfold:1.5), (covered eyes:1.5), (eye mask:1.5), lace blindfold' in the negative prompt; negatives alone at strength 1.0 do not remove the mask. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
           "series",
@@ -7385,6 +7389,10 @@
             "trigger": "deepseek whalegirl",
             "default_strength": 1.0
           }
+        },
+        "content_modes": {
+          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
         }
       },
       "source": {
@@ -7708,7 +7716,7 @@
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, ors scholar, 1girl, solo, adult, very long hair, orange hair, orange eyes, orange flower, flower hair ornament, black bow', then outfit, pose, camera, scene and lighting. Name an outfit (white dress, long dress, puffy sleeves, black corset, white capelet, gold buttons is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, ors scholar, 1girl, solo, adult, very long hair, orange hair, orange eyes, orange flower, flower hair ornament, black bow', then outfit, pose, camera, scene and lighting. Name an outfit (white dress, long dress, puffy sleeves, black corset, white capelet, gold buttons is her own). Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
           "series",
@@ -7800,6 +7808,10 @@
             "trigger": "ors scholar",
             "default_strength": 1.0
           }
+        },
+        "content_modes": {
+          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
         }
       },
       "source": {
@@ -8123,7 +8135,7 @@
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, chatgpt, 1girl, solo, adult, dragon girl, white hair, long hair, dragon horns, pointy ears, purple eyes, white rose hair ornament, dragon wings, dragon tail', then outfit, pose, camera, scene and lighting. Name an outfit (white dress is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, chatgpt, 1girl, solo, adult, dragon girl, white hair, long hair, dragon horns, pointy ears, purple eyes, white rose hair ornament, dragon wings, dragon tail', then outfit, pose, camera, scene and lighting. Name an outfit (white dress is her own). Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
           "series",
@@ -8217,6 +8229,10 @@
             "trigger": "chatgpt",
             "default_strength": 0.8
           }
+        },
+        "content_modes": {
+          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
         }
       },
       "source": {
@@ -8538,7 +8554,7 @@
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, qwengirl, 1girl, solo, adult woman, periwinkle blue hair, very long hair, wavy hair, side braid, purple eyes', then outfit, pose, camera, scene and lighting. Name an outfit (indigo cloak, gold trim, tassels, periwinkle gown, white frills is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, qwengirl, 1girl, solo, adult woman, periwinkle blue hair, very long hair, wavy hair, side braid, purple eyes', then outfit, pose, camera, scene and lighting. Name an outfit (indigo cloak, gold trim, tassels, periwinkle gown, white frills is her own). Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
           "series",
@@ -8632,6 +8648,10 @@
             "trigger": "qwengirl",
             "default_strength": 0.9
           }
+        },
+        "content_modes": {
+          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
         }
       },
       "source": {
@@ -8954,7 +8974,7 @@
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, gemini musume, 1girl, solo, adult, very long hair, blue hair, purple hair, gradient hair, double bun, star hair ornament, ahoge, heterochromia, red eyes, yellow eyes, cat ears, cat tail', then outfit, pose, camera, scene and lighting. Name an outfit (black crop top, detached sleeves, skirt is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, gemini musume, 1girl, solo, adult, very long hair, blue hair, purple hair, gradient hair, double bun, star hair ornament, ahoge, heterochromia, red eyes, yellow eyes, cat ears, cat tail', then outfit, pose, camera, scene and lighting. Name an outfit (black crop top, detached sleeves, skirt is her own). Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
           "series",
@@ -9048,6 +9068,10 @@
             "trigger": "gemini musume",
             "default_strength": 1.0
           }
+        },
+        "content_modes": {
+          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
         }
       },
       "source": {
