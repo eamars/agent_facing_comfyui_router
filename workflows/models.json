@@ -2568,6 +2568,806 @@
       "file_sizes": {
         "models/loras/DeepSeek_WhaleGirl_ZipZipPipe_Anima2B.safetensors": 183628056
       }
+    },
+    {
+      "id": "claude-girl-anima-lora",
+      "name": "Claude girl — Anima 2B LoRA (siling40)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "claude-girl-character",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0 (2B)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the Claude girl (375 training images). Design: Claude-chan / 'ors scholar': very long orange hair, orange eyes, orange flower and black bow in her hair, white scholar dress with black corset, white capelet and gold chain.",
+      "capabilities": {
+        "domains": [
+          "claude girl anima"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "Claude girl",
+          "Claude娘",
+          "Claude 娘",
+          "Claude-chan"
+        ],
+        "outfits": [
+          "white dress, black corset, white capelet, gold chain, long skirt"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "ors scholar"
+        ],
+        "recommended_strength": 1.0,
+        "notes": [
+          "Identity tags: ors scholar, 1girl, solo, adult, orange hair, very long hair, orange eyes, hair flower, orange flower, black hair bow"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima"
+        ],
+        "base_models": [
+          "Anima"
+        ],
+        "known_limits": [
+          "Anima 2B only."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2972520?modelVersionId=3368645",
+        "type": "Civitai",
+        "creator": "siling40",
+        "model_version_id": 3368645,
+        "file_name": "misc_claude.safetensors",
+        "bytes": 91869600,
+        "sha256": "21986AFC5D6731A9985920318B1DC811E00D34C371ED0813E5949A554BE6BECF",
+        "license_note": "Fan-made design, not affiliated with Anthropic; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "required_file": "models/loras/Claude_Girl_OrsScholar_Anima2B.safetensors",
+      "route_roles": [
+        "claude-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/Claude_Girl_OrsScholar_Anima2B.safetensors": 91869600
+      }
+    },
+    {
+      "id": "claude-girl-illustrious-lora",
+      "name": "Claude girl — Illustrious LoRA (kadaizuo604)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "claude-girl-character",
+      "architecture": "sdxl",
+      "base_model": "Illustrious XL v0.1",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the Claude girl (280 training images). Design: Claude-chan / 'ors scholar': very long orange hair, orange eyes, orange flower and black bow in her hair, white scholar dress with black corset, white capelet and gold chain.",
+      "capabilities": {
+        "domains": [
+          "claude girl illustrious"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "Claude girl",
+          "Claude娘",
+          "Claude 娘",
+          "Claude-chan"
+        ],
+        "outfits": [
+          "white dress, long dress, puffy sleeves, black corset, white capelet, gold buttons"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "ors scholar"
+        ],
+        "recommended_strength": 1.0,
+        "notes": [
+          "Identity tags: ors scholar, 1girl, solo, adult, very long hair, orange hair, orange eyes, orange flower, flower hair ornament, black bow"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "sdxl-illustrious"
+        ],
+        "base_models": [
+          "Chenkin NoobXL",
+          "NoobAI",
+          "Illustrious"
+        ],
+        "known_limits": [
+          "Use with JANKU v7.77; not for Anima or Flux graphs."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/3014460?modelVersionId=3421596",
+        "type": "Civitai",
+        "creator": "kadaizuo604",
+        "model_version_id": 3421596,
+        "file_name": "claude_illi_v5.safetensors",
+        "bytes": 57421836,
+        "sha256": "3C6ED23551298E18E183A38119AACCE1E4A1B14674F1DAF02FE09A3760941C6A",
+        "license_note": "Fan-made design, not affiliated with Anthropic; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "required_file": "models/loras/Claude_Girl_OrsScholar_Illustrious.safetensors",
+      "route_roles": [
+        "claude-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/Claude_Girl_OrsScholar_Illustrious.safetensors": 57421836
+      }
+    },
+    {
+      "id": "chatgpt-girl-anima-lora",
+      "name": "ChatGPT dragon girl — Anima 2B LoRA (Ptilopsism)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "chatgpt-girl-character",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0 (2B)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the ChatGPT dragon girl (50 training images). Design: ChatGPT dragon girl (ZipZipPipe design): long white hair, white dragon horns, pointy ears, purple eyes, white rose hair ornament, white qipao-style dress, dragon wings and tail.",
+      "capabilities": {
+        "domains": [
+          "chatgpt"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "ChatGPT dragon girl",
+          "ChatGPT娘",
+          "GPT娘",
+          "ChatGPT龙娘"
+        ],
+        "outfits": [
+          "white dress"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "Chatgpt_dragon_girl"
+        ],
+        "recommended_strength": 0.8,
+        "notes": [
+          "Identity tags: Chatgpt_dragon_girl, 1girl, solo, adult, dragon girl, white hair, long hair, white horns, dragon horns, pointy ears, purple eyes, ahoge, hair ornament, dragon wings, dragon tail"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima"
+        ],
+        "base_models": [
+          "Anima"
+        ],
+        "known_limits": [
+          "Anima 2B only."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2871688?modelVersionId=3244620",
+        "type": "Civitai",
+        "creator": "Ptilopsism",
+        "model_version_id": 3244620,
+        "file_name": "Chatgpt_dragon_girl_anima.safetensors",
+        "bytes": 138716752,
+        "sha256": "D5AB678C1D3A4982AC307C64290CCB189041A0BDB8642B2756D8618C6417152C",
+        "license_note": "Fan-made design, not affiliated with OpenAI; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 0.8
+          }
+        ]
+      },
+      "required_file": "models/loras/ChatGPT_DragonGirl_Anima2B.safetensors",
+      "route_roles": [
+        "chatgpt-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/ChatGPT_DragonGirl_Anima2B.safetensors": 138716752
+      }
+    },
+    {
+      "id": "chatgpt-girl-illustrious-lora",
+      "name": "ChatGPT dragon girl — Illustrious LoRA (g2025942049487)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "chatgpt-girl-character",
+      "architecture": "sdxl",
+      "base_model": "Illustrious (rank 16)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the ChatGPT dragon girl (221 training images). Design: ChatGPT dragon girl (ZipZipPipe design): long white hair, white dragon horns, pointy ears, purple eyes, white rose hair ornament, white qipao-style dress, dragon wings and tail.",
+      "capabilities": {
+        "domains": [
+          "chatgpt"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "ChatGPT dragon girl",
+          "ChatGPT娘",
+          "GPT娘",
+          "ChatGPT龙娘"
+        ],
+        "outfits": [
+          "white dress"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "chatgpt"
+        ],
+        "recommended_strength": 0.8,
+        "notes": [
+          "Identity tags: chatgpt, 1girl, solo, adult, dragon girl, white hair, long hair, dragon horns, pointy ears, purple eyes, white rose hair ornament, dragon wings, dragon tail"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "sdxl-illustrious"
+        ],
+        "base_models": [
+          "Chenkin NoobXL",
+          "NoobAI",
+          "Illustrious"
+        ],
+        "known_limits": [
+          "Use with JANKU v7.77; not for Anima or Flux graphs."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/3006307?modelVersionId=3411033",
+        "type": "Civitai",
+        "creator": "g2025942049487",
+        "model_version_id": 3411033,
+        "file_name": "chatgpt_v2.safetensors",
+        "bytes": 198002792,
+        "sha256": "9CF9FCEBFA31C38917A6B1F21B5357649F71FD574FDDEE1A60555B8CD5A339EA",
+        "license_note": "Fan-made design, not affiliated with OpenAI; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 0.8
+          }
+        ]
+      },
+      "required_file": "models/loras/ChatGPT_DragonGirl_Illustrious.safetensors",
+      "route_roles": [
+        "chatgpt-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/ChatGPT_DragonGirl_Illustrious.safetensors": 198002792
+      }
+    },
+    {
+      "id": "qwen-girl-anima-lora",
+      "name": "Qwen girl — Anima 2B LoRA (Aetherlyn)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "qwen-girl-character",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0 (2B)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the Qwen girl (20 training images). Design: Qwen-chan (ZipZipPipe design): long wavy periwinkle/purple hair with a side braid, purple eyes, white Chinese-style gown with gold trim under an indigo robe with wide sleeves.",
+      "capabilities": {
+        "domains": [
+          "qwen girl"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "Qwen girl",
+          "千问娘",
+          "Qwen娘",
+          "Qwen 娘"
+        ],
+        "outfits": [
+          "white dress, chinese clothes, gold trim, robe, long sleeves, wide sleeves"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "qwen \\(girl\\)"
+        ],
+        "recommended_strength": 1.0,
+        "notes": [
+          "Identity tags: qwen \\(girl\\), 1girl, solo, adult, purple hair, blue hair, very long hair, wavy hair, braid, purple eyes"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima"
+        ],
+        "base_models": [
+          "Anima"
+        ],
+        "known_limits": [
+          "Anima 2B only."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/3016389?modelVersionId=3424116",
+        "type": "Civitai",
+        "creator": "Aetherlyn",
+        "model_version_id": 3424116,
+        "file_name": "Qwen-Chan.safetensors",
+        "bytes": 109090512,
+        "sha256": "61F616F4CB9A81D022DC97B0D22A15C9312A172669EBDB2DD35635A3B441EBF0",
+        "license_note": "Fan-made design, not affiliated with Alibaba Qwen; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "required_file": "models/loras/Qwen_Girl_Anima2B.safetensors",
+      "route_roles": [
+        "qwen-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/Qwen_Girl_Anima2B.safetensors": 109090512
+      }
+    },
+    {
+      "id": "qwen-girl-illustrious-lora",
+      "name": "Qwen girl — Illustrious LoRA (zionesan5389)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "qwen-girl-character",
+      "architecture": "sdxl",
+      "base_model": "an unnamed SDXL/Illustrious base (rank 64, natural-language captions)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the Qwen girl (256 training images). Design: Qwen-chan (ZipZipPipe design): long wavy periwinkle/purple hair with a side braid, purple eyes, white Chinese-style gown with gold trim under an indigo robe with wide sleeves.",
+      "capabilities": {
+        "domains": [
+          "qwen girl"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "Qwen girl",
+          "千问娘",
+          "Qwen娘",
+          "Qwen 娘"
+        ],
+        "outfits": [
+          "indigo cloak, gold trim, tassels, periwinkle gown, white frills"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "qwengirl"
+        ],
+        "recommended_strength": 0.9,
+        "notes": [
+          "Identity tags: qwengirl, 1girl, solo, adult woman, periwinkle blue hair, very long hair, wavy hair, side braid, purple eyes"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "sdxl-illustrious"
+        ],
+        "base_models": [
+          "Chenkin NoobXL",
+          "NoobAI",
+          "Illustrious"
+        ],
+        "known_limits": [
+          "Use with JANKU v7.77; not for Anima or Flux graphs."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2895705?modelVersionId=3273627",
+        "type": "Civitai",
+        "creator": "zionesan5389",
+        "model_version_id": 3273627,
+        "file_name": "qianwen.safetensors",
+        "bytes": 456544636,
+        "sha256": "BFA27AEBE1BF030DB3C6A54EF91CBC37407A0D2C84CE271C01BEA5E6AC572259",
+        "license_note": "Fan-made design, not affiliated with Alibaba Qwen; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 0.9
+          }
+        ]
+      },
+      "required_file": "models/loras/Qwen_Girl_Illustrious.safetensors",
+      "route_roles": [
+        "qwen-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/Qwen_Girl_Illustrious.safetensors": 456544636
+      }
+    },
+    {
+      "id": "gemini-girl-anima-lora",
+      "name": "Gemini girl — Anima 2B LoRA (Nopsil)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "gemini-girl-character",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0 (2B)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the Gemini girl (317 training images). Design: Gemini-chan / 哈基米 (上善无形, ZipZipPipe): blue-to-purple gradient long hair with double buns, cat ears and tail, heterochromia (red right eye, golden left eye), star hair ornament, black sleeveless crop top, detached sleeves, layered black skirt.",
+      "capabilities": {
+        "domains": [
+          "gemini girl anima"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "Gemini girl",
+          "Gemini娘",
+          "Gemini 娘",
+          "哈基米"
+        ],
+        "outfits": [
+          "sleeveless crop top, black skirt, detached sleeves"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "gemini_ai"
+        ],
+        "recommended_strength": 0.9,
+        "notes": [
+          "Identity tags: gemini_ai, 1girl, solo, adult, blue hair, purple hair, gradient hair, long hair, hair bun, ahoge, cat ears, animal ear fluff, heterochromia, red right eye, golden left eye, star-shaped hair ornament"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima"
+        ],
+        "base_models": [
+          "Anima"
+        ],
+        "known_limits": [
+          "Anima 2B only."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/2950198?modelVersionId=3341211",
+        "type": "Civitai",
+        "creator": "Nopsil",
+        "model_version_id": 3341211,
+        "file_name": "Gemini-chan-Anima-v1.0.safetensors",
+        "bytes": 91869432,
+        "sha256": "B2825DDB36FAA22168507D3CED7327E6FD81586D46FAD70E24048221C688CC08",
+        "license_note": "Fan-made design, not affiliated with Google; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 0.9
+          }
+        ]
+      },
+      "required_file": "models/loras/Gemini_Girl_Anima2B.safetensors",
+      "route_roles": [
+        "gemini-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/Gemini_Girl_Anima2B.safetensors": 91869432
+      }
+    },
+    {
+      "id": "gemini-girl-illustrious-lora",
+      "name": "Gemini girl — Illustrious LoRA (kadaizuo604)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "gemini-girl-character",
+      "architecture": "sdxl",
+      "base_model": "Illustrious XL v0.1",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Character LoRA of the Gemini girl (280 training images). Design: Gemini-chan / 哈基米 (上善无形, ZipZipPipe): blue-to-purple gradient long hair with double buns, cat ears and tail, heterochromia (red right eye, golden left eye), star hair ornament, black sleeveless crop top, detached sleeves, layered black skirt.",
+      "capabilities": {
+        "domains": [
+          "gemini girl illustrious"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "Gemini girl",
+          "Gemini娘",
+          "Gemini 娘",
+          "哈基米"
+        ],
+        "outfits": [
+          "black crop top, detached sleeves, skirt"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "gemini musume"
+        ],
+        "recommended_strength": 1.0,
+        "notes": [
+          "Identity tags: gemini musume, 1girl, solo, adult, very long hair, blue hair, purple hair, gradient hair, double bun, star hair ornament, ahoge, heterochromia, red eyes, yellow eyes, cat ears, cat tail"
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "sdxl-illustrious"
+        ],
+        "base_models": [
+          "Chenkin NoobXL",
+          "NoobAI",
+          "Illustrious"
+        ],
+        "known_limits": [
+          "Use with JANKU v7.77; not for Anima or Flux graphs."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/3014606?modelVersionId=3421768",
+        "type": "Civitai",
+        "creator": "kadaizuo604",
+        "model_version_id": 3421768,
+        "file_name": "gem_illi_v1.safetensors",
+        "bytes": 57422076,
+        "sha256": "5A9B9F7241BC78ACF960EA1FE200428EA245B0D9BFE19CE10C538031B043FF40",
+        "license_note": "Fan-made design, not affiliated with Google; non-commercial use only."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "required_file": "models/loras/Gemini_Girl_Illustrious.safetensors",
+      "route_roles": [
+        "gemini-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/Gemini_Girl_Illustrious.safetensors": 57422076
+      }
     }
   ]
 }

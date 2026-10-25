@@ -1097,7 +1097,15 @@
           "sdxl-openpose-controlnet",
           "deepseek-whale-girl-janku",
           "deepseek-whale-girl-anima-turbo",
-          "animagine-xl-3.1-nsfw"
+          "animagine-xl-3.1-nsfw",
+          "claude-girl-anima-turbo",
+          "chatgpt-girl-anima-turbo",
+          "qwen-girl-anima-turbo",
+          "gemini-girl-anima-turbo",
+          "claude-girl-janku",
+          "chatgpt-girl-janku",
+          "qwen-girl-janku",
+          "gemini-girl-janku"
         ]
       },
       "agent_hints": {
@@ -3518,7 +3526,15 @@
           "sdxl-openpose-controlnet",
           "deepseek-whale-girl-janku",
           "deepseek-whale-girl-anima-turbo",
-          "animagine-xl-3.1-nsfw"
+          "animagine-xl-3.1-nsfw",
+          "claude-girl-anima-turbo",
+          "chatgpt-girl-anima-turbo",
+          "qwen-girl-anima-turbo",
+          "gemini-girl-anima-turbo",
+          "claude-girl-janku",
+          "chatgpt-girl-janku",
+          "qwen-girl-janku",
+          "gemini-girl-janku"
         ]
       },
       "agent_hints": {
@@ -3957,7 +3973,7 @@
         },
         "recommendations_are_advisory": true,
         "adapter_selection": {
-          "deepseek": "Default 0.9 (author range 0.7-1.0 on the Anima base)."
+          "character": "Default 0.9 (author range 0.7-1.0 on the Anima base)."
         }
       },
       "compatibility_notes": [
@@ -4011,7 +4027,7 @@
           "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
         ],
         "lora_triggers": {
-          "deepseek": {
+          "character": {
             "trigger": "deepseek_whale_girl_zipzippipe",
             "outfit_trigger": "deepseek_maid_outfit_zipzippipe",
             "default_strength": 0.9
@@ -4074,7 +4090,7 @@
           "node": "11",
           "input": "filename_prefix"
         },
-        "deepseek_strength_model": {
+        "character_strength_model": {
           "node": "2",
           "input": "strength_model"
         }
@@ -4090,7 +4106,7 @@
         "scheduler": "simple",
         "filename_prefix": "deepseek_whale_girl_anima_turbo",
         "loras": {
-          "deepseek": 0.9
+          "character": 0.9
         }
       },
       "resource_limits": {
@@ -4104,11 +4120,1638 @@
         "image_to_image": true
       },
       "lora_bindings": {
-        "deepseek": {
+        "character": {
           "file": "DeepSeek_WhaleGirl_ZipZipPipe_Anima2B.safetensors",
           "trigger": "deepseek_whale_girl_zipzippipe",
           "default": 0.9,
-          "strength_model": "deepseek_strength_model"
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
+      "id": "claude-girl-anima-turbo",
+      "name": "Claude girl — Anima Turbo v1.1 + character LoRA",
+      "description": "Claude girl character route: official Anima Turbo v1.1 with siling40's Anima 2B LoRA. Design: Claude-chan / 'ors scholar': very long orange hair, orange eyes, orange flower and black bow in her hair, white scholar dress with black corset, white capelet and gold chain. Preferred Claude girl route for SFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "claude",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "claude_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "claude-girl-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/Claude_Girl_OrsScholar_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "claude girl",
+          "claude-chan"
+        ],
+        "aliases": [
+          "Claude娘",
+          "Claude 娘",
+          "Claude-chan",
+          "克劳德小姐",
+          "Claude girl",
+          "Anthropic girl",
+          "Anthropic娘",
+          "ors scholar"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the Claude girl character; generic anime requests use anima-turbo-v1-1.",
+          "The bare name is not a domain: it also names other characters (Claude Monet, Claude von Riegan, Gemini Saga). Use the girl/chan/娘 forms."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'ors scholar' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "Claude girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Claude girl SFW",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "Claude girl",
+          "Anthropic",
+          "Claude娘",
+          "Claude 娘"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "claude-girl-janku",
+            "when": "the request is NSFW or asks for the JANKU look"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, ors scholar, 1girl, solo, adult, orange hair, very long hair, orange eyes, hair flower, orange flower, black hair bow', then outfit (white dress, black corset, white capelet, gold chain, long skirt is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 1.0; the probe at this strength held her design on Anima Turbo."
+        }
+      },
+      "compatibility_notes": [
+        "The LoRA was trained on Anima Base v1.0 (2B, 28 blocks) from 375 images; Anima Turbo v1.1 shares that architecture.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with Anthropic; non-commercial use only."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, ors scholar, 1girl, solo, adult, orange hair, very long hair, orange eyes, hair flower, orange flower, black hair bow, white dress, black corset, white capelet, gold chain, long skirt, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "ors scholar",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "siling40",
+        "civitai_model_id": 2972520,
+        "civitai_version_id": 3368645,
+        "local_file": "Claude_Girl_OrsScholar_Anima2B.safetensors",
+        "sha256": "21986AFC5D6731A9985920318B1DC811E00D34C371ED0813E5949A554BE6BECF"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "claude_girl_anima_turbo",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "Claude_Girl_OrsScholar_Anima2B.safetensors",
+          "trigger": "ors scholar",
+          "default": 1.0,
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
+      "id": "chatgpt-girl-anima-turbo",
+      "name": "ChatGPT dragon girl — Anima Turbo v1.1 + character LoRA",
+      "description": "ChatGPT dragon girl character route: official Anima Turbo v1.1 with Ptilopsism's Anima 2B LoRA. Design: ChatGPT dragon girl (ZipZipPipe design): long white hair, white dragon horns, pointy ears, purple eyes, white rose hair ornament, white qipao-style dress, dragon wings and tail. Preferred ChatGPT dragon girl route for SFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "chatgpt",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "chatgpt_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "chatgpt-girl-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/ChatGPT_DragonGirl_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "chatgpt",
+          "chatgpt girl",
+          "gpt girl"
+        ],
+        "aliases": [
+          "ChatGPT娘",
+          "GPT娘",
+          "ChatGPT龙娘",
+          "ChatGPT 龙娘",
+          "ChatGPT dragon girl",
+          "GPT-chan",
+          "OpenAI girl",
+          "OpenAI娘"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the ChatGPT dragon girl character; generic anime requests use anima-turbo-v1-1."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'Chatgpt_dragon_girl' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "ChatGPT dragon girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "ChatGPT dragon girl SFW",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "ChatGPT dragon girl",
+          "OpenAI",
+          "ChatGPT娘",
+          "GPT娘"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "chatgpt-girl-janku",
+            "when": "the request is NSFW or asks for the JANKU look"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, Chatgpt_dragon_girl, 1girl, solo, adult, dragon girl, white hair, long hair, white horns, dragon horns, pointy ears, purple eyes, ahoge, hair ornament, dragon wings, dragon tail', then outfit (white dress is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks",
+          "the JANKU trigger 'chatgpt'"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 0.8; the probe at this strength held her design on Anima Turbo."
+        }
+      },
+      "compatibility_notes": [
+        "The LoRA was trained on Anima Base v1.0 (2B, 28 blocks) from 50 images; Anima Turbo v1.1 shares that architecture.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with OpenAI; non-commercial use only.",
+        "SDXL bases lean blue on white hair + dragon; keep 'purple eyes' and white horns explicit."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, Chatgpt_dragon_girl, 1girl, solo, adult, dragon girl, white hair, long hair, white horns, dragon horns, pointy ears, purple eyes, ahoge, hair ornament, dragon wings, dragon tail, white dress, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "Chatgpt_dragon_girl",
+            "default_strength": 0.8
+          }
+        }
+      },
+      "source": {
+        "creator": "Ptilopsism",
+        "civitai_model_id": 2871688,
+        "civitai_version_id": 3244620,
+        "local_file": "ChatGPT_DragonGirl_Anima2B.safetensors",
+        "sha256": "D5AB678C1D3A4982AC307C64290CCB189041A0BDB8642B2756D8618C6417152C"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "chatgpt_girl_anima_turbo",
+        "loras": {
+          "character": 0.8
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "ChatGPT_DragonGirl_Anima2B.safetensors",
+          "trigger": "Chatgpt_dragon_girl",
+          "default": 0.8,
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
+      "id": "qwen-girl-anima-turbo",
+      "name": "Qwen girl — Anima Turbo v1.1 + character LoRA",
+      "description": "Qwen girl character route: official Anima Turbo v1.1 with Aetherlyn's Anima 2B LoRA. Design: Qwen-chan (ZipZipPipe design): long wavy periwinkle/purple hair with a side braid, purple eyes, white Chinese-style gown with gold trim under an indigo robe with wide sleeves. Preferred Qwen girl route for SFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "qwen",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "qwen_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "qwen-girl-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/Qwen_Girl_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "qwen girl",
+          "qwen-chan",
+          "qwen chan"
+        ],
+        "aliases": [
+          "千问娘",
+          "Qwen娘",
+          "Qwen 娘",
+          "Qwen-chan",
+          "通义千问娘",
+          "千问"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the Qwen girl character; generic anime requests use anima-turbo-v1-1."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'qwen \\(girl\\)' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "Qwen girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Qwen girl SFW",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "Qwen girl",
+          "Alibaba Qwen",
+          "千问娘",
+          "Qwen娘"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "qwen-girl-janku",
+            "when": "the request is NSFW or asks for the JANKU look"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, qwen \\(girl\\), 1girl, solo, adult, purple hair, blue hair, very long hair, wavy hair, braid, purple eyes', then outfit (white dress, chinese clothes, gold trim, robe, long sleeves, wide sleeves is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks",
+          "the JANKU trigger 'qwengirl'"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 1.0; the probe at this strength held her design on Anima Turbo."
+        }
+      },
+      "compatibility_notes": [
+        "The LoRA was trained on Anima Base v1.0 (2B, 28 blocks) from 20 images; Anima Turbo v1.1 shares that architecture.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with Alibaba Qwen; non-commercial use only.",
+        "The Qwen logo on her accessories is not reproduced reliably (author note). Plain domain 'qwen' stays with the Qwen-Image routes."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, qwen \\(girl\\), 1girl, solo, adult, purple hair, blue hair, very long hair, wavy hair, braid, purple eyes, white dress, chinese clothes, gold trim, robe, long sleeves, wide sleeves, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "qwen \\(girl\\)",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "Aetherlyn",
+        "civitai_model_id": 3016389,
+        "civitai_version_id": 3424116,
+        "local_file": "Qwen_Girl_Anima2B.safetensors",
+        "sha256": "61F616F4CB9A81D022DC97B0D22A15C9312A172669EBDB2DD35635A3B441EBF0"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "qwen_girl_anima_turbo",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "Qwen_Girl_Anima2B.safetensors",
+          "trigger": "qwen \\(girl\\)",
+          "default": 1.0,
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
+      "id": "gemini-girl-anima-turbo",
+      "name": "Gemini girl — Anima Turbo v1.1 + character LoRA",
+      "description": "Gemini girl character route: official Anima Turbo v1.1 with Nopsil's Anima 2B LoRA. Design: Gemini-chan / 哈基米 (上善无形, ZipZipPipe): blue-to-purple gradient long hair with double buns, cat ears and tail, heterochromia (red right eye, golden left eye), star hair ornament, black sleeveless crop top, detached sleeves, layered black skirt. Preferred Gemini girl route for SFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "gemini",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "gemini_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "gemini-girl-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/Gemini_Girl_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "gemini girl",
+          "gemini-chan"
+        ],
+        "aliases": [
+          "Gemini娘",
+          "Gemini 娘",
+          "哈基米",
+          "哈基米娘",
+          "Gemini-chan",
+          "Google Gemini girl",
+          "gemini musume"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the Gemini girl character; generic anime requests use anima-turbo-v1-1.",
+          "The bare name is not a domain: it also names other characters (Claude Monet, Claude von Riegan, Gemini Saga). Use the girl/chan/娘 forms."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'gemini_ai' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "Gemini girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Gemini girl SFW",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "Gemini girl",
+          "Google",
+          "Gemini娘",
+          "Gemini 娘"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "gemini-girl-janku",
+            "when": "the request is NSFW or asks for the JANKU look"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, gemini_ai, 1girl, solo, adult, blue hair, purple hair, gradient hair, long hair, hair bun, ahoge, cat ears, animal ear fluff, heterochromia, red right eye, golden left eye, star-shaped hair ornament', then outfit (sleeveless crop top, black skirt, detached sleeves is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks",
+          "the JANKU trigger 'gemini musume'"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 0.9; the probe at this strength held her design on Anima Turbo."
+        }
+      },
+      "compatibility_notes": [
+        "The LoRA was trained on Anima Base v1.0 (2B, 28 blocks) from 317 images; Anima Turbo v1.1 shares that architecture.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with Google; non-commercial use only.",
+        "On Anima the tail usually comes from gemini_ai alone; add 'tail' once if missing (author note)."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, gemini_ai, 1girl, solo, adult, blue hair, purple hair, gradient hair, long hair, hair bun, ahoge, cat ears, animal ear fluff, heterochromia, red right eye, golden left eye, star-shaped hair ornament, sleeveless crop top, black skirt, detached sleeves, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "gemini_ai",
+            "default_strength": 0.9
+          }
+        }
+      },
+      "source": {
+        "creator": "Nopsil",
+        "civitai_model_id": 2950198,
+        "civitai_version_id": 3341211,
+        "local_file": "Gemini_Girl_Anima2B.safetensors",
+        "sha256": "B2825DDB36FAA22168507D3CED7327E6FD81586D46FAD70E24048221C688CC08"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "gemini_girl_anima_turbo",
+        "loras": {
+          "character": 0.9
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "Gemini_Girl_Anima2B.safetensors",
+          "trigger": "gemini_ai",
+          "default": 0.9,
+          "strength_model": "character_strength_model"
         }
       }
     },
@@ -5211,7 +6854,15 @@
           "animagine-xl-3.1-nsfw",
           "sdxl-face-reference-ipadapter",
           "sdxl-openpose-controlnet",
-          "moody-anima-inpaint"
+          "moody-anima-inpaint",
+          "claude-girl-anima-turbo",
+          "chatgpt-girl-anima-turbo",
+          "qwen-girl-anima-turbo",
+          "gemini-girl-anima-turbo",
+          "claude-girl-janku",
+          "chatgpt-girl-janku",
+          "qwen-girl-janku",
+          "gemini-girl-janku"
         ],
         "prefer_instead": [
           {
@@ -5630,13 +7281,13 @@
         "prefer_instead": [
           {
             "workflow": "deepseek-whale-girl-anima-turbo",
-            "when": "the request asks for her popular navy maid outfit or the ZipZipPipe art style, or is SFW"
+            "when": "the request is SFW and does not ask for her original white/blue off-shoulder dress, or asks for the navy maid outfit or the ZipZipPipe style"
           }
         ]
       },
       "agent_hints": {
         "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Start with the quality tags, then 'deepseek whalegirl', 1girl, solo, adult, then outfit, pose, camera, scene and lighting. The LoRA carries her hair, whale-fin ears, tail and a white lace eye mask. Name an outfit (her own: 'white dress, blue dress, layered dress'); without one JANKU drifts into lingerie. For SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. To show her eyes use all three: loras.deepseek 0.8, '(blue eyes:1.3), looking at viewer' in the prompt, and '(blindfold:1.5), (covered eyes:1.5), (eye mask:1.5), lace blindfold' in the negative prompt; negatives alone at strength 1.0 do not remove the mask. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "prompt_scope": "Start with the quality tags, then 'deepseek whalegirl', 1girl, solo, adult, then outfit, pose, camera, scene and lighting. The LoRA carries her hair, whale-fin ears, tail and a white lace eye mask. Name an outfit (her own: 'white dress, blue dress, layered dress'); without one JANKU drifts into lingerie. For SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. To show her eyes use all three: loras.character 0.8, '(blue eyes:1.3), looking at viewer' in the prompt, and '(blindfold:1.5), (covered eyes:1.5), (eye mask:1.5), lace blindfold' in the negative prompt; negatives alone at strength 1.0 do not remove the mask. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
           "series",
@@ -5674,7 +7325,7 @@
         "recommendations_are_advisory": true,
         "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms.",
         "adapter_selection": {
-          "deepseek": "1.0 by default (author range 0.8-1.2); use 0.8 when her eyes must be visible. Lower to 0.6-0.75 if pose or background feels locked."
+          "character": "1.0 by default (author range 0.8-1.2); use 0.8 when her eyes must be visible. Lower to 0.6-0.75 if pose or background feels locked."
         }
       },
       "compatibility_notes": [
@@ -5721,16 +7372,16 @@
         "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
         "examples": [
           {
-            "purpose": "SFW character portrait with eyes shown (set loras.deepseek to 0.8)",
+            "purpose": "SFW character portrait with eyes shown (set loras.character to 0.8)",
             "prompt": "masterpiece, best quality, very aesthetic, absurdres, deepseek whalegirl, 1girl, solo, adult, white dress, blue dress, layered dress, (blue eyes:1.3), looking at viewer, standing, light smile, beach at sunset, waves, cowboy shot, soft rim light",
             "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts, nsfw, underwear, panties, lingerie, see-through, (blindfold:1.5), (covered eyes:1.5), (eye mask:1.5), lace blindfold",
             "loras": {
-              "deepseek": 0.8
+              "character": 0.8
             }
           }
         ],
         "lora_triggers": {
-          "deepseek": {
+          "character": {
             "trigger": "deepseek whalegirl",
             "default_strength": 1.0
           }
@@ -5792,11 +7443,11 @@
           "node": "8",
           "input": "filename_prefix"
         },
-        "deepseek_strength_model": {
+        "character_strength_model": {
           "node": "2",
           "input": "strength_model"
         },
-        "deepseek_strength_clip": {
+        "character_strength_clip": {
           "node": "2",
           "input": "strength_clip"
         }
@@ -5812,7 +7463,7 @@
         "scheduler": "normal",
         "filename_prefix": "deepseek_whale_girl_janku",
         "loras": {
-          "deepseek": 1.0
+          "character": 1.0
         }
       },
       "resource_limits": {
@@ -5826,12 +7477,1675 @@
         "image_to_image": true
       },
       "lora_bindings": {
-        "deepseek": {
+        "character": {
           "file": "DeepSeek_WhaleGirl_ChenkinNoobXL.safetensors",
           "trigger": "deepseek whalegirl",
           "default": 1.0,
-          "strength_model": "deepseek_strength_model",
-          "strength_clip": "deepseek_strength_clip"
+          "strength_model": "character_strength_model",
+          "strength_clip": "character_strength_clip"
+        }
+      }
+    },
+    {
+      "id": "claude-girl-janku",
+      "name": "Claude girl — JANKU v7.77 + character LoRA",
+      "description": "Claude girl character route: JANKU v7.77 with kadaizuo604's Illustrious LoRA. Design: Claude-chan / 'ors scholar': very long orange hair, orange eyes, orange flower and black bow in her hair, white scholar dress with black corset, white capelet and gold chain. Preferred Claude girl route for NSFW.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-janku",
+      "tags": [
+        "anime",
+        "sdxl",
+        "illustrious",
+        "janku",
+        "claude",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "claude_girl_janku.json",
+      "model_ids": [
+        "janku-v7-77",
+        "claude-girl-illustrious-lora"
+      ],
+      "required_files": [
+        "models/checkpoints/JANKU_v7_77.safetensors",
+        "models/loras/Claude_Girl_OrsScholar_Illustrious.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "claude girl",
+          "claude-chan"
+        ],
+        "aliases": [
+          "Claude娘",
+          "Claude 娘",
+          "Claude-chan",
+          "克劳德小姐",
+          "Claude girl",
+          "Anthropic girl",
+          "Anthropic娘",
+          "ors scholar"
+        ],
+        "styles": [
+          "JANKU",
+          "Illustrious",
+          "anime",
+          "illustration",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 90,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 95,
+        "fallback": false,
+        "exclusive": true,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Only for the Claude girl character; generic anime requests use janku-illustrious.",
+          "The bare name is not a domain: it also names other characters (Claude Monet, Claude von Riegan, Gemini Saga). Use the girl/chan/娘 forms."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "mainstream anime",
+          "modern anime",
+          "anime key visual",
+          "detailed background",
+          "cinematic lighting",
+          "thick clean linework"
+        ],
+        "subjects": [
+          "Claude girl"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "LoRA-assisted; trigger 'ors scholar' plus her identity tags",
+        "style_control": "strong for mainstream modern anime with detailed, cinematic backgrounds",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on JANKU v7.77",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison with an SFW negative prompt; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Claude girl NSFW",
+          "JANKU mainstream-anime look"
+        ],
+        "not_for": [
+          "other characters",
+          "Anima LoRAs"
+        ],
+        "priority_signals": [
+          "Claude girl",
+          "Anthropic",
+          "JANKU"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "claude-girl-anima-turbo",
+            "when": "the request is SFW"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, ors scholar, 1girl, solo, adult, very long hair, orange hair, orange eyes, orange flower, flower hair ornament, black bow', then outfit, pose, camera, scene and lighting. Name an outfit (white dress, long dress, puffy sleeves, black corset, white capelet, gold buttons is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "artist",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "avoid": [
+          "age-lowering tags",
+          "natural-language paragraphs"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "lighting"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-30 steps, CFG 3-5, Euler or Euler A/euler_ancestral with the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            30
+          ],
+          "cfg": [
+            3,
+            5
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms.",
+        "adapter_selection": {
+          "character": "Default 1.0; lower to 0.6-0.75 if pose or background feels locked."
+        }
+      },
+      "compatibility_notes": [
+        "JANKU v7.77 with an SDXL LoRA trained on Illustrious XL v0.1 from 280 images; model and CLIP strengths move together.",
+        "Fan-made design, not affiliated with Anthropic; non-commercial use only."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, ors scholar, 1girl, solo, adult, very long hair, orange hair, orange eyes, orange flower, flower hair ornament, black bow, white dress, long dress, puffy sleeves, black corset, white capelet, gold buttons, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight",
+            "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts, nsfw, underwear, panties, lingerie, see-through"
+          }
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "ors scholar",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "kadaizuo604",
+        "civitai_model_id": 3014460,
+        "civitai_version_id": 3421596,
+        "local_file": "Claude_Girl_OrsScholar_Illustrious.safetensors",
+        "sha256": "3C6ED23551298E18E183A38119AACCE1E4A1B14674F1DAF02FE09A3760941C6A"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "width": {
+          "node": "5",
+          "input": "width"
+        },
+        "height": {
+          "node": "5",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "5",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "6",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "6",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "6",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "6",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "6",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "6",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "8",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "character_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "claude_girl_janku",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "Claude_Girl_OrsScholar_Illustrious.safetensors",
+          "trigger": "ors scholar",
+          "default": 1.0,
+          "strength_model": "character_strength_model",
+          "strength_clip": "character_strength_clip"
+        }
+      }
+    },
+    {
+      "id": "chatgpt-girl-janku",
+      "name": "ChatGPT dragon girl — JANKU v7.77 + character LoRA",
+      "description": "ChatGPT dragon girl character route: JANKU v7.77 with g2025942049487's Illustrious LoRA. Design: ChatGPT dragon girl (ZipZipPipe design): long white hair, white dragon horns, pointy ears, purple eyes, white rose hair ornament, white qipao-style dress, dragon wings and tail. Preferred ChatGPT dragon girl route for NSFW.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-janku",
+      "tags": [
+        "anime",
+        "sdxl",
+        "illustrious",
+        "janku",
+        "chatgpt",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "chatgpt_girl_janku.json",
+      "model_ids": [
+        "janku-v7-77",
+        "chatgpt-girl-illustrious-lora"
+      ],
+      "required_files": [
+        "models/checkpoints/JANKU_v7_77.safetensors",
+        "models/loras/ChatGPT_DragonGirl_Illustrious.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "chatgpt",
+          "chatgpt girl",
+          "gpt girl"
+        ],
+        "aliases": [
+          "ChatGPT娘",
+          "GPT娘",
+          "ChatGPT龙娘",
+          "ChatGPT 龙娘",
+          "ChatGPT dragon girl",
+          "GPT-chan",
+          "OpenAI girl",
+          "OpenAI娘"
+        ],
+        "styles": [
+          "JANKU",
+          "Illustrious",
+          "anime",
+          "illustration",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 90,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 95,
+        "fallback": false,
+        "exclusive": true,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Only for the ChatGPT dragon girl character; generic anime requests use janku-illustrious."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "mainstream anime",
+          "modern anime",
+          "anime key visual",
+          "detailed background",
+          "cinematic lighting",
+          "thick clean linework"
+        ],
+        "subjects": [
+          "ChatGPT dragon girl"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "LoRA-assisted; trigger 'chatgpt' plus her identity tags",
+        "style_control": "strong for mainstream modern anime with detailed, cinematic backgrounds",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on JANKU v7.77",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison with an SFW negative prompt; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "ChatGPT dragon girl NSFW",
+          "JANKU mainstream-anime look"
+        ],
+        "not_for": [
+          "other characters",
+          "Anima LoRAs"
+        ],
+        "priority_signals": [
+          "ChatGPT dragon girl",
+          "OpenAI",
+          "JANKU"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "chatgpt-girl-anima-turbo",
+            "when": "the request is SFW"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, chatgpt, 1girl, solo, adult, dragon girl, white hair, long hair, dragon horns, pointy ears, purple eyes, white rose hair ornament, dragon wings, dragon tail', then outfit, pose, camera, scene and lighting. Name an outfit (white dress is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "artist",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "avoid": [
+          "age-lowering tags",
+          "natural-language paragraphs",
+          "the Anima trigger 'Chatgpt_dragon_girl'"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "lighting"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-30 steps, CFG 3-5, Euler or Euler A/euler_ancestral with the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            30
+          ],
+          "cfg": [
+            3,
+            5
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms.",
+        "adapter_selection": {
+          "character": "Default 0.8; lower to 0.6-0.75 if pose or background feels locked."
+        }
+      },
+      "compatibility_notes": [
+        "JANKU v7.77 with an SDXL LoRA trained on Illustrious (rank 16) from 221 images; model and CLIP strengths move together.",
+        "Fan-made design, not affiliated with OpenAI; non-commercial use only.",
+        "SDXL bases lean blue on white hair + dragon; keep 'purple eyes' and white horns explicit."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, chatgpt, 1girl, solo, adult, dragon girl, white hair, long hair, dragon horns, pointy ears, purple eyes, white rose hair ornament, dragon wings, dragon tail, white dress, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight",
+            "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts, nsfw, underwear, panties, lingerie, see-through"
+          }
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "chatgpt",
+            "default_strength": 0.8
+          }
+        }
+      },
+      "source": {
+        "creator": "g2025942049487",
+        "civitai_model_id": 3006307,
+        "civitai_version_id": 3411033,
+        "local_file": "ChatGPT_DragonGirl_Illustrious.safetensors",
+        "sha256": "9CF9FCEBFA31C38917A6B1F21B5357649F71FD574FDDEE1A60555B8CD5A339EA"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "width": {
+          "node": "5",
+          "input": "width"
+        },
+        "height": {
+          "node": "5",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "5",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "6",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "6",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "6",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "6",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "6",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "6",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "8",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "character_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "chatgpt_girl_janku",
+        "loras": {
+          "character": 0.8
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "ChatGPT_DragonGirl_Illustrious.safetensors",
+          "trigger": "chatgpt",
+          "default": 0.8,
+          "strength_model": "character_strength_model",
+          "strength_clip": "character_strength_clip"
+        }
+      }
+    },
+    {
+      "id": "qwen-girl-janku",
+      "name": "Qwen girl — JANKU v7.77 + character LoRA",
+      "description": "Qwen girl character route: JANKU v7.77 with zionesan5389's Illustrious LoRA. Design: Qwen-chan (ZipZipPipe design): long wavy periwinkle/purple hair with a side braid, purple eyes, white Chinese-style gown with gold trim under an indigo robe with wide sleeves. Preferred Qwen girl route for NSFW.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-janku",
+      "tags": [
+        "anime",
+        "sdxl",
+        "illustrious",
+        "janku",
+        "qwen",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "qwen_girl_janku.json",
+      "model_ids": [
+        "janku-v7-77",
+        "qwen-girl-illustrious-lora"
+      ],
+      "required_files": [
+        "models/checkpoints/JANKU_v7_77.safetensors",
+        "models/loras/Qwen_Girl_Illustrious.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "qwen girl",
+          "qwen-chan",
+          "qwen chan"
+        ],
+        "aliases": [
+          "千问娘",
+          "Qwen娘",
+          "Qwen 娘",
+          "Qwen-chan",
+          "通义千问娘",
+          "千问"
+        ],
+        "styles": [
+          "JANKU",
+          "Illustrious",
+          "anime",
+          "illustration",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 90,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 95,
+        "fallback": false,
+        "exclusive": true,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Only for the Qwen girl character; generic anime requests use janku-illustrious."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "mainstream anime",
+          "modern anime",
+          "anime key visual",
+          "detailed background",
+          "cinematic lighting",
+          "thick clean linework"
+        ],
+        "subjects": [
+          "Qwen girl"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "LoRA-assisted; trigger 'qwengirl' plus her identity tags",
+        "style_control": "strong for mainstream modern anime with detailed, cinematic backgrounds",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on JANKU v7.77",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison with an SFW negative prompt; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Qwen girl NSFW",
+          "JANKU mainstream-anime look"
+        ],
+        "not_for": [
+          "other characters",
+          "Anima LoRAs"
+        ],
+        "priority_signals": [
+          "Qwen girl",
+          "Alibaba Qwen",
+          "JANKU"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "qwen-girl-anima-turbo",
+            "when": "the request is SFW"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, qwengirl, 1girl, solo, adult woman, periwinkle blue hair, very long hair, wavy hair, side braid, purple eyes', then outfit, pose, camera, scene and lighting. Name an outfit (indigo cloak, gold trim, tassels, periwinkle gown, white frills is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "artist",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "avoid": [
+          "age-lowering tags",
+          "natural-language paragraphs",
+          "the Anima trigger 'qwen \\(girl\\)'"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "lighting"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-30 steps, CFG 3-5, Euler or Euler A/euler_ancestral with the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            30
+          ],
+          "cfg": [
+            3,
+            5
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms.",
+        "adapter_selection": {
+          "character": "Default 0.9; lower to 0.6-0.75 if pose or background feels locked."
+        }
+      },
+      "compatibility_notes": [
+        "JANKU v7.77 with an SDXL LoRA trained on an unnamed SDXL/Illustrious base (rank 64, natural-language captions) from 256 images; model and CLIP strengths move together.",
+        "Fan-made design, not affiliated with Alibaba Qwen; non-commercial use only.",
+        "The Qwen logo on her accessories is not reproduced reliably (author note). Plain domain 'qwen' stays with the Qwen-Image routes."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, qwengirl, 1girl, solo, adult woman, periwinkle blue hair, very long hair, wavy hair, side braid, purple eyes, indigo cloak, gold trim, tassels, periwinkle gown, white frills, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight",
+            "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts, nsfw, underwear, panties, lingerie, see-through"
+          }
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "qwengirl",
+            "default_strength": 0.9
+          }
+        }
+      },
+      "source": {
+        "creator": "zionesan5389",
+        "civitai_model_id": 2895705,
+        "civitai_version_id": 3273627,
+        "local_file": "Qwen_Girl_Illustrious.safetensors",
+        "sha256": "BFA27AEBE1BF030DB3C6A54EF91CBC37407A0D2C84CE271C01BEA5E6AC572259"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "width": {
+          "node": "5",
+          "input": "width"
+        },
+        "height": {
+          "node": "5",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "5",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "6",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "6",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "6",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "6",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "6",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "6",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "8",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "character_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "qwen_girl_janku",
+        "loras": {
+          "character": 0.9
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "Qwen_Girl_Illustrious.safetensors",
+          "trigger": "qwengirl",
+          "default": 0.9,
+          "strength_model": "character_strength_model",
+          "strength_clip": "character_strength_clip"
+        }
+      }
+    },
+    {
+      "id": "gemini-girl-janku",
+      "name": "Gemini girl — JANKU v7.77 + character LoRA",
+      "description": "Gemini girl character route: JANKU v7.77 with kadaizuo604's Illustrious LoRA. Design: Gemini-chan / 哈基米 (上善无形, ZipZipPipe): blue-to-purple gradient long hair with double buns, cat ears and tail, heterochromia (red right eye, golden left eye), star hair ornament, black sleeveless crop top, detached sleeves, layered black skirt. Preferred Gemini girl route for NSFW.",
+      "family": "sdxl-illustrious",
+      "resident_group": "sdxl-illustrious-janku",
+      "tags": [
+        "anime",
+        "sdxl",
+        "illustrious",
+        "janku",
+        "gemini",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "gemini_girl_janku.json",
+      "model_ids": [
+        "janku-v7-77",
+        "gemini-girl-illustrious-lora"
+      ],
+      "required_files": [
+        "models/checkpoints/JANKU_v7_77.safetensors",
+        "models/loras/Gemini_Girl_Illustrious.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "gemini girl",
+          "gemini-chan"
+        ],
+        "aliases": [
+          "Gemini娘",
+          "Gemini 娘",
+          "哈基米",
+          "哈基米娘",
+          "Gemini-chan",
+          "Google Gemini girl",
+          "gemini musume"
+        ],
+        "styles": [
+          "JANKU",
+          "Illustrious",
+          "anime",
+          "illustration",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_mode_preferences": {
+          "nsfw": 90,
+          "sfw": -10,
+          "general": -10
+        },
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ]
+        },
+        "priority": 95,
+        "fallback": false,
+        "exclusive": true,
+        "strict_style": false,
+        "explicit_only": false,
+        "exclusion_rules": [
+          "Only for the Gemini girl character; generic anime requests use janku-illustrious.",
+          "The bare name is not a domain: it also names other characters (Claude Monet, Claude von Riegan, Gemini Saga). Use the girl/chan/娘 forms."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image",
+          "latent"
+        ],
+        "architectures": [
+          "sdxl"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "illustrious",
+          "mainstream anime",
+          "modern anime",
+          "anime key visual",
+          "detailed background",
+          "cinematic lighting",
+          "thick clean linework"
+        ],
+        "subjects": [
+          "Gemini girl"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "content_modes": [
+          "sfw",
+          "nsfw"
+        ],
+        "prompt_dialect": "illustrious-noobai-danbooru-tags",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        },
+        "natural_language": false,
+        "character_identity": "LoRA-assisted; trigger 'gemini musume' plus her identity tags",
+        "style_control": "strong for mainstream modern anime with detailed, cinematic backgrounds",
+        "outfit_control": "medium through tags",
+        "composition_control": "medium through tags",
+        "recommended_resolutions": [
+          "1024x1536",
+          "1024x1024"
+        ],
+        "performance": "medium"
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "ordered Illustrious/NoobAI/Danbooru-style tags"
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size; one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the candidate LoRA on JANKU v7.77",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-10-25",
+            "seed": 101,
+            "scope": "Candidate comparison with an SFW negative prompt; identity visually confirmed. Not an NSFW benchmark."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Gemini girl NSFW",
+          "JANKU mainstream-anime look"
+        ],
+        "not_for": [
+          "other characters",
+          "Anima LoRAs"
+        ],
+        "priority_signals": [
+          "Gemini girl",
+          "Google",
+          "JANKU"
+        ],
+        "prefer_instead": [
+          {
+            "workflow": "gemini-girl-anima-turbo",
+            "when": "the request is SFW"
+          }
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "detailed",
+        "prompt_scope": "Start with 'masterpiece, best quality, very aesthetic, absurdres, gemini musume, 1girl, solo, adult, very long hair, blue hair, purple hair, gradient hair, double bun, star hair ornament, ahoge, heterochromia, red eyes, yellow eyes, cat ears, cat tail', then outfit, pose, camera, scene and lighting. Name an outfit (black crop top, detached sleeves, skirt is her own); for SFW add 'nsfw, underwear, panties, lingerie, see-through' to the negative prompt. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "artist",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "avoid": [
+          "age-lowering tags",
+          "natural-language paragraphs",
+          "the Anima trigger 'gemini_ai'"
+        ],
+        "suggested_prompt_details": [
+          "character",
+          "series",
+          "appearance",
+          "pose",
+          "lighting"
+        ],
+        "prompt_details_are_advisory": true,
+        "sampling": "Default to 25-30 steps, CFG 3-5, Euler or Euler A/euler_ancestral with the normal scheduler.",
+        "recommended": {
+          "steps": [
+            25,
+            30
+          ],
+          "cfg": [
+            3,
+            5
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "negative_prompt": "Use a caller-provided negative prompt appropriate to the requested content; do not automatically add NSFW terms.",
+        "adapter_selection": {
+          "character": "Default 1.0; lower to 0.6-0.75 if pose or background feels locked."
+        }
+      },
+      "compatibility_notes": [
+        "JANKU v7.77 with an SDXL LoRA trained on Illustrious XL v0.1 from 280 images; model and CLIP strengths move together.",
+        "Fan-made design, not affiliated with Google; non-commercial use only.",
+        "On Anima the tail usually comes from gemini_ai alone; add 'tail' once if missing (author note)."
+      ],
+      "prompting": {
+        "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
+        "structure": [
+          "quality",
+          "subject count",
+          "character or subject",
+          "series",
+          "appearance",
+          "outfit",
+          "pose",
+          "camera",
+          "scene",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert",
+          "accepted": [
+            "structured",
+            "detailed",
+            "expert"
+          ],
+          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
+        "recommended": {
+          "width": 1024,
+          "height": 1536,
+          "steps": 30,
+          "cfg": 5.0,
+          "sampler_name": "euler_ancestral",
+          "scheduler": "normal"
+        },
+        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, very aesthetic, absurdres, gemini musume, 1girl, solo, adult, very long hair, blue hair, purple hair, gradient hair, double bun, star hair ornament, ahoge, heterochromia, red eyes, yellow eyes, cat ears, cat tail, black crop top, detached sleeves, skirt, standing, looking at viewer, smile, cowboy shot, sunlit garden, soft daylight",
+            "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, fewer digits, blurry, text, watermark, logo, signature, jpeg artifacts, nsfw, underwear, panties, lingerie, see-through"
+          }
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "gemini musume",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "kadaizuo604",
+        "civitai_model_id": 3014606,
+        "civitai_version_id": 3421768,
+        "local_file": "Gemini_Girl_Illustrious.safetensors",
+        "sha256": "5A9B9F7241BC78ACF960EA1FE200428EA245B0D9BFE19CE10C538031B043FF40"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "3",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "4",
+          "input": "text"
+        },
+        "width": {
+          "node": "5",
+          "input": "width"
+        },
+        "height": {
+          "node": "5",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "5",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "6",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "6",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "6",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "6",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "6",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "6",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "8",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        },
+        "character_strength_clip": {
+          "node": "2",
+          "input": "strength_clip"
+        }
+      },
+      "defaults": {
+        "width": 1024,
+        "height": 1536,
+        "batch_size": 1,
+        "steps": 30,
+        "cfg": 5.0,
+        "denoise": 1.0,
+        "sampler_name": "euler_ancestral",
+        "scheduler": "normal",
+        "filename_prefix": "gemini_girl_janku",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, using the existing SDXL convention. This is not a guarantee of model fit."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "Gemini_Girl_Illustrious.safetensors",
+          "trigger": "gemini musume",
+          "default": 1.0,
+          "strength_model": "character_strength_model",
+          "strength_clip": "character_strength_clip"
         }
       }
     },
@@ -6104,7 +9418,15 @@
           "animagine-xl-3.1-nsfw",
           "sdxl-face-reference-ipadapter",
           "sdxl-openpose-controlnet",
-          "moody-anima-inpaint"
+          "moody-anima-inpaint",
+          "claude-girl-anima-turbo",
+          "chatgpt-girl-anima-turbo",
+          "qwen-girl-anima-turbo",
+          "gemini-girl-anima-turbo",
+          "claude-girl-janku",
+          "chatgpt-girl-janku",
+          "qwen-girl-janku",
+          "gemini-girl-janku"
         ],
         "prefer_instead": [
           {
@@ -6528,7 +9850,15 @@
           "animagine-xl-3.1-nsfw",
           "sdxl-face-reference-ipadapter",
           "sdxl-openpose-controlnet",
-          "moody-anima-inpaint"
+          "moody-anima-inpaint",
+          "claude-girl-anima-turbo",
+          "chatgpt-girl-anima-turbo",
+          "qwen-girl-anima-turbo",
+          "gemini-girl-anima-turbo",
+          "claude-girl-janku",
+          "chatgpt-girl-janku",
+          "qwen-girl-janku",
+          "gemini-girl-janku"
         ]
       },
       "agent_hints": {

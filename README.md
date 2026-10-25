@@ -34,6 +34,10 @@
 | One Obsession v24 · Illustrious 系 | 纹理、戏剧性光影与 2.5D 风格 | 文生图、图生图 | `one-obsession` |
 | Anima Turbo v1.1 + DeepSeek 鲸鱼娘 LoRA（ZipZipPipe 画风） | 大肥鱼女仆装形象，SFW 优先 | 文生图、图生图 | `deepseek-whale-girl-anima-turbo` |
 | JANKU v7.77 + DeepSeek 鲸鱼娘 LoRA（Chenkin 系训练） | 大肥鱼原版白蓝露肩裙形象，NSFW 优先 | 文生图、图生图 | `deepseek-whale-girl-janku` |
+| Anima Turbo / JANKU + Claude 娘 LoRA | Claude 娘（ors scholar，橙发白裙） | 文生图、图生图 | `claude-girl-anima-turbo`、`claude-girl-janku` |
+| Anima Turbo / JANKU + ChatGPT 龙娘 LoRA | ChatGPT 龙娘（白发龙角、龙翼龙尾） | 文生图、图生图 | `chatgpt-girl-anima-turbo`、`chatgpt-girl-janku` |
+| Anima Turbo / JANKU + 千问娘 LoRA | 千问娘（紫蓝长发侧辫、中式长袍） | 文生图、图生图 | `qwen-girl-anima-turbo`、`qwen-girl-janku` |
+| Anima Turbo / JANKU + Gemini 娘 LoRA | Gemini 娘 / 哈基米（渐变发双丸子、猫耳异色瞳） | 文生图、图生图 | `gemini-girl-anima-turbo`、`gemini-girl-janku` |
 
 动漫路由和 Qwen-Image-2.1 Uncensored 路由均声明支持 SFW / NSFW 内容模式。内容模式用于路由选择，具体画面由调用方的提示词决定。
 
@@ -51,7 +55,7 @@
 
 ### 如何选择
 
-通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、DeepSeek 鲸鱼娘（`domain: "deepseek"`，别名含“大肥鱼”“DeepSeek娘”）或模型风格时，路由器优先匹配对应组合；DeepSeek 鲸鱼娘的 SFW 请求走 Anima Turbo，NSFW 请求走 JANKU。角色一律按成年女性描写。
+通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、AI 娘化角色或模型风格时，路由器优先匹配对应组合。AI 娘化角色的 domain 为 `deepseek`（大肥鱼）、`claude girl`（Claude娘）、`chatgpt`（ChatGPT龙娘）、`qwen girl`（千问娘）和 `gemini girl`（哈基米）；单独的 `qwen` 仍指 Qwen-Image，单独的 `claude`、`gemini` 也会撞上其他同名角色，不作为 domain；每个角色的 SFW 请求走 Anima Turbo，NSFW 请求走 JANKU，LoRA 强度统一用 `loras.character` 调整。角色一律按成年女性描写。
 
 使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
 
@@ -83,6 +87,7 @@
 | JANKU v5.0 | `janku-v5-illustrious` |
 | One Obsession v24 | `one-obsession` |
 | DeepSeek 鲸鱼娘 LoRA（两个，需 `CIVITAI_TOKEN`） | `deepseek-whale-girl` |
+| Claude / ChatGPT / 千问 / Gemini 娘 LoRA（八个，需 `CIVITAI_TOKEN`） | `ai-agent-girls` |
 | SDXL 人物参考附加组件 | `ipadapter-face-sdxl` |
 | SDXL 姿态控制附加组件 | `controlnet-openpose-sdxl` |
 

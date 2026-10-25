@@ -306,7 +306,7 @@ class AgentContractTests(unittest.TestCase):
             with self.assertRaises(api.ApiError):
                 api._prepare_graph(entry, {"parameters": {"prompt": "portrait", "unknown": True}})
         self.assertIn(
-            "'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ipadapter-face-sdxl'",
+            "'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl'",
             downloader,
         )
 
@@ -339,29 +339,48 @@ class AgentContractTests(unittest.TestCase):
         self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v7.77"}))
         self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v24"}))
 
-    def test_deepseek_lora_routes_split_by_content_and_bind_their_loras(self):
+    def test_character_lora_routes_split_by_content_and_bind_their_loras(self):
         entries = {entry["id"]: entry for entry in catalog["workflows"]}
         models = {model["id"]: model for model in api._read_catalog()["model_registry"]}
-        janku, anima = entries["deepseek-whale-girl-janku"], entries["deepseek-whale-girl-anima-turbo"]
-        for alias in ("deepseek", "大肥鱼", "DeepSeek娘", "deepseek whale girl"):
-            sfw, nsfw = {"domain": alias, "content_mode": "sfw"}, {"domain": alias, "content_mode": "nsfw"}
-            self.assertGreater(api._route_score(anima, sfw)[0], api._route_score(janku, sfw)[0], alias)
-            self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0], alias)
-            self.assertGreater(api._route_score(anima, {"domain": alias})[0], api._route_score(janku, {"domain": alias})[0], alias)
         downloader = (ROOT / "scripts" / "download_models.ps1").read_text(encoding="utf-8")
-        for entry, node, loader in ((janku, "2", "LoraLoader"), (anima, "2", "LoraLoaderModelOnly")):
-            (lora_id,) = [m for m in entry["model_ids"] if m.startswith("deepseek-")]
-            model = models[lora_id]
-            self.assertIn(model["required_file"], entry["required_files"])
-            self.assertIn(model["source"]["sha256"], downloader)
-            graph = api._read_workflow(entry)
-            self.assertEqual(graph[node]["class_type"], loader)
-            self.assertEqual(graph[node]["inputs"]["lora_name"], Path(model["required_file"]).name)
-            self.assertEqual(entry["lora_bindings"]["deepseek"]["file"], Path(model["required_file"]).name)
-            prepared = api._prepare_graph(entry, {"parameters": {"prompt": "1girl", "loras": {"deepseek": 0.5}}})
-            self.assertEqual(prepared[node]["inputs"]["strength_model"], 0.5)
-            default = api._prepare_graph(entry, {"parameters": {"prompt": "1girl"}})
-            self.assertEqual(default[node]["inputs"]["strength_model"], entry["defaults"]["loras"]["deepseek"])
+        characters = {
+            "deepseek-whale-girl": ("deepseek", "大肥鱼", "DeepSeek娘", "deepseek whale girl"),
+            "claude-girl": ("Claude-chan", "Claude娘", "claude girl"),
+            "chatgpt-girl": ("chatgpt", "ChatGPT龙娘", "GPT娘"),
+            "qwen-girl": ("qwen girl", "千问娘", "Qwen-chan"),
+            "gemini-girl": ("gemini girl", "Gemini娘", "哈基米"),
+        }
+        for slug, aliases in characters.items():
+            anima, janku = entries[f"{slug}-anima-turbo"], entries[f"{slug}-janku"]
+            for alias in aliases:
+                sfw, nsfw = {"domain": alias, "content_mode": "sfw"}, {"domain": alias, "content_mode": "nsfw"}
+                self.assertGreater(api._route_score(anima, sfw)[0], api._route_score(janku, sfw)[0], alias)
+                self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0], alias)
+                self.assertGreater(api._route_score(anima, {"domain": alias})[0], api._route_score(janku, {"domain": alias})[0], alias)
+                for other in characters:
+                    if other != slug:
+                        self.assertIsNone(api._route_score(entries[f"{other}-anima-turbo"], sfw), (alias, other))
+            for entry, loader in ((janku, "LoraLoader"), (anima, "LoraLoaderModelOnly")):
+                (lora_id,) = [m for m in entry["model_ids"] if m.startswith(slug)]
+                model = models[lora_id]
+                (lora_name,) = entry["lora_bindings"]
+                self.assertIn(model["required_file"], entry["required_files"])
+                self.assertIn(model["source"]["sha256"], downloader)
+                graph = api._read_workflow(entry)
+                self.assertEqual(graph["2"]["class_type"], loader)
+                self.assertEqual(graph["2"]["inputs"]["lora_name"], Path(model["required_file"]).name)
+                self.assertEqual(entry["lora_bindings"][lora_name]["file"], Path(model["required_file"]).name)
+                prepared = api._prepare_graph(entry, {"parameters": {"prompt": "1girl", "loras": {lora_name: 0.5}}})
+                self.assertEqual(prepared["2"]["inputs"]["strength_model"], 0.5)
+                default = api._prepare_graph(entry, {"parameters": {"prompt": "1girl"}})
+                self.assertEqual(default["2"]["inputs"]["strength_model"], entry["defaults"]["loras"][lora_name])
+        for query in ({"domain": "qwen"}, {"domain": "qwen", "content_mode": "nsfw", "input_mode": "text-to-image"}):
+            self.assertIsNone(api._route_score(entries["qwen-girl-anima-turbo"], query))
+        # Bare names that also belong to other characters must not select a character route.
+        for slug, domain in (("qwen-girl", "qwen"), ("claude-girl", "Claude Monet style"), ("claude-girl", "Claude von Riegan"),
+                             ("gemini-girl", "Gemini Saga"), ("gemini-girl", "Saint Seiya Gemini")):
+            for side in ("anima-turbo", "janku"):
+                self.assertIsNone(api._route_score(entries[f"{slug}-{side}"], {"domain": domain}), domain)
         self.assertNotIn("blue-archive", downloader)
 
     def test_image_inputs_match_what_prepare_graph_accepts(self):
