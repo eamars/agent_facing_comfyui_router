@@ -34,7 +34,9 @@ MIN_BODY_POINTS = 8
 # A hand is drawn only when its points average at least this score (counting unseen points as 0).
 MIN_HAND_SCORE = 0.4
 # Part of every skeleton cache key: bump it when extraction changes so stale skeletons are not reused.
-EXTRACTOR_VERSION = "dwpose-l384-filled-2"
+EXTRACTOR_VERSION = "dwpose-l384-filled-3"
+# DWPose's own cut-off for a visible keypoint; whole-body points below it are not stored.
+MIN_POINT_SCORE = 0.3
 MAX_FETCH_BYTES = 8_000_000
 FETCH_TIMEOUT_SECONDS = 20
 ANGLES = {"front": "front", "diag": "three-quarter", "side": "side", "high": "from above", "low": "from below"}
@@ -254,8 +256,8 @@ def _filled_figure(rgb):
     return (filled * (1 - 0.7 * shade)[..., None]).astype(np.uint8)
 
 
-def _estimate(image: Image.Image) -> tuple[list, str]:
-    """DWPose people for an RGB image, and how they were found.
+def _estimate(image: Image.Image) -> tuple[list, str, list]:
+    """DWPose people for an RGB image, how they were found, and each person's raw COCO-WholeBody 133 points.
 
     Photos go through the person detector. When it finds no one (line art), the figure is filled in and
     detected again; if still no one, the estimator takes the whole frame as one person.
@@ -287,7 +289,8 @@ def _estimate(image: Image.Image) -> tuple[list, str]:
     neck[:, 2:4] = np.logical_and(info[:, 5, 2:4] > 0.3, info[:, 6, 2:4] > 0.3).astype(int)
     info = np.insert(info, 17, neck, axis=1)
     info[:, [1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17]] = info[:, [17, 6, 8, 10, 7, 9, 12, 14, 16, 13, 15, 2, 1, 4, 3]]
-    return Wholebody.format_result(info), found
+    wholebody = [np.concatenate((points, point_scores[:, None]), axis=-1) for points, point_scores in zip(keypoints, scores)]
+    return Wholebody.format_result(info), found, wholebody
 
 
 def _points(part, width: int, height: int, minimum_mean_score: float = 0.0) -> list[list[float] | None] | None:
@@ -302,6 +305,13 @@ def _points(part, width: int, height: int, minimum_mean_score: float = 0.0) -> l
         else:
             points.append([round(point.x / width, 5), round(point.y / height, 5), round(float(point.score), 3)])
     return points if any(points) else None
+
+
+def _wholebody_points(raw, width: int, height: int) -> list[list[float] | None]:
+    """All 133 COCO-WholeBody points (body, feet, face, hands), normalised, None where unseen or off-canvas."""
+    return [[round(float(x) / width, 5), round(float(y) / height, 5), round(float(score), 3)]
+            if score >= MIN_POINT_SCORE and 0 <= x <= width and 0 <= y <= height else None
+            for x, y, score in raw]
 
 
 def skeleton(source_name: str) -> dict[str, Any]:
@@ -320,14 +330,15 @@ def skeleton(source_name: str) -> dict[str, Any]:
                 image = Image.alpha_composite(Image.new("RGBA", image.size, "white"), image.convert("RGBA"))
             image = image.convert("RGB")
         width, height = image.size
-        people, found = _estimate(image)
+        people, found, wholebody = _estimate(image)
         result = {"version": 1, "key": key, "width": width, "height": height, "found_by": found, "people": []}
-        for person in people:
+        for person, raw in zip(people, wholebody):
             body = _points(person.body.keypoints, width, height) or [None] * 18
             if sum(point is not None for point in body) < MIN_BODY_POINTS:
                 continue
             result["people"].append({"body": body, "left_hand": _points(person.left_hand, width, height, MIN_HAND_SCORE),
-                                     "right_hand": _points(person.right_hand, width, height, MIN_HAND_SCORE)})
+                                     "right_hand": _points(person.right_hand, width, height, MIN_HAND_SCORE),
+                                     "wholebody": _wholebody_points(raw, width, height)})
         _write_atomic(cached, json.dumps(result).encode())
     if not result["people"]:
         raise PoseError(422, "No human body pose was detected in the pose image; use a clearer full-body image",
@@ -346,15 +357,12 @@ def letterbox(pose: dict[str, Any], width: int, height: int) -> list[dict[str, A
         return [None if p is None else [(p[0] * pose["width"] * scale + offset_x) / width,
                                          (p[1] * pose["height"] * scale + offset_y) / height, p[2]] for p in points]
 
-    return [{part: place(person[part]) for part in ("body", "left_hand", "right_hand")} for person in pose["people"]]
+    return [{part: place(person.get(part)) for part in ("body", "left_hand", "right_hand", "wholebody")}
+            for person in pose["people"]]
 
 
-def render(pose: dict[str, Any], width: int, height: int) -> str:
-    """Input-relative path of the skeleton drawn for a width x height output (OpenPose colours, xinsir stick width)."""
-    name = f"{CACHE_DIR}/rendered/{pose['key']}_{width}x{height}.png"
-    target = input_root() / name
-    if target.is_file():
-        return name
+def _draw_openpose(people: list[dict[str, Any]], width: int, height: int):
+    """OpenPose-18 body and hands in OpenPose colours with xinsir stick width (what the Xinsir ControlNet reads)."""
     from custom_controlnet_aux.dwpose import draw_poses
     from custom_controlnet_aux.dwpose.types import BodyResult, Keypoint, PoseResult
 
@@ -364,11 +372,56 @@ def render(pose: dict[str, Any], width: int, height: int) -> str:
         return [None if p is None else Keypoint(p[0], p[1], p[2], index) for index, p in enumerate(points)]
 
     results = []
-    for person in letterbox(pose, width, height):
+    for person in people:
         body = keypoints(person["body"])
         results.append(PoseResult(BodyResult(body, sum(p.score for p in body if p), len(body)),
                                   keypoints(person["left_hand"]), keypoints(person["right_hand"]), None))
-    canvas = draw_poses(results, height, width, draw_body=True, draw_hand=True, draw_face=False, xinsr_stick_scaling=True)
+    return draw_poses(results, height, width, draw_body=True, draw_hand=True, draw_face=False, xinsr_stick_scaling=True)
+
+
+# COCO-17 limbs and colours of the thin whole-body skeleton Anima Control Pose was trained on
+# (its node's "R0_thin" style): 2 px limbs, white body joints, small white feet and face dots, cyan hand dots.
+_COCO_LIMBS = ((5, 7), (7, 9), (6, 8), (8, 10), (11, 13), (13, 15), (12, 14), (14, 16),
+               (5, 6), (11, 12), (5, 11), (6, 12), (0, 5), (0, 6))
+_COCO_LIMB_COLOURS = ((255, 0, 0), (255, 128, 0), (255, 255, 0), (128, 255, 0), (0, 255, 0), (0, 255, 128), (0, 255, 255),
+                      (0, 128, 255), (0, 0, 255), (128, 0, 255), (255, 0, 255), (255, 0, 128), (180, 180, 180), (220, 220, 220))
+
+
+def _draw_wholebody_thin(people: list[dict[str, Any]], width: int, height: int):
+    import cv2
+    import numpy as np
+    canvas = np.zeros((height, width, 3), np.uint8)
+    for person in people:
+        points = [None if p is None else (int(p[0] * width), int(p[1] * height)) for p in person.get("wholebody") or []]
+        if not points:
+            continue
+        for (start, end), colour in zip(_COCO_LIMBS, _COCO_LIMB_COLOURS):
+            if points[start] and points[end]:
+                cv2.line(canvas, points[start], points[end], colour, 2)
+        for index, point in enumerate(points):
+            if point is None:
+                continue
+            if index < 17:
+                cv2.circle(canvas, point, 3, (255, 255, 255), -1)
+            elif index < 23:  # feet
+                cv2.circle(canvas, point, 1, (255, 255, 255), -1)
+            elif index < 91:  # face
+                cv2.circle(canvas, point, 2, (255, 255, 255), -1)
+            else:  # hands
+                cv2.circle(canvas, point, 2, (0, 255, 255), -1)
+    return canvas
+
+
+_RENDER_STYLES = {"openpose": _draw_openpose, "wholebody-thin": _draw_wholebody_thin}
+
+
+def render(pose: dict[str, Any], width: int, height: int, style: str = "openpose") -> str:
+    """Input-relative path of the skeleton drawn in the adapter's style for a width x height output."""
+    name = f"{CACHE_DIR}/rendered/{pose['key']}_{style}_{width}x{height}.png"
+    target = input_root() / name
+    if target.is_file():
+        return name
+    canvas = _RENDER_STYLES[style](letterbox(pose, width, height), width, height)
     buffer = io.BytesIO()
     Image.fromarray(canvas).save(buffer, "PNG")
     _write_atomic(target, buffer.getvalue())
@@ -412,12 +465,32 @@ def _attach_controlnet(graph: dict[str, Any], adapter: dict[str, Any], skeleton_
     sampler["positive"], sampler["negative"] = [apply_id, 0], [apply_id, 1]
 
 
-_MECHANISMS = {"controlnet-openpose": _attach_controlnet}
+def _attach_anima_control(graph: dict[str, Any], adapter: dict[str, Any], skeleton_image: str, strength: float) -> None:
+    """Anima Control Pose: its LoRA plus the VAE-encoded skeleton added at the DiT patch embed, on the sampler's model."""
+    samplers = [node for node in graph.values() if isinstance(node, dict) and node.get("class_type") == "KSampler"]
+    decoders = [node for node in graph.values() if isinstance(node, dict) and node.get("class_type") == "VAEDecode"]
+    if len(samplers) != 1 or not decoders:
+        raise PoseError(500, "Route graph does not have the single KSampler the Anima pose adapter expects",
+                        "pose_adapter_failed")
+    sampler = samplers[0]["inputs"]
+    next_id = max((int(node_id) for node_id in graph if str(node_id).isdigit()), default=0) + 1
+    lora_id, load_id, encode_id, apply_id = (str(next_id + offset) for offset in range(4))
+    # The LoRA and the control embedder are trained together and share one file; the LoRA stays at 1.0
+    # because lowering it loses the pose (measured), so pose_strength scales the control alone.
+    graph[lora_id] = {"class_type": "LoraLoaderModelOnly", "inputs": {
+        "model": copy.deepcopy(sampler["model"]), "lora_name": adapter["lora"], "strength_model": 1.0}}
+    graph[load_id] = {"class_type": "LoadImage", "inputs": {"image": skeleton_image}}
+    graph[encode_id] = {"class_type": "VAEEncode", "inputs": {
+        "pixels": [load_id, 0], "vae": copy.deepcopy(decoders[0]["inputs"]["vae"])}}
+    graph[apply_id] = {"class_type": "AnimaControlApply", "inputs": {
+        "model": [lora_id, 0], "control_latent": [encode_id, 0], "control_embedder_path": adapter["lora"],
+        "strength": strength}}
+    sampler["model"] = [apply_id, 0]
+
+
+_MECHANISMS = {"controlnet-openpose": _attach_controlnet, "anima-control-lora": _attach_anima_control}
 
 
 def attach(graph: dict[str, Any], adapter: dict[str, Any], skeleton_image: str, strength: float) -> None:
     _MECHANISMS[adapter["mechanism"]](graph, adapter, skeleton_image, strength)
 
-
-def adapter_nodes(adapter: dict[str, Any]) -> set[str]:
-    return {"controlnet-openpose": {"LoadImage", "ControlNetLoader", "ControlNetApplyAdvanced"}}[adapter["mechanism"]]

@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'pose', 'moss-image-sft', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'anima-control-pose', 'pose', 'moss-image-sft', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -285,6 +285,16 @@ $AssetSets = @{
             Sha256 = 'B8524E557A7DF60D081F5D4A0EB109967D107DF217943BF88C2D99B9EBCC06C5'
         }
     )
+    # Anima pose adapter: one file holds the control LoRA and the control embedder (non-commercial weights licence).
+    'anima-control-pose' = @(
+        [pscustomobject]@{
+            Name = 'Anima Control Pose Preview-2 (Claquasse)'
+            Url = 'https://huggingface.co/Claquasse/Anima-Control-Pose/resolve/8f559771d5a49a02fa03f7df2a05ccb7eecb3a2a/anima_pose_preview2.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'loras\anima_pose_preview2.safetensors')
+            Bytes = [int64]75051096
+            Sha256 = 'C10FA11628E9B1BF16DFE095AC5C6DC4DDD9AE77D7FE023D0A1857F7E29C516F'
+        }
+    )
     # Pose add-on: DWPose turns every pose input (library sketch or upload) into the canonical skeleton.
     'pose' = @(
         [pscustomobject]@{
@@ -324,7 +334,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'pose', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'anima-control-pose', 'pose', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

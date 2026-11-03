@@ -939,7 +939,7 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
     if pose_request:
         strength = entry["pose"]["default_strength"] if pose_strength is None else _as_float("pose_strength", pose_strength, 0.0, 1.0)
         width, height = _binding_value(graph, entry, "width"), _binding_value(graph, entry, "height")
-        skeleton_image = pose_addon.render(pose_request["skeleton"], width, height)
+        skeleton_image = pose_addon.render(pose_request["skeleton"], width, height, pose_request["adapter"].get("render", "openpose"))
         pose_addon.attach(graph, pose_request["adapter"], skeleton_image, strength)
         pose_request.update(strength=strength, skeleton_image=skeleton_image, size=[width, height])
     elif pose_strength is not None:
@@ -965,8 +965,8 @@ def _resolve_pose(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any]
     adapter = pose_addon.adapter_for(_read_catalog(), entry)
     public_pose = _public_entry(entry, _read_catalog().get("model_registry", []))["pose"]
     if not public_pose.get("ready"):
-        raise ApiError(409, "Pose dependencies are not installed; run scripts/download_models.ps1 -Profile pose",
-                       public_pose, code="pose_unavailable")
+        raise ApiError(409, "Pose dependencies are not installed; run scripts/download_models.ps1 -Profile pose and "
+                            f"-Profile {adapter.get('download_profile', 'pose')}", public_pose, code="pose_unavailable")
     value = _as_text("pose", parameters["pose"], MAX_INPUT_IMAGE_LENGTH).strip()
     found = pose_addon.lookup(value)
     if found:
@@ -1505,13 +1505,13 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                            "you want, or the pose id for the front view.",
             },
             "no_match": "If no library pose fits the request, leave pose out and describe the pose in the prompt.",
-            "prompt": "Also name the pose in the prompt (e.g. sitting, knee up, hand on chin): on Illustrious routes seated and "
-                      "kneeling poses often stay standing when only the skeleton asks for them.",
-            "pose_strength": "Optional parameters.pose_strength 0-1 (default 0.8): how strictly the pose is followed.",
+            "prompt": "Also name the pose in the prompt (e.g. sitting, knee up, hand on chin): on Illustrious and character-LoRA "
+                      "routes seated and kneeling poses often stay standing when only the skeleton asks for them.",
+            "pose_strength": "Optional parameters.pose_strength 0-1 (default per route in its parameter schema): how strictly the pose is followed.",
             "routing": "Not every route takes a pose yet (route_table[].pose). When sending pose, add input_mode "
-                       "'openpose-control' to /project/resolve so only routes that take one are chosen. A named character "
-                       "comes first: if that drops the character's own route (selection.fallback is true), resolve without "
-                       "input_mode, keep the character's route and describe the pose in the prompt.",
+                       "'openpose-control' to /project/resolve so only routes that take one are chosen. If that drops the "
+                       "route the requester asked for (selection.fallback is true), resolve without input_mode, keep that "
+                       "route and describe the pose in the prompt.",
             "output_size": "Without width and height the output follows the pose image's aspect ratio.",
             "response": "The queued or dry-run response has a pose object: the pose used, people_detected and skeleton_url, "
                         "the skeleton the model follows.",

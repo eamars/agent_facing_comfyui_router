@@ -42,6 +42,56 @@
         },
         "observed": "Standing poses and arm gestures follow well; seated and kneeling poses on Illustrious checkpoints often stay standing unless the prompt also names the pose. Animagine (SDXL) followed every tested pose.",
         "tool": "scripts/verify_pose_fidelity.py"
+      },
+      "download_profile": "controlnet-openpose-sdxl"
+    },
+    "anima-control-pose": {
+      "description": "Draws the thin whole-body DWPose skeleton for the output size and applies it with Anima Control Pose Preview-2 (control LoRA plus a control embedder on the DiT patch embed) at the route's KSampler model input.",
+      "families": [
+        "anima-turbo",
+        "anima",
+        "anima-ipadapter"
+      ],
+      "mechanism": "anima-control-lora",
+      "render": "wholebody-thin",
+      "lora": "anima_pose_preview2.safetensors",
+      "model_ids": [
+        "anima-control-pose-preview2",
+        "dwpose-pose-extractor"
+      ],
+      "download_profile": "anima-control-pose",
+      "default_strength": 1.0,
+      "measured_fidelity": {
+        "metric": "PCK@0.1: share of requested body points DWPose finds within 10% of figure size in the output",
+        "date": "2026-11-03",
+        "pose_without_pose_words": {
+          "with_pose": 0.77,
+          "no_pose_baseline": 0.28,
+          "cases": 7,
+          "routes": [
+            "anima-turbo-v1-1"
+          ],
+          "subject": "Xiaoman (prompt-only character, no LoRA)"
+        },
+        "observed": "Standing, arm, hand-on-hip and seated poses follow; the tested side view did not. The adapter pulls skin darker and trousers tighter than the same prompt without a pose. The thin whole-body skeleton follows better than the OpenPose render (0.75 vs 0.59 in the A/B). Moody Anima Mix followed the seated pose but not raised arms. On claude-girl-anima-turbo the character LoRA keeps her identity but holds her default stance; seated and hand-on-hip poses followed once the prompt named them.",
+        "tool": "scripts/verify_pose_fidelity.py --set anima",
+        "other_routes": {
+          "moody-anima-mix": {
+            "with_pose": 0.53,
+            "no_pose_baseline": 0.34,
+            "cases": 2
+          },
+          "anima-turbo-face-reference-ipadapter": {
+            "with_pose": 0.89,
+            "no_pose_baseline": 0.39,
+            "cases": 2
+          },
+          "claude-girl-anima-turbo": {
+            "with_pose": 0.41,
+            "no_pose_baseline": 0.2,
+            "cases": 3
+          }
+        }
       }
     }
   },

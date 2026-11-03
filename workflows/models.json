@@ -1507,6 +1507,116 @@
       }
     },
     {
+      "id": "anima-control-pose-preview2",
+      "name": "Anima Control Pose Preview-2 (Claquasse)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "anima-control",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0",
+      "precision": "bf16",
+      "tensor_dtypes": [
+        "BF16",
+        "F32"
+      ],
+      "description": "Pose control adapter for Anima: a rank-16 LoRA plus a control embedder that adds the VAE-encoded skeleton at the DiT patch embed. Applies the pose add-on's skeleton on Anima routes; the prompt still controls character, outfit and scene.",
+      "required_file": "models/loras/anima_pose_preview2.safetensors",
+      "capabilities": {
+        "domains": [
+          "general",
+          "anime",
+          "character-illustration"
+        ],
+        "input_types": [
+          "image",
+          "control"
+        ],
+        "input_modes": [
+          "openpose-control"
+        ],
+        "output_types": [
+          "conditioning"
+        ],
+        "control_types": [
+          "openpose"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "pose_strength": "follows standing, arm and seated poses from a usable skeleton; side views are least reliable",
+        "identity_strength": "none; the adapter's LoRA pulls skin tone and face style toward its own default",
+        "outfit_strength": "prompt dependent",
+        "style_strength": "base checkpoint dependent",
+        "composition_strength": "strong for body pose and orientation",
+        "natural_language": true,
+        "prompt_dialect": "anima-tags-and-natural-language",
+        "prompt_granularity": {
+          "minimum": "structured",
+          "recommended": "detailed",
+          "maximum": "expert"
+        }
+      },
+      "prompting": {
+        "dialect": "Anima tags and natural language",
+        "trigger_words": [],
+        "negative_prompt_supported": true,
+        "recommended_granularity": "detailed",
+        "notes": [
+          "The skeleton sets the pose; keep the character's appearance tags in the prompt, since the adapter can drift skin tone and face style."
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima-turbo",
+          "anima",
+          "anima-ipadapter"
+        ],
+        "base_models": [
+          "Anima Base v1.0",
+          "Anima Turbo v1.1"
+        ],
+        "adapter_families": [
+          "pose-add-on"
+        ],
+        "known_limits": [
+          "Trained on the thin COCO-WholeBody skeleton only; the OpenPose render the SDXL adapter uses follows worse.",
+          "The LoRA and the control embedder are trained together: lowering the LoRA weight loses the pose.",
+          "Preview release: some poses are ignored and hands can fuse; dynamic poses are least reliable."
+        ]
+      },
+      "source": {
+        "url": "https://huggingface.co/Claquasse/Anima-Control-Pose",
+        "type": "Hugging Face",
+        "revision": "8f559771d5a49a02fa03f7df2a05ccb7eecb3a2a",
+        "file_name": "anima_pose_preview2.safetensors",
+        "sha256": "C10FA11628E9B1BF16DFE095AC5C6DC4DDD9AE77D7FE023D0A1857F7E29C516F",
+        "license_note": "CircleStone Labs Non-Commercial License (inherits Anima); generated images are not restricted. Needs the AnimaControlApply node installed by scripts/setup_comfyui.ps1."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "pose add-on on anima-turbo-v1-1 through /project/generate",
+        "probes": [
+          {
+            "mode": "pose-control",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-11-03",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "route_roles": [
+        "pose-adapter"
+      ],
+      "file_sizes": {
+        "models/loras/anima_pose_preview2.safetensors": 75051096
+      }
+    },
+    {
       "id": "dwpose-pose-extractor",
       "name": "DWPose whole-body pose extractor (YOLOX-L + dw-ll_ucoco_384)",
       "kind": "preprocessor",

@@ -1,7 +1,7 @@
 """Measure how closely live renders follow a requested pose.
 
 Run with the ComfyUI interpreter against a running server:
-    ComfyUI\\.venv\\Scripts\\python.exe scripts\\verify_pose_fidelity.py [--base http://127.0.0.1:8191] [--out DIR]
+    ComfyUI\\.venv\\Scripts\\python.exe scripts\\verify_pose_fidelity.py [--set sdxl|anima] [--base http://127.0.0.1:8191] [--out DIR]
 
 Each case renders once with the pose and once without (same seed). DWPose reads the output and the score is
 PCK@0.1: the share of requested body points whose detected point lies within 10% of the requested figure's
@@ -27,19 +27,28 @@ from PIL import Image, ImageDraw  # noqa: E402
 from project_nodes import pose  # noqa: E402
 
 PROMPT = "1girl, solo, {outfit}, simple background, full body, masterpiece, best quality"
-CASES = [  # (workflow, pose, outfit)
-    ("janku-illustrious", "full_single_P035_side", "kimono"),
-    ("janku-illustrious", "full_single_P012_front", "silver armor"),
-    ("janku-illustrious", "full_single_P015_low", "office suit"),
-    ("janku-illustrious", "full_single_P049_high", "pajamas"),
-    ("janku-illustrious", "full_single_P066_diag", "streetwear hoodie"),
-    ("janku-illustrious", "full_single_P041_front", "school uniform"),
-    ("janku-illustrious", "full_single_P030_front", "maid dress"),
-    ("one-obsession", "full_sexy_P013_diag", "evening dress"),
-    ("janku-v5-illustrious", "upper80v2_P010_front", "sweater"),
-    ("animagine-xl-3.1-nsfw", "full_single_P078_diag", "swimsuit"),
-    ("janku-illustrious", "tests/fixtures/reference_character.webp", "gothic dress"),
-]
+# Pose test subject: Xiaoman, a prompt-only character (no LoRA, so no pose prior of her own).
+XIAOMAN = ("masterpiece, best quality, 1girl, solo, adult, original character, chinese young woman, black hair, bob cut, "
+           "chin-length hair, grey eyes, calm face, subtle smirk, slim, white t-shirt, light beige overshirt, open shirt, "
+           "dark straight-leg trousers, white canvas sneakers, full body, plain light grey background, simple background")
+CASE_SETS = {  # set -> [(workflow, pose, prompt)]
+    "sdxl": [(workflow, pose_value, PROMPT.format(outfit=outfit)) for workflow, pose_value, outfit in (
+        ("janku-illustrious", "full_single_P035_side", "kimono"),
+        ("janku-illustrious", "full_single_P012_front", "silver armor"),
+        ("janku-illustrious", "full_single_P015_low", "office suit"),
+        ("janku-illustrious", "full_single_P049_high", "pajamas"),
+        ("janku-illustrious", "full_single_P066_diag", "streetwear hoodie"),
+        ("janku-illustrious", "full_single_P041_front", "school uniform"),
+        ("janku-illustrious", "full_single_P030_front", "maid dress"),
+        ("one-obsession", "full_sexy_P013_diag", "evening dress"),
+        ("janku-v5-illustrious", "upper80v2_P010_front", "sweater"),
+        ("animagine-xl-3.1-nsfw", "full_single_P078_diag", "swimsuit"),
+        ("janku-illustrious", "tests/fixtures/reference_character.webp", "gothic dress"),
+    )],
+    "anima": [("anima-turbo-v1-1", pose_value, XIAOMAN) for pose_value in (
+        "full_single_P035_side", "full_single_P012_front", "full_single_P015_low", "full_single_P049_high",
+        "full_single_P066_diag", "full_single_P030_front", "tests/fixtures/reference_character.webp")],
+}
 
 
 def http(base: str, path: str, body: dict | None = None) -> dict:
@@ -101,13 +110,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="http://127.0.0.1:8191")
     parser.add_argument("--out", type=Path, default=ROOT / "ComfyUI" / "output" / "pose_fidelity")
+    parser.add_argument("--set", choices=sorted(CASE_SETS), default="sdxl", help="which adapter family to measure")
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     rows, tiles = [], []
-    for index, (workflow, pose_value, outfit) in enumerate(CASES):
+    for index, (workflow, pose_value, prompt) in enumerate(CASE_SETS[args.set]):
         if pose_value.startswith("tests/"):
             pose_value = upload(args.base, ROOT / pose_value)
-        prompt, seed = PROMPT.format(outfit=outfit), 4100 + index
+        seed = 4100 + index
         with_pose, job = render(args.base, workflow, prompt, seed, pose_value)
         summary = job["pose"]
         size = tuple(summary["size"])
@@ -119,7 +129,7 @@ def main() -> None:
         without, _ = render(args.base, workflow, prompt, seed, None)
         scores = {}
         for label, image in (("with_pose", with_pose), ("no_pose", without)):
-            people, _ = pose._estimate(image.resize(size))
+            people, _, _ = pose._estimate(image.resize(size))
             scores[label] = round(pck(requested, people, size), 2)
         rows.append({"workflow": workflow, "pose": summary.get("id") or summary.get("file"), "size": list(size), **scores})
         print(json.dumps(rows[-1]), flush=True)

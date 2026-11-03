@@ -7,7 +7,8 @@ param(
     [string]$IPAdapterCommit = 'b188a6cb39b512a9c6da7235b880af42c78ccd0d',
     [string]$ControlNetAuxCommit = '59b1fc411ede8623b2997855b8018f0b3b6cf49f',
     [string]$AnimaIPAdapterCommit = '6b77cd0c367d76402174ace2be50d3cb6aa77855',
-    [string]$MossImageCommit = '599a039ec6f8108eecdd0d8c107ceade6863145e'
+    [string]$MossImageCommit = '599a039ec6f8108eecdd0d8c107ceade6863145e',
+    [string]$AnimaControlCommit = '8f559771d5a49a02fa03f7df2a05ccb7eecb3a2a'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -157,6 +158,24 @@ $MossImage = Join-Path $NodesDir 'moss-image'
 if (Test-Path -LiteralPath $MossImage) { Remove-Item -LiteralPath $MossImage -Recurse -Force }
 Copy-Item -LiteralPath (Join-Path $MossImageSource 'comfyui\moss-image') -Destination $MossImage -Recurse
 Write-Host "  Installed the MOSS-Image node pack at $MossImageCommit."
+
+# Anima Control Apply (pose add-on on Anima routes) ships as two files inside the Anima-Control-Pose model
+# repository; fetch them at a pinned revision and check their hashes. They need only torch, einops and safetensors.
+$AnimaControl = Join-Path $NodesDir 'anima_control_lora'
+New-Item -ItemType Directory -Force -Path $AnimaControl | Out-Null
+$AnimaControlFiles = @{
+    '__init__.py' = '7EA5E56918AE753FE2C139CD0FCD4F69ADD8C03361F9EABD3973C3EB3EE74851'
+    'control_embedder.py' = 'F80A18F093A4BC39EF2B9DEFAB74C1DA7102D00470B318A3DF11350F193075BD'
+}
+foreach ($file in $AnimaControlFiles.Keys) {
+    $target = Join-Path $AnimaControl $file
+    Invoke-WebRequest -Uri "https://huggingface.co/Claquasse/Anima-Control-Pose/resolve/$AnimaControlCommit/comfyui/anima_control_lora/$file" -OutFile $target
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $target).Hash -ne $AnimaControlFiles[$file]) {
+        Remove-Item -LiteralPath $target -Force
+        throw "Anima Control node file $file failed SHA-256 verification"
+    }
+}
+Write-Host "  Installed the Anima Control Apply node at $AnimaControlCommit."
 
 $ProjectApiSource = Join-Path $Root 'project_nodes\comfyui_shim.py'
 $ProjectApiTarget = Join-Path $NodesDir 'project_workflow_api.py'
