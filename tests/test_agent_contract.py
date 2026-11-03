@@ -98,7 +98,8 @@ class AgentContractTests(unittest.TestCase):
             self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "input_mode": mode}))
         edit = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-edit")
         self.assertIsNotNone(api._route_score(edit, {"input_mode": "image-edit"}))
-        self.assertIsNotNone(api._route_score(edit, {"domain": "qwen", "input_mode": "image-to-image"}))
+        # Edit takes an instruction and no denoise; image-to-image redraws from a description, so edit must not claim it.
+        self.assertIsNone(api._route_score(edit, {"domain": "qwen", "input_mode": "image-to-image"}))
 
     def test_moss_is_explicit_and_binds_layout_prompts_verbatim(self):
         moss = next(e for e in catalog["workflows"] if e["id"] == "moss-image-sft-t2i")

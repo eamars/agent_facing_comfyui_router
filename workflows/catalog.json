@@ -481,15 +481,14 @@
       },
       "capabilities": {
         "modalities": [
-          "image-to-image"
+          "image-edit"
         ],
         "input_types": [
           "text",
           "image"
         ],
         "input_modes": [
-          "image-edit",
-          "image-to-image"
+          "image-edit"
         ],
         "output_types": [
           "image"
@@ -588,7 +587,7 @@
         "inpaint": false,
         "face_reference": false,
         "controlnet": false,
-        "image_to_image": true
+        "image_to_image": false
       },
       "agent_hints": {
         "recommended": {

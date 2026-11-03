@@ -52,7 +52,7 @@ def main():
         resources()
         for query, expected in [
             ({"domain": "qwen", "input_mode": "text-to-image"}, "qwen-image-2.1-t2i"),
-            ({"domain": "qwen", "input_mode": "image-to-image"}, "qwen-image-2.1-edit"),
+            ({"domain": "qwen", "input_mode": "image-edit"}, "qwen-image-2.1-edit"),
             ({"domain": "anime"}, "anima-turbo-v1-1"),
             ({"domain": "anime", "style": "mainstream anime"}, "janku-illustrious"),
         ]:
