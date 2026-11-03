@@ -395,21 +395,55 @@ class AgentContractTests(unittest.TestCase):
                 self.assertNotIn("nsfw", default_negative, entry["id"])
 
     def test_image_inputs_match_what_prepare_graph_accepts(self):
-        workflows = catalog["workflows"]
+        workflows = api._read_catalog()["workflows"]
         uses = {use["input_mode"]: use["routes"] for use in api._reference_uses(workflows)}
         self.assertEqual(uses["image-edit"], ["qwen-image-2.1-edit"])
         self.assertEqual(set(uses["face-reference"]), {"sdxl-face-reference-ipadapter", "anima-turbo-face-reference-ipadapter"})
-        self.assertEqual(uses["openpose-control"], ["sdxl-openpose-controlnet"])
+        self.assertEqual(set(uses["openpose-control"]), {e["id"] for e in workflows if e["family"] in {"sdxl", "sdxl-illustrious", "sdxl-ipadapter"}})
         self.assertEqual(set(uses["inpaint"]), {"moody-anima-inpaint", "anima-turbo-inpaint"})
         text_only = [e["id"] for e in workflows if not api._image_inputs(e)]
         self.assertEqual(text_only, ["qwen-image-2.1-t2i", "moss-image-sft-t2i"])
         for entry in workflows:
             for name in api._image_inputs(entry):
-                if name != "input_image":
+                if name not in {"input_image", "pose"}:  # pose is attached by its family adapter, not a binding
                     self.assertIn(name, entry["bindings"], entry["id"])
             if "input_image" not in api._image_inputs(entry):
                 with self.assertRaises(api.ApiError):
                     api._prepare_graph(entry, {"parameters": {"prompt": "x", "input_image": "missing.png"}})
+
+    def test_pose_routes_only_and_controlnet_feeds_the_sampler(self):
+        # A pose sent to a route without an adapter would be silently lost, so routing must never pick one.
+        annotated = api._read_catalog()
+        with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):
+            for content_mode in ("sfw", "nsfw"):
+                result = api._resolve_routes(annotated, {"domain": "anime", "content_mode": content_mode, "input_mode": "openpose-control"}, limit=20)
+                self.assertTrue(result["matches"], content_mode)
+                for match in result["matches"]:
+                    self.assertTrue(match["workflow"]["pose"]["supported"], match["workflow_id"])
+            nsfw = api._resolve_routes(annotated, {"domain": "anime", "content_mode": "nsfw", "input_mode": "openpose-control"})
+            self.assertEqual(nsfw["selected_workflow"], "janku-illustrious")
+        entry = next(e for e in annotated["workflows"] if e["id"] == "janku-illustrious")
+        anima = next(e for e in annotated["workflows"] if e["id"] == "anima-turbo-v1-1")
+        with self.assertRaises(api.ApiError) as raised:
+            api._resolve_pose(anima, {"parameters": {"prompt": "x", "pose": "full_single_P001_front"}})
+        self.assertEqual(raised.exception.code, "pose_unsupported")
+        skeleton = {"key": "test", "width": 900, "height": 1200, "people": [{"body": [[0.5, 0.1 + i * 0.04, 0.9] for i in range(18)],
+                                                                             "left_hand": None, "right_hand": None}]}
+        request = {"skeleton": skeleton, "adapter": api.pose_addon.adapter_for(annotated, entry)}
+        with patch.object(api.pose_addon, "render", return_value="_poses/rendered/test.png"), \
+                patch.object(api, "_resource_request"):
+            graph = api._prepare_graph(entry, {"parameters": {"prompt": "x", "pose_strength": 0.6}}, None, request)
+        sampler = next(node for node in graph.values() if node["class_type"] == "KSampler")
+        apply = graph[sampler["inputs"]["positive"][0]]
+        self.assertEqual((apply["class_type"], sampler["inputs"]["negative"]), ("ControlNetApplyAdvanced", [sampler["inputs"]["positive"][0], 1]))
+        self.assertEqual(apply["inputs"]["strength"], 0.6)
+        self.assertEqual(graph[apply["inputs"]["image"][0]]["inputs"]["image"], "_poses/rendered/test.png")
+        # No size requested: the output takes the 3:4 pose aspect at JANKU's default pixel count.
+        default_graph = api._read_workflow(entry)
+        default_pixels = api._binding_value(default_graph, entry, "width") * api._binding_value(default_graph, entry, "height")
+        width, height = request["size"]
+        self.assertAlmostEqual(width / height, 0.75, delta=0.03)
+        self.assertAlmostEqual(width * height / default_pixels, 1.0, delta=0.08)
 
     def test_janku_versions_split_by_style_and_point_at_each_other(self):
         ready = {"workflows": catalog["workflows"]}

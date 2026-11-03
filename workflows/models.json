@@ -1422,7 +1422,7 @@
       "tensor_dtypes": [
         "F16"
       ],
-      "description": "SDXL OpenPose ControlNet used to stabilize body orientation, pose and multi-limb composition while the prompt controls character and scene.",
+      "description": "SDXL OpenPose ControlNet that applies the pose add-on's skeleton on SDXL and Illustrious routes; the prompt still controls character, outfit and scene.",
       "required_file": "models/controlnet/xinsir-controlnet-openpose-sdxl-1.0.safetensors",
       "capabilities": {
         "domains": [
@@ -1451,7 +1451,7 @@
           "general"
         ],
         "nsfw_capable": true,
-        "pose_strength": "strong when the source image yields a usable human skeleton",
+        "pose_strength": "strong when the pose image yields a usable skeleton",
         "identity_strength": "none; identity remains prompt/model dependent",
         "outfit_strength": "prompt dependent",
         "style_strength": "base checkpoint dependent",
@@ -1475,14 +1475,16 @@
       },
       "compatibility": {
         "workflow_families": [
-          "sdxl-controlnet"
+          "sdxl",
+          "sdxl-illustrious",
+          "sdxl-ipadapter"
         ],
         "base_models": [
           "Animagine XL 3.1",
-          "SDXL anime checkpoints"
+          "Illustrious/NoobAI checkpoints (JANKU, One Obsession)"
         ],
         "adapter_families": [
-          "sdxl-controlnet"
+          "pose-add-on"
         ],
         "known_limits": [
           "OpenPose does not control clothing details, face identity or depth; detection quality depends on the supplied source image and the preprocessor."
@@ -1494,48 +1496,38 @@
         "sha256": "B8524E557A7DF60D081F5D4A0EB109967D107DF217943BF88C2D99B9EBCC06C5"
       },
       "validation": {
-        "status": "verified-by-runtime-probe",
-        "scope": "named-API OpenPose route",
-        "probes": [
-          {
-            "mode": "loaded-by-openpose-control-named-API",
-            "status": "success",
-            "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b",
-            "prompt_class": "sfw"
-          }
-        ],
-        "visual_fidelity": "Not established until an SFW route probe completes; control success means graph execution and pose-conditioning plumbing, not exact character likeness."
+        "status": "pending-pose-add-on-probe",
+        "scope": "pose add-on on SDXL and Illustrious routes"
       },
       "route_roles": [
-        "openpose-control"
+        "pose-adapter"
       ],
       "file_sizes": {
         "models/controlnet/xinsir-controlnet-openpose-sdxl-1.0.safetensors": 2502139104
       }
     },
     {
-      "id": "controlnet-aux-openpose-preprocessor",
-      "name": "comfyui_controlnet_aux OpenPose preprocessor",
+      "id": "dwpose-pose-extractor",
+      "name": "DWPose whole-body pose extractor (YOLOX-L + dw-ll_ucoco_384)",
       "kind": "preprocessor",
       "status": "installed",
       "routeable": true,
-      "family": "sdxl-controlnet",
-      "architecture": "openpose",
-      "base_model": "ControlNet OpenPose",
+      "family": "pose-add-on",
+      "architecture": "dwpose",
+      "base_model": "DWPose",
       "precision": "fp32",
       "tensor_dtypes": [
         "F32"
       ],
-      "description": "Pinned OpenPose preprocessing node that turns a supplied source/control image into an OpenPose map before ControlNet application. Its body/hand/face weights are downloaded and cached by the node on first use.",
+      "description": "Turns every pose input (library sketch, photo or illustration) into the canonical OpenPose-18 skeleton with hands. Runs on CPU in the API process and caches the skeleton by content hash.",
       "capabilities": {
         "input_types": [
           "image"
         ],
         "input_modes": [
-          "pose-preprocessing"
+          "pose-extraction"
         ],
         "output_types": [
-          "image",
           "pose-keypoints"
         ],
         "control_types": [
@@ -1556,41 +1548,34 @@
       },
       "compatibility": {
         "workflow_families": [
-          "sdxl-controlnet"
+          "pose-add-on"
         ],
         "base_models": [
-          "ControlNet OpenPose"
+          "DWPose"
         ],
         "known_limits": [
-          "Preprocessor weights are cached under the pinned custom node; a first request may download them and take longer."
+          "The person detector misses line art and many illustrations; the extractor then fills the figure in or reads the whole frame as one person, so two-person line art cannot be split."
         ]
       },
       "source": {
-        "url": "https://github.com/Fannovel16/comfyui_controlnet_aux",
-        "type": "GitHub",
-        "commit": "59b1fc411ede8623b2997855b8018f0b3b6cf49f"
+        "url": "https://huggingface.co/yzd-v/DWPose",
+        "type": "Hugging Face",
+        "sha256": {
+          "yolox_l.onnx": "7860AE79DE6C89A3C1EB72AE9A2756C0CCFBE04B7791BB5880AFABD97855A411",
+          "dw-ll_ucoco_384.onnx": "724F4FF2439ED61AFB86FB8A1951EC39C6220682803B4A8BD4F598CD913B1843"
+        }
       },
       "required_files": [
-        "custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/body_pose_model.pth",
-        "custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/hand_pose_model.pth",
-        "custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/facenet.pth"
+        "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx",
+        "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/dw-ll_ucoco_384.onnx"
       ],
-      "validation": {
-        "status": "verified-by-runtime-probe",
-        "scope": "OpenPose preprocessing node",
-        "probes": [
-          {
-            "mode": "executed-by-openpose-control-named-API",
-            "status": "success",
-            "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b",
-            "prompt_class": "sfw"
-          }
-        ]
-      },
       "route_roles": [
-        "openpose-preprocessor-dependency"
+        "pose-extractor"
       ],
-      "file_sizes": {}
+      "file_sizes": {
+        "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx": 216746733,
+        "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/dw-ll_ucoco_384.onnx": 134399116
+      }
     },
     {
       "id": "anima-turbo-v1-1-checkpoint",

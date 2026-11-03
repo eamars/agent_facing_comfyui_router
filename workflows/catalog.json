@@ -2,6 +2,49 @@
   "schema_version": 1,
   "description": "Named API-format workflows exposed by the project workflow API.",
   "model_registry_file": "models.json",
+  "pose_adapters": {
+    "sdxl-openpose-controlnet": {
+      "description": "Draws the DWPose skeleton for the output size and applies it with Xinsir OpenPose ControlNet before the route's KSampler.",
+      "families": [
+        "sdxl",
+        "sdxl-illustrious",
+        "sdxl-ipadapter"
+      ],
+      "mechanism": "controlnet-openpose",
+      "controlnet": "xinsir-controlnet-openpose-sdxl-1.0.safetensors",
+      "model_ids": [
+        "controlnet-openpose-sdxl-xinsir",
+        "dwpose-pose-extractor"
+      ],
+      "default_strength": 0.8,
+      "end_percent": 1.0,
+      "measured_fidelity": {
+        "metric": "PCK@0.1: share of requested body points DWPose finds within 10% of figure size in the output",
+        "date": "2026-11-03",
+        "pose_without_pose_words": {
+          "with_pose": 0.75,
+          "no_pose_baseline": 0.34,
+          "cases": 11,
+          "routes": [
+            "janku-illustrious",
+            "deepseek-whale-girl-janku",
+            "one-obsession",
+            "janku-v5-illustrious",
+            "animagine-xl-3.1-nsfw"
+          ]
+        },
+        "pose_with_pose_words": {
+          "with_pose": 0.81,
+          "cases": 8,
+          "routes": [
+            "claude-girl-janku"
+          ]
+        },
+        "observed": "Standing poses and arm gestures follow well; seated and kneeling poses on Illustrious checkpoints often stay standing unless the prompt also names the pose. Animagine (SDXL) followed every tested pose.",
+        "tool": "scripts/verify_pose_fidelity.py"
+      }
+    }
+  },
   "workflows": [
     {
       "id": "qwen-image-2.1-t2i",
@@ -1094,7 +1137,6 @@
         "specific_route_precedence": [
           "moody-anima-inpaint",
           "sdxl-face-reference-ipadapter",
-          "sdxl-openpose-controlnet",
           "deepseek-whale-girl-janku",
           "deepseek-whale-girl-anima-turbo",
           "animagine-xl-3.1-nsfw",
@@ -2105,434 +2147,6 @@
       }
     },
     {
-      "id": "sdxl-openpose-controlnet",
-      "name": "SDXL OpenPose Control — Animagine XL 3.1",
-      "description": "Pose/orientation-controlled SDXL workflow. The API accepts a source control image, preprocesses it with OpenPose and applies Xinsir's SDXL OpenPose ControlNet; the agent keeps identity and outfit in the prompt.",
-      "family": "sdxl-controlnet",
-      "resident_group": "sdxl-animagine31-openpose",
-      "tags": [
-        "anime",
-        "sdxl",
-        "controlnet",
-        "openpose",
-        "pose-control",
-        "nsfw-capable"
-      ],
-      "content_class": "anime-nsfw-capable",
-      "file": "sdxl_openpose_controlnet.json",
-      "model_ids": [
-        "animagine-xl-3.1-checkpoint",
-        "controlnet-openpose-sdxl-xinsir",
-        "controlnet-aux-openpose-preprocessor"
-      ],
-      "routing": {
-        "selector_scope": "workflow-model",
-        "selector_fields": [
-          "domain",
-          "content_mode",
-          "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
-        ],
-        "domains": [
-          "general",
-          "anime",
-          "anime-portrait",
-          "blue-archive",
-          "nikke",
-          "character-illustration"
-        ],
-        "aliases": [
-          "OpenPose",
-          "pose control",
-          "ControlNet pose",
-          "姿势控制",
-          "骨架控制",
-          "动作控制"
-        ],
-        "styles": [
-          "openpose",
-          "pose control",
-          "skeleton control",
-          "composition control"
-        ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "input_types": [
-          "image"
-        ],
-        "input_modes": [
-          "openpose-control"
-        ],
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
-        "priority": 70,
-        "fallback": false,
-        "exclusive": false,
-        "required_selectors": [
-          "input_mode"
-        ],
-        "strict_style": false,
-        "exclusion_rules": [
-          "Use this route when pose/orientation is the primary control need; use inpaint for local edits and face-reference for a face-only reference."
-        ]
-      },
-      "capabilities": {
-        "modalities": [
-          "text-to-image-with-openpose-control"
-        ],
-        "input_types": [
-          "text",
-          "image",
-          "control"
-        ],
-        "input_modes": [
-          "openpose-control"
-        ],
-        "output_types": [
-          "image"
-        ],
-        "architectures": [
-          "sdxl"
-        ],
-        "styles": [
-          "anime",
-          "pose-controlled",
-          "gacha illustration"
-        ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
-        "lora_support": false,
-        "controlnet_support": true,
-        "control_types": [
-          "openpose"
-        ],
-        "preprocessor": "OpenposePreprocessor",
-        "control_scope": [
-          "human body pose",
-          "orientation",
-          "limb placement",
-          "multi-person pose composition"
-        ],
-        "not_controlled": [
-          "character identity",
-          "exact face",
-          "clothing details",
-          "depth or lighting"
-        ],
-        "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
-        "natural_language": false,
-        "character_identity": "prompt/model dependent; OpenPose is not an identity adapter",
-        "style_control": "base checkpoint dependent",
-        "outfit_control": "prompt dependent",
-        "composition_control": "strong for pose and body orientation",
-        "recommended_resolutions": [
-          "832x1216",
-          "1024x1024"
-        ],
-        "performance": "medium-to-slow; first use may download OpenPose annotator weights"
-      },
-      "input_contract": {
-        "text": {
-          "required": true,
-          "parameter": "prompt",
-          "format": "short-to-detailed SDXL Danbooru-style tags; specify character identity, outfit, expression and scene here"
-        },
-        "control_image": {
-          "supported": true,
-          "required": true,
-          "parameter": "control_image",
-          "mode": "openpose-source-image",
-          "accepted_sources": [
-            "comfyui-input",
-            "http-upload"
-          ],
-          "format": "A source image containing the desired human pose. The workflow runs OpenposePreprocessor internally; callers do not need to create a pre-rendered skeleton map.",
-          "upload": {
-            "endpoint": "/upload/image",
-            "method": "POST",
-            "content_type": "multipart/form-data",
-            "file_field": "image",
-            "type_field": "type",
-            "type_value": "input",
-            "list_endpoint": "/project/inputs",
-            "response_to_parameter": "Join returned subfolder and name with '/' and pass it as parameters.control_image."
-          },
-          "job_output_reference": false
-        },
-        "parameter_aliases": {
-          "subject": "prompt"
-        },
-        "required_fields": [
-          "prompt",
-          "control_image"
-        ],
-        "required_fields_apply_after_aliases": true
-      },
-      "validation": {
-        "status": "verified-by-runtime-probe",
-        "scope": "named-API OpenPose route",
-        "probes": [
-          {
-            "mode": "openpose-control-named-API",
-            "status": "success",
-            "job_id": "c0b9852b-4005-45fa-85a9-87b4e3c99d6b",
-            "prompt_class": "sfw",
-            "control_image": "asuna_src_up.png",
-            "steps": 2,
-            "resolution": "512x768"
-          },
-          {
-            "mode": "openpose-control-named-API",
-            "status": "success",
-            "job_id": "e68453f4-faca-4fd7-8971-a08ae277c269",
-            "prompt_class": "sfw",
-            "date": "2026-09-17",
-            "elapsed_ms": 11359,
-            "scope": "API validation, installed-model execution and output delivery; not a visual-fidelity benchmark"
-          }
-        ],
-        "limitations": [
-          "An SFW execution probe validates graph execution and pose-conditioning plumbing, not exact pose detection, character likeness or NSFW quality."
-        ]
-      },
-      "selection": {
-        "best_for": [
-          "盘腿坐, 背面 3/4 and other explicit body poses",
-          "stabilizing orientation and limb placement",
-          "SFW or NSFW-capable SDXL anime generation with a pose source image"
-        ],
-        "not_for": [
-          "face-only identity transfer",
-          "local clothing replacement",
-          "depth control",
-          "exact character identity without prompt/adapters"
-        ],
-        "priority_signals": [
-          "OpenPose",
-          "pose control",
-          "skeleton",
-          "body orientation",
-          "姿势",
-          "动作",
-          "背面",
-          "盘腿"
-        ]
-      },
-      "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
-        "prompt_scope": "Use ordered SDXL tags for 1girl/solo, identity, appearance, outfit, expression, camera, scene and lighting. The control image supplies the body pose and orientation.",
-        "optional_fields": [
-          "negative_prompt",
-          "control_strength",
-          "control_start_percent",
-          "control_end_percent",
-          "seed",
-          "width",
-          "height",
-          "steps",
-          "cfg"
-        ],
-        "control_image": "Use a clear human-pose source. OpenPose preprocessing is built into the route; the first call can be slower while annotator weights are cached.",
-        "control_strength": "Start around 0.70-0.90. Higher values preserve the skeleton more strongly but may reduce prompt freedom.",
-        "negative_prompt": "supported; keep it focused on duplicate subjects, multiple views, anatomy, text and watermark",
-        "avoid": [
-          "expecting OpenPose to identify the character",
-          "using a character sheet as a pose source when it has multiple unrelated views",
-          "using denoise to solve a pose problem without a control image"
-        ],
-        "suggested_prompt_details": [
-          "control_image",
-          "prompt"
-        ],
-        "prompt_details_are_advisory": true,
-        "recommended": {
-          "steps": [
-            20,
-            30
-          ],
-          "cfg": [
-            5,
-            7
-          ]
-        },
-        "recommendations_are_advisory": true
-      },
-      "compatibility_notes": [
-        "The graph uses the real OpenposePreprocessor node from the pinned comfyui_controlnet_aux checkout and ControlNetApplyAdvanced from ComfyUI core.",
-        "The Xinsir OpenPose model is an SDXL ControlNet and is paired with the Animagine XL 3.1 SDXL checkpoint.",
-        "The route accepts the raw source image and performs preprocessing internally; an agent does not need to expose a separate preprocessor choice."
-      ],
-      "prompting": {
-        "style": "comma-separated SDXL anime tags",
-        "structure": [
-          "quality",
-          "subject count",
-          "character/series",
-          "appearance",
-          "outfit",
-          "expression",
-          "camera",
-          "scene",
-          "lighting"
-        ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use detailed to describe the requested subject and scene; leave body pose/orientation to the OpenPose control image.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
-        "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
-        "recommended": {
-          "width": 832,
-          "height": 1216,
-          "steps": 28,
-          "cfg": 6.0,
-          "control_strength": 0.8,
-          "control_start_percent": 0.0,
-          "control_end_percent": 1.0,
-          "sampler_name": "euler_ancestral",
-          "scheduler": "normal"
-        },
-        "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra fingers, duplicate, multiple views, text, watermark, blurry",
-        "examples": [
-          {
-            "purpose": "Pose-controlled SFW probe request",
-            "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, blue archive, anime student, brown hair, blue eyes, neat school uniform, calm expression, full body, classroom, soft daylight"
-          }
-        ]
-      },
-      "source": {
-        "model_url": "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0",
-        "controlnet_aux_url": "https://github.com/Fannovel16/comfyui_controlnet_aux"
-      },
-      "required_files": [
-        "models/checkpoints/Animagine_XL_3.1.safetensors",
-        "models/controlnet/xinsir-controlnet-openpose-sdxl-1.0.safetensors"
-      ],
-      "bindings": {
-        "prompt": {
-          "node": "5",
-          "input": "text"
-        },
-        "negative_prompt": {
-          "node": "6",
-          "input": "text"
-        },
-        "control_image": {
-          "node": "2",
-          "input": "image"
-        },
-        "control_strength": {
-          "node": "7",
-          "input": "strength"
-        },
-        "control_start_percent": {
-          "node": "7",
-          "input": "start_percent"
-        },
-        "control_end_percent": {
-          "node": "7",
-          "input": "end_percent"
-        },
-        "width": {
-          "node": "8",
-          "input": "width"
-        },
-        "height": {
-          "node": "8",
-          "input": "height"
-        },
-        "batch_size": {
-          "node": "8",
-          "input": "batch_size"
-        },
-        "seed": {
-          "node": "9",
-          "input": "seed"
-        },
-        "steps": {
-          "node": "9",
-          "input": "steps"
-        },
-        "cfg": {
-          "node": "9",
-          "input": "cfg"
-        },
-        "denoise": {
-          "node": "9",
-          "input": "denoise"
-        },
-        "sampler_name": {
-          "node": "9",
-          "input": "sampler_name"
-        },
-        "scheduler": {
-          "node": "9",
-          "input": "scheduler"
-        },
-        "filename_prefix": {
-          "node": "11",
-          "input": "filename_prefix"
-        }
-      },
-      "defaults": {
-        "width": 832,
-        "height": 1216,
-        "batch_size": 1,
-        "steps": 28,
-        "cfg": 6.0,
-        "denoise": 1.0,
-        "control_strength": 0.8,
-        "control_start_percent": 0.0,
-        "control_end_percent": 1.0,
-        "sampler_name": "euler_ancestral",
-        "scheduler": "normal",
-        "filename_prefix": "sdxl_openpose_controlnet"
-      },
-      "resource_limits": {
-        "max_total_pixels": 2359296,
-        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
-      },
-      "control_ports": {
-        "inpaint": false,
-        "face_reference": false,
-        "controlnet": true,
-        "image_to_image": false
-      }
-    },
-    {
       "id": "moody-desire-v30",
       "name": "Moody Desire Mix v3.0",
       "description": "Flux.2/Klein-style low-step workflow for the installed Moody Desire checkpoint; the route is marked SFW/NSFW-capable and accepts concise natural-language prompts.",
@@ -3295,7 +2909,10 @@
         "face_reference": false,
         "controlnet": false,
         "image_to_image": true
-      }
+      },
+      "previous_ids": [
+        "sdxl-openpose-controlnet"
+      ]
     },
     {
       "id": "anima-turbo-v1-1",
@@ -3523,7 +3140,6 @@
           "anima-turbo-face-reference-ipadapter",
           "moody-anima-inpaint",
           "sdxl-face-reference-ipadapter",
-          "sdxl-openpose-controlnet",
           "deepseek-whale-girl-janku",
           "deepseek-whale-girl-anima-turbo",
           "animagine-xl-3.1-nsfw",
@@ -6853,7 +6469,6 @@
           "deepseek-whale-girl-anima-turbo",
           "animagine-xl-3.1-nsfw",
           "sdxl-face-reference-ipadapter",
-          "sdxl-openpose-controlnet",
           "moody-anima-inpaint",
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
@@ -9441,7 +9056,6 @@
           "deepseek-whale-girl-anima-turbo",
           "animagine-xl-3.1-nsfw",
           "sdxl-face-reference-ipadapter",
-          "sdxl-openpose-controlnet",
           "moody-anima-inpaint",
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
@@ -9873,7 +9487,6 @@
           "deepseek-whale-girl-anima-turbo",
           "animagine-xl-3.1-nsfw",
           "sdxl-face-reference-ipadapter",
-          "sdxl-openpose-controlnet",
           "moody-anima-inpaint",
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",

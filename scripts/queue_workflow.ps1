@@ -21,10 +21,8 @@ param(
     [string]$MaskChannel,
     [int]$GrowMaskBy,
     [string]$FaceImage,
-    [string]$ControlImage,
-    [double]$ControlStrength,
-    [double]$ControlStartPercent,
-    [double]$ControlEndPercent,
+    [string]$Pose,
+    [double]$PoseStrength,
     [double]$IPAdapterWeight,
     [double]$LoraConceptStrength,
     [double]$LoraRapiStrength,
@@ -58,7 +56,7 @@ $parameterNames = @(
     'Prompt', 'NegativePrompt', 'Seed', 'Width', 'Height', 'BatchSize', 'Steps',
     'Cfg', 'Denoise', 'SamplerName', 'Scheduler', 'FilenamePrefix',
     'InputImage', 'MaskImage', 'MaskChannel', 'GrowMaskBy', 'FaceImage',
-    'ControlImage', 'ControlStrength', 'ControlStartPercent', 'ControlEndPercent', 'IPAdapterWeight'
+    'Pose', 'PoseStrength', 'IPAdapterWeight'
 )
 $parameterMap = @{
     Prompt = 'prompt'
@@ -78,10 +76,8 @@ $parameterMap = @{
     MaskChannel = 'mask_channel'
     GrowMaskBy = 'grow_mask_by'
     FaceImage = 'face_image'
-    ControlImage = 'control_image'
-    ControlStrength = 'control_strength'
-    ControlStartPercent = 'control_start_percent'
-    ControlEndPercent = 'control_end_percent'
+    Pose = 'pose'
+    PoseStrength = 'pose_strength'
     IPAdapterWeight = 'ipadapter_weight'
 }
 $parameters = [ordered]@{}

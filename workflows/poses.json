@@ -1,0 +1,6500 @@
+{
+ "schema_version": 1,
+ "source": {
+  "name": "ai-pose-gallery-zh via Lanpose (gen-ai-pose-image)",
+  "catalog": "https://raw.githubusercontent.com/wzc520pyfm/gen-ai-pose-image/aec165637c985cc554de89b44fbd6e3fdfe6a851/data/catalog.json",
+  "origin": "https://ai-pose-gallery.anhao.app",
+  "attribution": "Pose sketches and raw pose data © ギア (giaaibusi); Chinese names from Anhao's ai-pose-gallery-zh; index from wzc520pyfm/gen-ai-pose-image. The sketches may not be used commercially and are fetched on first use, not stored in this repository. English names are machine translations."
+ },
+ "angles": {
+  "front": "front",
+  "diag": "three-quarter",
+  "side": "side",
+  "high": "from above",
+  "low": "from below"
+ },
+ "poses": [
+  {
+   "id": "full_single_P001",
+   "name": "Reclining seated with one knee raised",
+   "name_zh": "后仰坐・单膝立起",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P001_front",
+     "path": "img/full_single_P001_front.png"
+    },
+    "diag": {
+     "id": "full_single_P001_diag",
+     "path": "img/full_single_P001_diag.png"
+    },
+    "side": {
+     "id": "full_single_P001_side",
+     "path": "img/full_single_P001_side.png"
+    },
+    "high": {
+     "id": "full_single_P001_high",
+     "path": "img/full_single_P001_high.png"
+    },
+    "low": {
+     "id": "full_single_P001_low",
+     "path": "img/full_single_P001_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P002",
+   "name": "Sitting with one hand supporting, legs extended diagonally forward",
+   "name_zh": "单手支撑・双腿斜向前伸",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_single_P002_diag",
+     "path": "img/full_single_P002_diag.png"
+    },
+    "side": {
+     "id": "full_single_P002_side",
+     "path": "img/full_single_P002_side.png"
+    },
+    "high": {
+     "id": "full_single_P002_high",
+     "path": "img/full_single_P002_high.png"
+    },
+    "low": {
+     "id": "full_single_P002_low",
+     "path": "img/full_single_P002_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P003",
+   "name": "Sitting with hands behind, chest out",
+   "name_zh": "双手后撑挺胸",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P003_front",
+     "path": "img/full_single_P003_front.png"
+    },
+    "diag": {
+     "id": "full_single_P003_diag",
+     "path": "img/full_single_P003_diag.png"
+    },
+    "side": {
+     "id": "full_single_P003_side",
+     "path": "img/full_single_P003_side.png"
+    },
+    "high": {
+     "id": "full_single_P003_high",
+     "path": "img/full_single_P003_high.png"
+    },
+    "low": {
+     "id": "full_single_P003_low",
+     "path": "img/full_single_P003_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P004",
+   "name": "Sitting with knees drawn up, both knees tilted left",
+   "name_zh": "三角坐・双膝左倾",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P004_front",
+     "path": "img/full_single_P004_front.png"
+    },
+    "diag": {
+     "id": "full_single_P004_diag",
+     "path": "img/full_single_P004_diag.png"
+    },
+    "side": {
+     "id": "full_single_P004_side",
+     "path": "img/full_single_P004_side.png"
+    },
+    "high": {
+     "id": "full_single_P004_high",
+     "path": "img/full_single_P004_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P005",
+   "name": "Sitting with one knee raised, hand touching hair",
+   "name_zh": "单膝立起・手抚发",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P005_front",
+     "path": "img/full_single_P005_front.png"
+    },
+    "high": {
+     "id": "full_single_P005_high",
+     "path": "img/full_single_P005_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P006",
+   "name": "Sitting with legs extended diagonally, hand on waist",
+   "name_zh": "双腿斜伸・手扶腰",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P006_front",
+     "path": "img/full_single_P006_front.png"
+    },
+    "diag": {
+     "id": "full_single_P006_diag",
+     "path": "img/full_single_P006_diag.png"
+    },
+    "side": {
+     "id": "full_single_P006_side",
+     "path": "img/full_single_P006_side.png"
+    },
+    "high": {
+     "id": "full_single_P006_high",
+     "path": "img/full_single_P006_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P007",
+   "name": "Sitting leaning back on both elbows",
+   "name_zh": "双肘支撑斜倚坐",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P007_front",
+     "path": "img/full_single_P007_front.png"
+    },
+    "diag": {
+     "id": "full_single_P007_diag",
+     "path": "img/full_single_P007_diag.png"
+    },
+    "side": {
+     "id": "full_single_P007_side",
+     "path": "img/full_single_P007_side.png"
+    },
+    "high": {
+     "id": "full_single_P007_high",
+     "path": "img/full_single_P007_high.png"
+    },
+    "low": {
+     "id": "full_single_P007_low",
+     "path": "img/full_single_P007_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P008",
+   "name": "Sitting with one knee raised, hands behind head",
+   "name_zh": "单膝立起・双手抱头后",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P009",
+   "name": "Sitting leaning right on elbow",
+   "name_zh": "向右倾・肘部支撑",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P009_front",
+     "path": "img/full_single_P009_front.png"
+    },
+    "diag": {
+     "id": "full_single_P009_diag",
+     "path": "img/full_single_P009_diag.png"
+    },
+    "side": {
+     "id": "full_single_P009_side",
+     "path": "img/full_single_P009_side.png"
+    },
+    "high": {
+     "id": "full_single_P009_high",
+     "path": "img/full_single_P009_high.png"
+    },
+    "low": {
+     "id": "full_single_P009_low",
+     "path": "img/full_single_P009_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P010",
+   "name": "Sitting with hand touching ankle",
+   "name_zh": "手抚脚踝",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P010_front",
+     "path": "img/full_single_P010_front.png"
+    },
+    "diag": {
+     "id": "full_single_P010_diag",
+     "path": "img/full_single_P010_diag.png"
+    },
+    "side": {
+     "id": "full_single_P010_side",
+     "path": "img/full_single_P010_side.png"
+    },
+    "high": {
+     "id": "full_single_P010_high",
+     "path": "img/full_single_P010_high.png"
+    },
+    "low": {
+     "id": "full_single_P010_low",
+     "path": "img/full_single_P010_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P011",
+   "name": "Sitting with hands behind head, chest out, leaning back",
+   "name_zh": "双手抱头・挺胸后仰",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P012",
+   "name": "Sitting with one knee raised, hand on chin",
+   "name_zh": "单膝立起・托腮",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P012_front",
+     "path": "img/full_single_P012_front.png"
+    },
+    "diag": {
+     "id": "full_single_P012_diag",
+     "path": "img/full_single_P012_diag.png"
+    },
+    "side": {
+     "id": "full_single_P012_side",
+     "path": "img/full_single_P012_side.png"
+    },
+    "high": {
+     "id": "full_single_P012_high",
+     "path": "img/full_single_P012_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P013",
+   "name": "Sitting with legs dangling, leaning back",
+   "name_zh": "双腿悬空后倚",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "side": {
+     "id": "full_single_P013_side",
+     "path": "img/full_single_P013_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P014",
+   "name": "Sitting holding ankle with one knee raised",
+   "name_zh": "握脚踝・单膝立起",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P014_front",
+     "path": "img/full_single_P014_front.png"
+    },
+    "diag": {
+     "id": "full_single_P014_diag",
+     "path": "img/full_single_P014_diag.png"
+    },
+    "side": {
+     "id": "full_single_P014_side",
+     "path": "img/full_single_P014_side.png"
+    },
+    "low": {
+     "id": "full_single_P014_low",
+     "path": "img/full_single_P014_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P015",
+   "name": "Standing in contrapposto with hand on waist",
+   "name_zh": "站立・对立式平衡・手扶腰",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P015_front",
+     "path": "img/full_single_P015_front.png"
+    },
+    "diag": {
+     "id": "full_single_P015_diag",
+     "path": "img/full_single_P015_diag.png"
+    },
+    "side": {
+     "id": "full_single_P015_side",
+     "path": "img/full_single_P015_side.png"
+    },
+    "high": {
+     "id": "full_single_P015_high",
+     "path": "img/full_single_P015_high.png"
+    },
+    "low": {
+     "id": "full_single_P015_low",
+     "path": "img/full_single_P015_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P016",
+   "name": "Standing with both hands lifting hair",
+   "name_zh": "站立・双手撩发",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P016_front",
+     "path": "img/full_single_P016_front.png"
+    },
+    "diag": {
+     "id": "full_single_P016_diag",
+     "path": "img/full_single_P016_diag.png"
+    },
+    "high": {
+     "id": "full_single_P016_high",
+     "path": "img/full_single_P016_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P017",
+   "name": "Standing looking back over shoulder",
+   "name_zh": "站立・回眸顾盼",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P017_front",
+     "path": "img/full_single_P017_front.png"
+    },
+    "diag": {
+     "id": "full_single_P017_diag",
+     "path": "img/full_single_P017_diag.png"
+    },
+    "side": {
+     "id": "full_single_P017_side",
+     "path": "img/full_single_P017_side.png"
+    },
+    "high": {
+     "id": "full_single_P017_high",
+     "path": "img/full_single_P017_high.png"
+    },
+    "low": {
+     "id": "full_single_P017_low",
+     "path": "img/full_single_P017_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P018",
+   "name": "Standing with both hands on waist",
+   "name_zh": "站立・双手扶腰",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P018_front",
+     "path": "img/full_single_P018_front.png"
+    },
+    "diag": {
+     "id": "full_single_P018_diag",
+     "path": "img/full_single_P018_diag.png"
+    },
+    "side": {
+     "id": "full_single_P018_side",
+     "path": "img/full_single_P018_side.png"
+    },
+    "high": {
+     "id": "full_single_P018_high",
+     "path": "img/full_single_P018_high.png"
+    },
+    "low": {
+     "id": "full_single_P018_low",
+     "path": "img/full_single_P018_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P019",
+   "name": "Standing with both arms raised and stretching",
+   "name_zh": "站立・双臂上举伸展",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P019_front",
+     "path": "img/full_single_P019_front.png"
+    },
+    "diag": {
+     "id": "full_single_P019_diag",
+     "path": "img/full_single_P019_diag.png"
+    },
+    "side": {
+     "id": "full_single_P019_side",
+     "path": "img/full_single_P019_side.png"
+    },
+    "high": {
+     "id": "full_single_P019_high",
+     "path": "img/full_single_P019_high.png"
+    },
+    "low": {
+     "id": "full_single_P019_low",
+     "path": "img/full_single_P019_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P020",
+   "name": "Standing with one hand touching back of head",
+   "name_zh": "站立・单手抚后脑",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P020_front",
+     "path": "img/full_single_P020_front.png"
+    },
+    "diag": {
+     "id": "full_single_P020_diag",
+     "path": "img/full_single_P020_diag.png"
+    },
+    "side": {
+     "id": "full_single_P020_side",
+     "path": "img/full_single_P020_side.png"
+    },
+    "high": {
+     "id": "full_single_P020_high",
+     "path": "img/full_single_P020_high.png"
+    },
+    "low": {
+     "id": "full_single_P020_low",
+     "path": "img/full_single_P020_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P021",
+   "name": "Standing with one hand on neck and one on leg",
+   "name_zh": "站立・一手抚颈一手扶腿",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P021_front",
+     "path": "img/full_single_P021_front.png"
+    },
+    "diag": {
+     "id": "full_single_P021_diag",
+     "path": "img/full_single_P021_diag.png"
+    },
+    "side": {
+     "id": "full_single_P021_side",
+     "path": "img/full_single_P021_side.png"
+    },
+    "high": {
+     "id": "full_single_P021_high",
+     "path": "img/full_single_P021_high.png"
+    },
+    "low": {
+     "id": "full_single_P021_low",
+     "path": "img/full_single_P021_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P022",
+   "name": "Standing with arms back and chest out",
+   "name_zh": "站立・双臂后展挺胸",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P022_front",
+     "path": "img/full_single_P022_front.png"
+    },
+    "diag": {
+     "id": "full_single_P022_diag",
+     "path": "img/full_single_P022_diag.png"
+    },
+    "side": {
+     "id": "full_single_P022_side",
+     "path": "img/full_single_P022_side.png"
+    },
+    "high": {
+     "id": "full_single_P022_high",
+     "path": "img/full_single_P022_high.png"
+    },
+    "low": {
+     "id": "full_single_P022_low",
+     "path": "img/full_single_P022_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P024",
+   "name": "Standing with one leg raised behind",
+   "name_zh": "站立・单腿后抬",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P024_front",
+     "path": "img/full_single_P024_front.png"
+    },
+    "diag": {
+     "id": "full_single_P024_diag",
+     "path": "img/full_single_P024_diag.png"
+    },
+    "side": {
+     "id": "full_single_P024_side",
+     "path": "img/full_single_P024_side.png"
+    },
+    "high": {
+     "id": "full_single_P024_high",
+     "path": "img/full_single_P024_high.png"
+    },
+    "low": {
+     "id": "full_single_P024_low",
+     "path": "img/full_single_P024_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P025",
+   "name": "Standing with legs apart and hands on waist",
+   "name_zh": "站立・分腿双手扶腰",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P025_front",
+     "path": "img/full_single_P025_front.png"
+    },
+    "diag": {
+     "id": "full_single_P025_diag",
+     "path": "img/full_single_P025_diag.png"
+    },
+    "side": {
+     "id": "full_single_P025_side",
+     "path": "img/full_single_P025_side.png"
+    },
+    "high": {
+     "id": "full_single_P025_high",
+     "path": "img/full_single_P025_high.png"
+    },
+    "low": {
+     "id": "full_single_P025_low",
+     "path": "img/full_single_P025_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P026",
+   "name": "Standing with one arm raised and hip thrust",
+   "name_zh": "站立・单臂上举顶胯",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P026_front",
+     "path": "img/full_single_P026_front.png"
+    },
+    "diag": {
+     "id": "full_single_P026_diag",
+     "path": "img/full_single_P026_diag.png"
+    },
+    "side": {
+     "id": "full_single_P026_side",
+     "path": "img/full_single_P026_side.png"
+    },
+    "high": {
+     "id": "full_single_P026_high",
+     "path": "img/full_single_P026_high.png"
+    },
+    "low": {
+     "id": "full_single_P026_low",
+     "path": "img/full_single_P026_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P027",
+   "name": "Standing with both hands on back of neck",
+   "name_zh": "站立・双手抚后颈",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P027_front",
+     "path": "img/full_single_P027_front.png"
+    },
+    "diag": {
+     "id": "full_single_P027_diag",
+     "path": "img/full_single_P027_diag.png"
+    },
+    "side": {
+     "id": "full_single_P027_side",
+     "path": "img/full_single_P027_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P029",
+   "name": "Standing with hair flowing",
+   "name_zh": "站立・发丝飘扬",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P029_front",
+     "path": "img/full_single_P029_front.png"
+    },
+    "diag": {
+     "id": "full_single_P029_diag",
+     "path": "img/full_single_P029_diag.png"
+    },
+    "side": {
+     "id": "full_single_P029_side",
+     "path": "img/full_single_P029_side.png"
+    },
+    "high": {
+     "id": "full_single_P029_high",
+     "path": "img/full_single_P029_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P030",
+   "name": "Standing on tiptoes with arms in V",
+   "name_zh": "站立・踮脚双臂V字",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P030_front",
+     "path": "img/full_single_P030_front.png"
+    },
+    "diag": {
+     "id": "full_single_P030_diag",
+     "path": "img/full_single_P030_diag.png"
+    },
+    "side": {
+     "id": "full_single_P030_side",
+     "path": "img/full_single_P030_side.png"
+    },
+    "high": {
+     "id": "full_single_P030_high",
+     "path": "img/full_single_P030_high.png"
+    },
+    "low": {
+     "id": "full_single_P030_low",
+     "path": "img/full_single_P030_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P031",
+   "name": "Kneeling with both hands on legs",
+   "name_zh": "跪立・双手扶腿",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P031_front",
+     "path": "img/full_single_P031_front.png"
+    },
+    "diag": {
+     "id": "full_single_P031_diag",
+     "path": "img/full_single_P031_diag.png"
+    },
+    "low": {
+     "id": "full_single_P031_low",
+     "path": "img/full_single_P031_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P032",
+   "name": "Kneeling with both hands behind head",
+   "name_zh": "跪立・双手抱头后",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P033",
+   "name": "Kneeling on one knee with hand on knee",
+   "name_zh": "单膝跪・手扶膝",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P033_front",
+     "path": "img/full_single_P033_front.png"
+    },
+    "diag": {
+     "id": "full_single_P033_diag",
+     "path": "img/full_single_P033_diag.png"
+    },
+    "side": {
+     "id": "full_single_P033_side",
+     "path": "img/full_single_P033_side.png"
+    },
+    "low": {
+     "id": "full_single_P033_low",
+     "path": "img/full_single_P033_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P034",
+   "name": "Kneeling with upper body leaning back",
+   "name_zh": "跪立・上体后仰",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P034_front",
+     "path": "img/full_single_P034_front.png"
+    },
+    "diag": {
+     "id": "full_single_P034_diag",
+     "path": "img/full_single_P034_diag.png"
+    },
+    "low": {
+     "id": "full_single_P034_low",
+     "path": "img/full_single_P034_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P035",
+   "name": "Kneeling with both arms raised",
+   "name_zh": "跪立・双臂上举",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P035_front",
+     "path": "img/full_single_P035_front.png"
+    },
+    "diag": {
+     "id": "full_single_P035_diag",
+     "path": "img/full_single_P035_diag.png"
+    },
+    "side": {
+     "id": "full_single_P035_side",
+     "path": "img/full_single_P035_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P036",
+   "name": "Kneeling with one hand lifting hair and one on waist",
+   "name_zh": "跪立・一手撩发一手扶腰",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P036_front",
+     "path": "img/full_single_P036_front.png"
+    },
+    "diag": {
+     "id": "full_single_P036_diag",
+     "path": "img/full_single_P036_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P037",
+   "name": "Kneeling on one knee looking up",
+   "name_zh": "单膝跪・仰望",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P037_front",
+     "path": "img/full_single_P037_front.png"
+    },
+    "diag": {
+     "id": "full_single_P037_diag",
+     "path": "img/full_single_P037_diag.png"
+    },
+    "side": {
+     "id": "full_single_P037_side",
+     "path": "img/full_single_P037_side.png"
+    },
+    "low": {
+     "id": "full_single_P037_low",
+     "path": "img/full_single_P037_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P038",
+   "name": "Kneeling sideways with hand touching ground",
+   "name_zh": "跪立・侧倾・手触地",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P038_front",
+     "path": "img/full_single_P038_front.png"
+    },
+    "side": {
+     "id": "full_single_P038_side",
+     "path": "img/full_single_P038_side.png"
+    },
+    "high": {
+     "id": "full_single_P038_high",
+     "path": "img/full_single_P038_high.png"
+    },
+    "low": {
+     "id": "full_single_P038_low",
+     "path": "img/full_single_P038_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P039",
+   "name": "Kneeling with hands on waist and leaning back",
+   "name_zh": "跪立・双手扶腰后仰",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_single_P039_diag",
+     "path": "img/full_single_P039_diag.png"
+    },
+    "low": {
+     "id": "full_single_P039_low",
+     "path": "img/full_single_P039_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P040",
+   "name": "Kneeling with hip swaying and one arm raised",
+   "name_zh": "跪立・摆胯・单臂上举",
+   "category": "kneeling",
+   "category_zh": "跪立",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P040_front",
+     "path": "img/full_single_P040_front.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P041",
+   "name": "W-sit (wariza), both hands on legs",
+   "name_zh": "女孩坐・双手扶腿",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P041_front",
+     "path": "img/full_single_P041_front.png"
+    },
+    "diag": {
+     "id": "full_single_P041_diag",
+     "path": "img/full_single_P041_diag.png"
+    },
+    "low": {
+     "id": "full_single_P041_low",
+     "path": "img/full_single_P041_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P042",
+   "name": "W-sit (wariza), both hands propped in front",
+   "name_zh": "女孩坐・双手前撑",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_single_P042_diag",
+     "path": "img/full_single_P042_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P043",
+   "name": "W-sit (wariza), both hands behind head",
+   "name_zh": "女孩坐・双手抱头后",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P044",
+   "name": "W-sit (wariza), hands braced behind",
+   "name_zh": "女孩坐・双手后撑",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P044_front",
+     "path": "img/full_single_P044_front.png"
+    },
+    "low": {
+     "id": "full_single_P044_low",
+     "path": "img/full_single_P044_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P045",
+   "name": "Side sitting, legs angled to right",
+   "name_zh": "侧坐・双腿斜向右侧",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P045_front",
+     "path": "img/full_single_P045_front.png"
+    },
+    "diag": {
+     "id": "full_single_P045_diag",
+     "path": "img/full_single_P045_diag.png"
+    },
+    "high": {
+     "id": "full_single_P045_high",
+     "path": "img/full_single_P045_high.png"
+    },
+    "low": {
+     "id": "full_single_P045_low",
+     "path": "img/full_single_P045_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P046",
+   "name": "Side sitting, hand on cheek",
+   "name_zh": "侧坐・手扶脸颊",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P046_front",
+     "path": "img/full_single_P046_front.png"
+    },
+    "diag": {
+     "id": "full_single_P046_diag",
+     "path": "img/full_single_P046_diag.png"
+    },
+    "high": {
+     "id": "full_single_P046_high",
+     "path": "img/full_single_P046_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P047",
+   "name": "Side sitting, one arm raised",
+   "name_zh": "侧坐・单臂上伸",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P047_front",
+     "path": "img/full_single_P047_front.png"
+    },
+    "diag": {
+     "id": "full_single_P047_diag",
+     "path": "img/full_single_P047_diag.png"
+    },
+    "high": {
+     "id": "full_single_P047_high",
+     "path": "img/full_single_P047_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P048",
+   "name": "W-sit (wariza), hand touching side of neck",
+   "name_zh": "女孩坐・手抚颈侧",
+   "category": "side sit / W-sit",
+   "category_zh": "侧坐・女孩坐",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P048_front",
+     "path": "img/full_single_P048_front.png"
+    },
+    "diag": {
+     "id": "full_single_P048_diag",
+     "path": "img/full_single_P048_diag.png"
+    },
+    "low": {
+     "id": "full_single_P048_low",
+     "path": "img/full_single_P048_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P049",
+   "name": "Lying on back, arms over head",
+   "name_zh": "仰卧・双臂过头",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P049_front",
+     "path": "img/full_single_P049_front.png"
+    },
+    "diag": {
+     "id": "full_single_P049_diag",
+     "path": "img/full_single_P049_diag.png"
+    },
+    "side": {
+     "id": "full_single_P049_side",
+     "path": "img/full_single_P049_side.png"
+    },
+    "high": {
+     "id": "full_single_P049_high",
+     "path": "img/full_single_P049_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P050",
+   "name": "Side lying, hand supporting cheek",
+   "name_zh": "侧卧・托腮",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P051",
+   "name": "Lying face down, lifting legs",
+   "name_zh": "俯卧・抬腿",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P051_front",
+     "path": "img/full_single_P051_front.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P052",
+   "name": "Lying on back, one knee raised",
+   "name_zh": "仰卧・单膝立起",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P052_front",
+     "path": "img/full_single_P052_front.png"
+    },
+    "diag": {
+     "id": "full_single_P052_diag",
+     "path": "img/full_single_P052_diag.png"
+    },
+    "side": {
+     "id": "full_single_P052_side",
+     "path": "img/full_single_P052_side.png"
+    },
+    "high": {
+     "id": "full_single_P052_high",
+     "path": "img/full_single_P052_high.png"
+    },
+    "low": {
+     "id": "full_single_P052_low",
+     "path": "img/full_single_P052_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P054",
+   "name": "Side lying, waistline curved",
+   "name_zh": "侧卧・腰线曲线",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P056",
+   "name": "Lying on back, legs straight up",
+   "name_zh": "仰卧・双腿竖直向上",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P056_front",
+     "path": "img/full_single_P056_front.png"
+    },
+    "diag": {
+     "id": "full_single_P056_diag",
+     "path": "img/full_single_P056_diag.png"
+    },
+    "low": {
+     "id": "full_single_P056_low",
+     "path": "img/full_single_P056_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P057",
+   "name": "Side lying, one arm over head",
+   "name_zh": "侧卧・单臂过头",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P058",
+   "name": "Lying face down, arm under head",
+   "name_zh": "俯卧・以臂枕头",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_single_P059",
+   "name": "Lying on back, chest lifted",
+   "name_zh": "仰卧・胸口上挺",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P059_front",
+     "path": "img/full_single_P059_front.png"
+    },
+    "diag": {
+     "id": "full_single_P059_diag",
+     "path": "img/full_single_P059_diag.png"
+    },
+    "side": {
+     "id": "full_single_P059_side",
+     "path": "img/full_single_P059_side.png"
+    },
+    "high": {
+     "id": "full_single_P059_high",
+     "path": "img/full_single_P059_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P061",
+   "name": "Squatting, hands on knees",
+   "name_zh": "蹲姿・手扶膝",
+   "category": "squatting",
+   "category_zh": "蹲姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P061_front",
+     "path": "img/full_single_P061_front.png"
+    },
+    "diag": {
+     "id": "full_single_P061_diag",
+     "path": "img/full_single_P061_diag.png"
+    },
+    "side": {
+     "id": "full_single_P061_side",
+     "path": "img/full_single_P061_side.png"
+    },
+    "low": {
+     "id": "full_single_P061_low",
+     "path": "img/full_single_P061_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P062",
+   "name": "Squatting, one hand touching ground",
+   "name_zh": "蹲姿・单手触地",
+   "category": "squatting",
+   "category_zh": "蹲姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P062_front",
+     "path": "img/full_single_P062_front.png"
+    },
+    "diag": {
+     "id": "full_single_P062_diag",
+     "path": "img/full_single_P062_diag.png"
+    },
+    "low": {
+     "id": "full_single_P062_low",
+     "path": "img/full_single_P062_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P063",
+   "name": "Squatting, hand supporting cheek",
+   "name_zh": "蹲姿・托腮",
+   "category": "squatting",
+   "category_zh": "蹲姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P063_front",
+     "path": "img/full_single_P063_front.png"
+    },
+    "diag": {
+     "id": "full_single_P063_diag",
+     "path": "img/full_single_P063_diag.png"
+    },
+    "low": {
+     "id": "full_single_P063_low",
+     "path": "img/full_single_P063_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P064",
+   "name": "Squatting, hand touching hair",
+   "name_zh": "蹲姿・手抚发",
+   "category": "squatting",
+   "category_zh": "蹲姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P064_front",
+     "path": "img/full_single_P064_front.png"
+    },
+    "diag": {
+     "id": "full_single_P064_diag",
+     "path": "img/full_single_P064_diag.png"
+    },
+    "low": {
+     "id": "full_single_P064_low",
+     "path": "img/full_single_P064_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P065",
+   "name": "Squatting on tiptoes, hands touching ground",
+   "name_zh": "蹲姿・踮脚双手触地",
+   "category": "squatting",
+   "category_zh": "蹲姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "low": {
+     "id": "full_single_P065_low",
+     "path": "img/full_single_P065_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P066",
+   "name": "Squatting, looking back",
+   "name_zh": "蹲姿・回头",
+   "category": "squatting",
+   "category_zh": "蹲姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P066_front",
+     "path": "img/full_single_P066_front.png"
+    },
+    "diag": {
+     "id": "full_single_P066_diag",
+     "path": "img/full_single_P066_diag.png"
+    },
+    "low": {
+     "id": "full_single_P066_low",
+     "path": "img/full_single_P066_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P067",
+   "name": "Leaning forward, hands on knees",
+   "name_zh": "前倾・手扶膝",
+   "category": "leaning forward",
+   "category_zh": "前倾",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P067_front",
+     "path": "img/full_single_P067_front.png"
+    },
+    "diag": {
+     "id": "full_single_P067_diag",
+     "path": "img/full_single_P067_diag.png"
+    },
+    "side": {
+     "id": "full_single_P067_side",
+     "path": "img/full_single_P067_side.png"
+    },
+    "low": {
+     "id": "full_single_P067_low",
+     "path": "img/full_single_P067_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P068",
+   "name": "Leaning forward, hands touching shins",
+   "name_zh": "前倾・手触小腿",
+   "category": "leaning forward",
+   "category_zh": "前倾",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P068_front",
+     "path": "img/full_single_P068_front.png"
+    },
+    "low": {
+     "id": "full_single_P068_low",
+     "path": "img/full_single_P068_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P069",
+   "name": "Leaning forward, one hand on waist, looking up",
+   "name_zh": "前倾・单手扶腰・仰望",
+   "category": "leaning forward",
+   "category_zh": "前倾",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P069_front",
+     "path": "img/full_single_P069_front.png"
+    },
+    "diag": {
+     "id": "full_single_P069_diag",
+     "path": "img/full_single_P069_diag.png"
+    },
+    "side": {
+     "id": "full_single_P069_side",
+     "path": "img/full_single_P069_side.png"
+    },
+    "low": {
+     "id": "full_single_P069_low",
+     "path": "img/full_single_P069_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P070",
+   "name": "Leaning forward, hands on thighs, hips pushed back",
+   "name_zh": "前倾・手扶大腿・臀部后坐",
+   "category": "leaning forward",
+   "category_zh": "前倾",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P070_front",
+     "path": "img/full_single_P070_front.png"
+    },
+    "diag": {
+     "id": "full_single_P070_diag",
+     "path": "img/full_single_P070_diag.png"
+    },
+    "side": {
+     "id": "full_single_P070_side",
+     "path": "img/full_single_P070_side.png"
+    },
+    "high": {
+     "id": "full_single_P070_high",
+     "path": "img/full_single_P070_high.png"
+    },
+    "low": {
+     "id": "full_single_P070_low",
+     "path": "img/full_single_P070_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P071",
+   "name": "Leaning forward, arms hanging naturally",
+   "name_zh": "前倾・双臂自然下垂",
+   "category": "leaning forward",
+   "category_zh": "前倾",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P071_front",
+     "path": "img/full_single_P071_front.png"
+    },
+    "diag": {
+     "id": "full_single_P071_diag",
+     "path": "img/full_single_P071_diag.png"
+    },
+    "side": {
+     "id": "full_single_P071_side",
+     "path": "img/full_single_P071_side.png"
+    },
+    "high": {
+     "id": "full_single_P071_high",
+     "path": "img/full_single_P071_high.png"
+    },
+    "low": {
+     "id": "full_single_P071_low",
+     "path": "img/full_single_P071_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P072",
+   "name": "Leaning forward, one leg raised back",
+   "name_zh": "前倾・单腿后抬",
+   "category": "leaning forward",
+   "category_zh": "前倾",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P072_front",
+     "path": "img/full_single_P072_front.png"
+    },
+    "diag": {
+     "id": "full_single_P072_diag",
+     "path": "img/full_single_P072_diag.png"
+    },
+    "side": {
+     "id": "full_single_P072_side",
+     "path": "img/full_single_P072_side.png"
+    },
+    "low": {
+     "id": "full_single_P072_low",
+     "path": "img/full_single_P072_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P073",
+   "name": "Leaning back, standing with straight back",
+   "name_zh": "后仰・站姿挺背",
+   "category": "leaning back, arched back",
+   "category_zh": "后仰・挺背",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P073_front",
+     "path": "img/full_single_P073_front.png"
+    },
+    "diag": {
+     "id": "full_single_P073_diag",
+     "path": "img/full_single_P073_diag.png"
+    },
+    "side": {
+     "id": "full_single_P073_side",
+     "path": "img/full_single_P073_side.png"
+    },
+    "low": {
+     "id": "full_single_P073_low",
+     "path": "img/full_single_P073_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P074",
+   "name": "Kneeling, hands braced behind, leaning back",
+   "name_zh": "跪立・双手后撑后仰",
+   "category": "leaning back, arched back",
+   "category_zh": "后仰・挺背",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P074_front",
+     "path": "img/full_single_P074_front.png"
+    },
+    "low": {
+     "id": "full_single_P074_low",
+     "path": "img/full_single_P074_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P075",
+   "name": "Leaning back, arms raised, body stretched",
+   "name_zh": "后仰・双臂上举挺身",
+   "category": "leaning back, arched back",
+   "category_zh": "后仰・挺背",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P075_front",
+     "path": "img/full_single_P075_front.png"
+    },
+    "diag": {
+     "id": "full_single_P075_diag",
+     "path": "img/full_single_P075_diag.png"
+    },
+    "side": {
+     "id": "full_single_P075_side",
+     "path": "img/full_single_P075_side.png"
+    },
+    "high": {
+     "id": "full_single_P075_high",
+     "path": "img/full_single_P075_high.png"
+    },
+    "low": {
+     "id": "full_single_P075_low",
+     "path": "img/full_single_P075_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P077",
+   "name": "Twisting body, standing with arms spread",
+   "name_zh": "扭身・站姿展臂",
+   "category": "twisting",
+   "category_zh": "扭身",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P077_front",
+     "path": "img/full_single_P077_front.png"
+    },
+    "diag": {
+     "id": "full_single_P077_diag",
+     "path": "img/full_single_P077_diag.png"
+    },
+    "side": {
+     "id": "full_single_P077_side",
+     "path": "img/full_single_P077_side.png"
+    },
+    "high": {
+     "id": "full_single_P077_high",
+     "path": "img/full_single_P077_high.png"
+    },
+    "low": {
+     "id": "full_single_P077_low",
+     "path": "img/full_single_P077_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P078",
+   "name": "Twisting body, kneeling looking back",
+   "name_zh": "扭身・跪立回望",
+   "category": "twisting",
+   "category_zh": "扭身",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P078_front",
+     "path": "img/full_single_P078_front.png"
+    },
+    "diag": {
+     "id": "full_single_P078_diag",
+     "path": "img/full_single_P078_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_single_P079",
+   "name": "Twisting body, seated torso twisted",
+   "name_zh": "扭身・坐姿上体扭转",
+   "category": "twisting",
+   "category_zh": "扭身",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_single_P079_front",
+     "path": "img/full_single_P079_front.png"
+    },
+    "diag": {
+     "id": "full_single_P079_diag",
+     "path": "img/full_single_P079_diag.png"
+    },
+    "side": {
+     "id": "full_single_P079_side",
+     "path": "img/full_single_P079_side.png"
+    },
+    "high": {
+     "id": "full_single_P079_high",
+     "path": "img/full_single_P079_high.png"
+    },
+    "low": {
+     "id": "full_single_P079_low",
+     "path": "img/full_single_P079_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P001",
+   "name": "S-curve standing, hips pushed sideways",
+   "name_zh": "S形站姿・胯部侧顶",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P001_front",
+     "path": "img/full_sexy_P001_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P001_diag",
+     "path": "img/full_sexy_P001_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P001_side",
+     "path": "img/full_sexy_P001_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P001_high",
+     "path": "img/full_sexy_P001_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P002",
+   "name": "Back arched backward, hands lifting hair",
+   "name_zh": "背部后仰・双手撩发",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P002_front",
+     "path": "img/full_sexy_P002_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P002_diag",
+     "path": "img/full_sexy_P002_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P002_side",
+     "path": "img/full_sexy_P002_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P002_high",
+     "path": "img/full_sexy_P002_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P002_low",
+     "path": "img/full_sexy_P002_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P003",
+   "name": "Hips pushed out, looking back",
+   "name_zh": "顶胯回眸",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P003_front",
+     "path": "img/full_sexy_P003_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P003_diag",
+     "path": "img/full_sexy_P003_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P003_side",
+     "path": "img/full_sexy_P003_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P003_high",
+     "path": "img/full_sexy_P003_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P003_low",
+     "path": "img/full_sexy_P003_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P004",
+   "name": "Leaning forward, hands on knees",
+   "name_zh": "前倾・手扶膝",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P004_front",
+     "path": "img/full_sexy_P004_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P004_diag",
+     "path": "img/full_sexy_P004_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P004_side",
+     "path": "img/full_sexy_P004_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P004_high",
+     "path": "img/full_sexy_P004_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P004_low",
+     "path": "img/full_sexy_P004_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P005",
+   "name": "Standing, hugging one knee to chest, back arched",
+   "name_zh": "站立・抱单膝至胸・背部后仰",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P005_front",
+     "path": "img/full_sexy_P005_front.png"
+    },
+    "side": {
+     "id": "full_sexy_P005_side",
+     "path": "img/full_sexy_P005_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P005_high",
+     "path": "img/full_sexy_P005_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P006",
+   "name": "Hand on wall, hips pushed back, standing rear-entry pose",
+   "name_zh": "手扶墙顶胯（站立后入待位）",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P006_front",
+     "path": "img/full_sexy_P006_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P006_diag",
+     "path": "img/full_sexy_P006_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P006_side",
+     "path": "img/full_sexy_P006_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P006_high",
+     "path": "img/full_sexy_P006_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P007",
+   "name": "Facing away, looking back, emphasizing buttocks",
+   "name_zh": "背向回望・强调臀部",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P007_front",
+     "path": "img/full_sexy_P007_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P007_diag",
+     "path": "img/full_sexy_P007_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P007_side",
+     "path": "img/full_sexy_P007_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P007_high",
+     "path": "img/full_sexy_P007_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P007_low",
+     "path": "img/full_sexy_P007_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P008",
+   "name": "Standing I-shape, one leg raised to shoulder height holding ankle",
+   "name_zh": "站立・单腿抬至肩高握踝（I字）",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P008_diag",
+     "path": "img/full_sexy_P008_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P008_high",
+     "path": "img/full_sexy_P008_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P008_low",
+     "path": "img/full_sexy_P008_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P009",
+   "name": "Standing, lifting hair as if bathing",
+   "name_zh": "似沐浴中撩发",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "high": {
+     "id": "full_sexy_P009_high",
+     "path": "img/full_sexy_P009_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P010",
+   "name": "Standing, pressing breasts together",
+   "name_zh": "站立挤胸",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P010_front",
+     "path": "img/full_sexy_P010_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P010_diag",
+     "path": "img/full_sexy_P010_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P010_side",
+     "path": "img/full_sexy_P010_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P010_high",
+     "path": "img/full_sexy_P010_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P010_low",
+     "path": "img/full_sexy_P010_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P011",
+   "name": "Standing, arms raised stretching, twisting waist",
+   "name_zh": "双臂上举伸展・扭转腰身",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P011_front",
+     "path": "img/full_sexy_P011_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P011_diag",
+     "path": "img/full_sexy_P011_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P011_side",
+     "path": "img/full_sexy_P011_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P012",
+   "name": "Standing V-shape, one leg raised high sideways",
+   "name_zh": "站立V字（单腿侧高抬）",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P012_front",
+     "path": "img/full_sexy_P012_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P012_diag",
+     "path": "img/full_sexy_P012_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P012_side",
+     "path": "img/full_sexy_P012_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P013",
+   "name": "Standing, hands behind back, chest out",
+   "name_zh": "双手背后・挺胸",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P013_front",
+     "path": "img/full_sexy_P013_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P013_diag",
+     "path": "img/full_sexy_P013_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P013_side",
+     "path": "img/full_sexy_P013_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P013_high",
+     "path": "img/full_sexy_P013_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P013_low",
+     "path": "img/full_sexy_P013_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P014",
+   "name": "Standing forward bend, hips raised, hands touching ground",
+   "name_zh": "站立前屈翘臀・双手触地",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P015",
+   "name": "Standing, hands on waist, one knee drawn in, leaning back",
+   "name_zh": "双手扶腰・单膝内收后仰",
+   "category": "standing",
+   "category_zh": "站姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P015_front",
+     "path": "img/full_sexy_P015_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P015_diag",
+     "path": "img/full_sexy_P015_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P015_side",
+     "path": "img/full_sexy_P015_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P015_high",
+     "path": "img/full_sexy_P015_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P015_low",
+     "path": "img/full_sexy_P015_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P016",
+   "name": "Side sitting, one hand supporting, body softly curved",
+   "name_zh": "侧坐・单手支撑・身体柔弯",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P016_front",
+     "path": "img/full_sexy_P016_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P016_diag",
+     "path": "img/full_sexy_P016_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P016_side",
+     "path": "img/full_sexy_P016_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P016_high",
+     "path": "img/full_sexy_P016_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P016_low",
+     "path": "img/full_sexy_P016_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P017",
+   "name": "Sitting upright, chest out, leaning back",
+   "name_zh": "正坐・挺胸后仰",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P017_front",
+     "path": "img/full_sexy_P017_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P017_diag",
+     "path": "img/full_sexy_P017_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P017_high",
+     "path": "img/full_sexy_P017_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P017_low",
+     "path": "img/full_sexy_P017_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P018",
+   "name": "Sitting M-shape legs open, hands supporting behind",
+   "name_zh": "M字开腿（坐位・双手后撑）",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P018_front",
+     "path": "img/full_sexy_P018_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P018_diag",
+     "path": "img/full_sexy_P018_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P018_side",
+     "path": "img/full_sexy_P018_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P018_high",
+     "path": "img/full_sexy_P018_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P019",
+   "name": "Sitting M-shape legs open, hands on knees",
+   "name_zh": "M字开腿（坐位・双手扶膝）",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P019_front",
+     "path": "img/full_sexy_P019_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P019_diag",
+     "path": "img/full_sexy_P019_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P019_side",
+     "path": "img/full_sexy_P019_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P019_high",
+     "path": "img/full_sexy_P019_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P019_low",
+     "path": "img/full_sexy_P019_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P020",
+   "name": "Sitting wide V-shape legs open, hands supporting behind",
+   "name_zh": "大幅V字开腿・双手后撑",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P020_front",
+     "path": "img/full_sexy_P020_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P020_diag",
+     "path": "img/full_sexy_P020_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P020_side",
+     "path": "img/full_sexy_P020_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P020_high",
+     "path": "img/full_sexy_P020_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P020_low",
+     "path": "img/full_sexy_P020_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P021",
+   "name": "Sitting, one leg raised high, hand holding ankle",
+   "name_zh": "坐姿・单腿高抬・手握脚踝",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P021_diag",
+     "path": "img/full_sexy_P021_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P022",
+   "name": "Sitting M-shape legs open, elbows supporting, leaning back",
+   "name_zh": "M字开腿（双肘支撑后仰）",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P022_front",
+     "path": "img/full_sexy_P022_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P022_diag",
+     "path": "img/full_sexy_P022_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P022_side",
+     "path": "img/full_sexy_P022_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P022_high",
+     "path": "img/full_sexy_P022_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P023",
+   "name": "Sitting with legs extended, side elbow supporting",
+   "name_zh": "伸腿・侧肘支撑坐",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P023_front",
+     "path": "img/full_sexy_P023_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P023_diag",
+     "path": "img/full_sexy_P023_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P023_side",
+     "path": "img/full_sexy_P023_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P023_high",
+     "path": "img/full_sexy_P023_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P023_low",
+     "path": "img/full_sexy_P023_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P024",
+   "name": "Sitting, hugging legs, opening them",
+   "name_zh": "坐姿・抱腿打开",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P024_front",
+     "path": "img/full_sexy_P024_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P024_diag",
+     "path": "img/full_sexy_P024_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P024_high",
+     "path": "img/full_sexy_P024_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P025",
+   "name": "Sitting, hugging one knee, leaning back",
+   "name_zh": "抱单膝坐・背部后仰",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P025_front",
+     "path": "img/full_sexy_P025_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P025_diag",
+     "path": "img/full_sexy_P025_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P025_high",
+     "path": "img/full_sexy_P025_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P025_low",
+     "path": "img/full_sexy_P025_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P026",
+   "name": "Side sitting, lifting hair",
+   "name_zh": "侧坐・撩发",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P027",
+   "name": "Duck sitting, hands supporting front, pressing breasts",
+   "name_zh": "鸭子坐・双手前撑挤胸",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P027_front",
+     "path": "img/full_sexy_P027_front.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P028",
+   "name": "Sitting, one knee raised, hands supporting behind",
+   "name_zh": "单膝立起・双手后撑",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P028_front",
+     "path": "img/full_sexy_P028_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P028_diag",
+     "path": "img/full_sexy_P028_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P028_side",
+     "path": "img/full_sexy_P028_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P028_high",
+     "path": "img/full_sexy_P028_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P028_low",
+     "path": "img/full_sexy_P028_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P029",
+   "name": "Sitting, one leg opened wide outward, single M-shape",
+   "name_zh": "坐姿・单腿大幅外开（单M字）",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P029_front",
+     "path": "img/full_sexy_P029_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P029_diag",
+     "path": "img/full_sexy_P029_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P029_side",
+     "path": "img/full_sexy_P029_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P029_high",
+     "path": "img/full_sexy_P029_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P029_low",
+     "path": "img/full_sexy_P029_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P030",
+   "name": "Sitting, hugging knees, knees slightly open",
+   "name_zh": "抱膝坐・双膝微开",
+   "category": "sitting",
+   "category_zh": "坐姿",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P030_diag",
+     "path": "img/full_sexy_P030_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P031",
+   "name": "Kneeling, upper body leaning back, hands behind head",
+   "name_zh": "跪立・上体后仰・双手抱后脑",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P032",
+   "name": "All fours, back arched, looking forward",
+   "name_zh": "四肢着地・挺背目视前方",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P032_front",
+     "path": "img/full_sexy_P032_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P032_diag",
+     "path": "img/full_sexy_P032_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P032_side",
+     "path": "img/full_sexy_P032_side.png"
+    },
+    "low": {
+     "id": "full_sexy_P032_low",
+     "path": "img/full_sexy_P032_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P033",
+   "name": "Kneeling with knees wide open, hips pressed down",
+   "name_zh": "双膝大幅外开的跪立・压胯下沉",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P033_front",
+     "path": "img/full_sexy_P033_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P033_diag",
+     "path": "img/full_sexy_P033_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P033_high",
+     "path": "img/full_sexy_P033_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P033_low",
+     "path": "img/full_sexy_P033_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P034",
+   "name": "Kneeling upright, lifting hair",
+   "name_zh": "正坐・撩发",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P035",
+   "name": "Kneeling on one knee, hand on thigh",
+   "name_zh": "单膝跪・手放大腿",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P035_front",
+     "path": "img/full_sexy_P035_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P035_diag",
+     "path": "img/full_sexy_P035_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P035_side",
+     "path": "img/full_sexy_P035_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P035_high",
+     "path": "img/full_sexy_P035_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P035_low",
+     "path": "img/full_sexy_P035_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P036",
+   "name": "Kneeling, knees open, hands supporting front, hips lowered",
+   "name_zh": "骑乘风・开膝双手前撑・沉胯",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P036_front",
+     "path": "img/full_sexy_P036_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P036_diag",
+     "path": "img/full_sexy_P036_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P036_high",
+     "path": "img/full_sexy_P036_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P037",
+   "name": "Kneeling, knees open, hips lowered, lifting hair",
+   "name_zh": "骑乘风・开膝沉胯・撩发",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P038",
+   "name": "Kneeling, leaning far back, hands holding heels",
+   "name_zh": "跪立大幅后仰・双手握脚跟",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P039",
+   "name": "Kneeling, twisting waist, one arm raised",
+   "name_zh": "跪立・扭腰・单臂上举",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P039_front",
+     "path": "img/full_sexy_P039_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P039_diag",
+     "path": "img/full_sexy_P039_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P039_high",
+     "path": "img/full_sexy_P039_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P040",
+   "name": "Cat pose, chest on ground, hips raised, side view",
+   "name_zh": "猫式（胸贴地翘臀・侧面）",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P040_front",
+     "path": "img/full_sexy_P040_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P040_diag",
+     "path": "img/full_sexy_P040_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P040_side",
+     "path": "img/full_sexy_P040_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P041",
+   "name": "All fours, one leg raised high behind",
+   "name_zh": "四肢着地・单腿后高抬",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P041_front",
+     "path": "img/full_sexy_P041_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P041_diag",
+     "path": "img/full_sexy_P041_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P041_side",
+     "path": "img/full_sexy_P041_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P041_high",
+     "path": "img/full_sexy_P041_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P041_low",
+     "path": "img/full_sexy_P041_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P042",
+   "name": "Kneeling upright, knees open, hands supporting front",
+   "name_zh": "开膝正坐・双手前撑（撒娇请求式）",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P042_front",
+     "path": "img/full_sexy_P042_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P042_diag",
+     "path": "img/full_sexy_P042_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P042_high",
+     "path": "img/full_sexy_P042_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P042_low",
+     "path": "img/full_sexy_P042_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P043",
+   "name": "Kneeling, thrusting hips forward",
+   "name_zh": "跪立・向前顶胯",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P043_front",
+     "path": "img/full_sexy_P043_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P043_diag",
+     "path": "img/full_sexy_P043_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P043_high",
+     "path": "img/full_sexy_P043_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P044",
+   "name": "Kneeling, supporting on side, body softly curved",
+   "name_zh": "跪立・侧向支撑・身体柔弯",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P044_front",
+     "path": "img/full_sexy_P044_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P044_diag",
+     "path": "img/full_sexy_P044_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P044_side",
+     "path": "img/full_sexy_P044_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P045",
+   "name": "Kneeling, one hand reaching heel, chest up, leaning back",
+   "name_zh": "跪立・单手伸向脚跟・挺身后仰",
+   "category": "kneeling / all fours",
+   "category_zh": "跪立・四肢着地",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P045_diag",
+     "path": "img/full_sexy_P045_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P045_high",
+     "path": "img/full_sexy_P045_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P046",
+   "name": "Side lying, waist emphasized, one leg bent",
+   "name_zh": "侧卧・强调腰线・单腿弯曲",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "side": {
+     "id": "full_sexy_P046_side",
+     "path": "img/full_sexy_P046_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P047",
+   "name": "Lying face down, chin on hands, legs raised",
+   "name_zh": "俯卧托腮・双腿上抬",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P048",
+   "name": "Prone, upper body pushed up, deeply arched backward",
+   "name_zh": "俯卧撑起上身大幅后仰",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P048_diag",
+     "path": "img/full_sexy_P048_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P048_side",
+     "path": "img/full_sexy_P048_side.png"
+    },
+    "low": {
+     "id": "full_sexy_P048_low",
+     "path": "img/full_sexy_P048_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P049",
+   "name": "Supine, back lifted, one leg raised high",
+   "name_zh": "仰卧・抬背・单腿高抬",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P049_front",
+     "path": "img/full_sexy_P049_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P049_diag",
+     "path": "img/full_sexy_P049_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P049_side",
+     "path": "img/full_sexy_P049_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P049_high",
+     "path": "img/full_sexy_P049_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P049_low",
+     "path": "img/full_sexy_P049_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P050",
+   "name": "Supine, knees together, tipped sideways",
+   "name_zh": "仰卧・双膝并拢侧倒",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P051",
+   "name": "Prone on elbows, legs straight slightly apart",
+   "name_zh": "俯卧肘撑・双腿伸直微开",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P051_front",
+     "path": "img/full_sexy_P051_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P051_diag",
+     "path": "img/full_sexy_P051_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P051_side",
+     "path": "img/full_sexy_P051_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P051_high",
+     "path": "img/full_sexy_P051_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P051_low",
+     "path": "img/full_sexy_P051_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P052",
+   "name": "Side lying, arm overhead, body in S-curve",
+   "name_zh": "侧卧・手臂过头・描S形曲线",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P052_diag",
+     "path": "img/full_sexy_P052_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P052_side",
+     "path": "img/full_sexy_P052_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P053",
+   "name": "Side lying on bed, inviting pose",
+   "name_zh": "床上侧卧邀约姿势",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P054",
+   "name": "Prone, hips raised",
+   "name_zh": "俯卧翘臀",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P054_front",
+     "path": "img/full_sexy_P054_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P054_diag",
+     "path": "img/full_sexy_P054_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P054_side",
+     "path": "img/full_sexy_P054_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P055",
+   "name": "Supine, legs raised, open in V",
+   "name_zh": "仰卧V字开腿（双腿抬起）",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P056",
+   "name": "Supine, back arched, arms overhead",
+   "name_zh": "仰卧・挺背后仰・双臂过头",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P056_diag",
+     "path": "img/full_sexy_P056_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P057",
+   "name": "Prone, looking back, one knee bent sideways",
+   "name_zh": "俯卧回望・单膝侧屈",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P057_front",
+     "path": "img/full_sexy_P057_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P057_diag",
+     "path": "img/full_sexy_P057_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P057_side",
+     "path": "img/full_sexy_P057_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P057_high",
+     "path": "img/full_sexy_P057_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P057_low",
+     "path": "img/full_sexy_P057_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P058",
+   "name": "Side lying, top leg raised, holding ankle",
+   "name_zh": "侧卧・上腿高抬握踝",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P059",
+   "name": "Supine, knees bent up, one arm overhead",
+   "name_zh": "仰卧・双膝立起・单臂过头",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P060",
+   "name": "Prone, knees splayed outward, frog legs",
+   "name_zh": "俯卧蛙腿（双膝外展）",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P061",
+   "name": "Side lying away, showing hip line",
+   "name_zh": "背向侧卧・臀部线条",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P061_front",
+     "path": "img/full_sexy_P061_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P061_diag",
+     "path": "img/full_sexy_P061_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P061_side",
+     "path": "img/full_sexy_P061_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P061_high",
+     "path": "img/full_sexy_P061_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P062",
+   "name": "Supine, knees hugged to chest",
+   "name_zh": "仰卧・双膝抱至胸前",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P063",
+   "name": "Prone, chin on hands, one leg raised",
+   "name_zh": "俯卧托腮・单腿上抬",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "side": {
+     "id": "full_sexy_P063_side",
+     "path": "img/full_sexy_P063_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P064",
+   "name": "Supine, one knee opened outward",
+   "name_zh": "仰卧・单膝外展打开",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P065",
+   "name": "Elbow-supported upper body, one knee bent up",
+   "name_zh": "肘撑起上身・单膝立起",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P065_front",
+     "path": "img/full_sexy_P065_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P065_diag",
+     "path": "img/full_sexy_P065_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P065_side",
+     "path": "img/full_sexy_P065_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P065_high",
+     "path": "img/full_sexy_P065_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P065_low",
+     "path": "img/full_sexy_P065_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P066",
+   "name": "Bridge, hips lifted high, knees open",
+   "name_zh": "桥式高抬胯・双膝打开",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P066_front",
+     "path": "img/full_sexy_P066_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P066_diag",
+     "path": "img/full_sexy_P066_diag.png"
+    },
+    "high": {
+     "id": "full_sexy_P066_high",
+     "path": "img/full_sexy_P066_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P066_low",
+     "path": "img/full_sexy_P066_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P067",
+   "name": "Tucked backward roll, side, hugging thighs",
+   "name_zh": "团身仰翻（侧面・抱大腿）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P068",
+   "name": "Tucked backward roll, side, legs toward head",
+   "name_zh": "团身仰翻（侧面・双腿伸向头前）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "high": {
+     "id": "full_sexy_P068_high",
+     "path": "img/full_sexy_P068_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P068_low",
+     "path": "img/full_sexy_P068_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P069",
+   "name": "Tucked backward roll, side, knees on floor beside head",
+   "name_zh": "团身仰翻（侧面・双膝落于头侧地面）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "high": {
+     "id": "full_sexy_P069_high",
+     "path": "img/full_sexy_P069_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P070",
+   "name": "Open-leg squat, knees apart",
+   "name_zh": "蹲姿开腿（混混蹲）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P070_front",
+     "path": "img/full_sexy_P070_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P070_diag",
+     "path": "img/full_sexy_P070_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P070_side",
+     "path": "img/full_sexy_P070_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P070_high",
+     "path": "img/full_sexy_P070_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P071",
+   "name": "Tiptoe open-leg squat, hands touching floor",
+   "name_zh": "踮脚蹲姿开腿・双手触地",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P071_front",
+     "path": "img/full_sexy_P071_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P071_diag",
+     "path": "img/full_sexy_P071_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P071_side",
+     "path": "img/full_sexy_P071_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P071_high",
+     "path": "img/full_sexy_P071_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P071_low",
+     "path": "img/full_sexy_P071_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P072",
+   "name": "Bridge, four-limb support",
+   "name_zh": "桥式（四肢支撑）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "high": {
+     "id": "full_sexy_P072_high",
+     "path": "img/full_sexy_P072_high.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P073",
+   "name": "Standing split, forward bend, one leg raised back",
+   "name_zh": "站立劈叉（前屈单腿高抬后举）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P073_front",
+     "path": "img/full_sexy_P073_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P073_diag",
+     "path": "img/full_sexy_P073_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P073_side",
+     "path": "img/full_sexy_P073_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P073_high",
+     "path": "img/full_sexy_P073_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P073_low",
+     "path": "img/full_sexy_P073_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P074",
+   "name": "Front-back split, upper body leaning back",
+   "name_zh": "前后劈叉・上体后仰",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P074_front",
+     "path": "img/full_sexy_P074_front.png"
+    },
+    "side": {
+     "id": "full_sexy_P074_side",
+     "path": "img/full_sexy_P074_side.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P075",
+   "name": "Side split, upper body raised",
+   "name_zh": "左右开腿（全开横叉）・上体抬起",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P075_front",
+     "path": "img/full_sexy_P075_front.png"
+    },
+    "high": {
+     "id": "full_sexy_P075_high",
+     "path": "img/full_sexy_P075_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P075_low",
+     "path": "img/full_sexy_P075_low.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P076",
+   "name": "Shoulder stand, legs open in V",
+   "name_zh": "肩倒立・双腿V字打开",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P077",
+   "name": "Kneeling, leaning back, hands touching floor",
+   "name_zh": "跪立・向后仰・双手触地",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P078",
+   "name": "Open-leg squat, hands behind head",
+   "name_zh": "蹲姿开腿・双手抱头后",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "full_sexy_P079",
+   "name": "One-leg bridge, hips lifted, one leg up",
+   "name_zh": "单腿桥式（抬胯・单腿朝天）",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "full_sexy_P079_diag",
+     "path": "img/full_sexy_P079_diag.png"
+    }
+   }
+  },
+  {
+   "id": "full_sexy_P080",
+   "name": "Reverse tabletop, hips pushed upward",
+   "name_zh": "反向四肢着地（桌面式）・向上顶胯",
+   "category": "special",
+   "category_zh": "特殊",
+   "framing": "full body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "full_sexy_P080_front",
+     "path": "img/full_sexy_P080_front.png"
+    },
+    "diag": {
+     "id": "full_sexy_P080_diag",
+     "path": "img/full_sexy_P080_diag.png"
+    },
+    "side": {
+     "id": "full_sexy_P080_side",
+     "path": "img/full_sexy_P080_side.png"
+    },
+    "high": {
+     "id": "full_sexy_P080_high",
+     "path": "img/full_sexy_P080_high.png"
+    },
+    "low": {
+     "id": "full_sexy_P080_low",
+     "path": "img/full_sexy_P080_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P001",
+   "name": "Hands forming heart at chest",
+   "name_zh": "胸前双手比心",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "upper80v2_P001_diag",
+     "path": "img/upper80v2_P001_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P002",
+   "name": "Arms forming heart above head",
+   "name_zh": "头顶双臂比心",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P003",
+   "name": "Fingers forming heart beside face",
+   "name_zh": "脸侧手指比心",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P003_front",
+     "path": "img/upper80v2_P003_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P003_diag",
+     "path": "img/upper80v2_P003_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P003_side",
+     "path": "img/upper80v2_P003_side.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P004",
+   "name": "Double V under chin",
+   "name_zh": "下巴下比双V",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P004_front",
+     "path": "img/upper80v2_P004_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P005",
+   "name": "V sign, back of hands outward",
+   "name_zh": "辣妹V（手背朝外比V）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "side": {
+     "id": "upper80v2_P005_side",
+     "path": "img/upper80v2_P005_side.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P006",
+   "name": "Fist pressed to face, cute gesture",
+   "name_zh": "握拳贴脸（撒娇）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P006_front",
+     "path": "img/upper80v2_P006_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P007",
+   "name": "Bunny ears hand gesture",
+   "name_zh": "兔耳手势",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "side": {
+     "id": "upper80v2_P007_side",
+     "path": "img/upper80v2_P007_side.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P008",
+   "name": "Cat paw hand gesture",
+   "name_zh": "招财猫猫爪手势",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P008_front",
+     "path": "img/upper80v2_P008_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P008_diag",
+     "path": "img/upper80v2_P008_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P008_low",
+     "path": "img/upper80v2_P008_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P009",
+   "name": "Roaring hand gesture",
+   "name_zh": "咆哮手势（嗷呜）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P009_front",
+     "path": "img/upper80v2_P009_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P009_diag",
+     "path": "img/upper80v2_P009_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P009_high",
+     "path": "img/upper80v2_P009_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P009_low",
+     "path": "img/upper80v2_P009_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P010",
+   "name": "Index finger pressed to lips",
+   "name_zh": "嘘——（食指抵唇）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P010_front",
+     "path": "img/upper80v2_P010_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P010_diag",
+     "path": "img/upper80v2_P010_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P011",
+   "name": "Tilted head, hand covering one eye",
+   "name_zh": "歪头＋手遮单眼（眨眼风）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P011_front",
+     "path": "img/upper80v2_P011_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P011_diag",
+     "path": "img/upper80v2_P011_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P012",
+   "name": "Blowing a kiss",
+   "name_zh": "飞吻",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P012_front",
+     "path": "img/upper80v2_P012_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P012_diag",
+     "path": "img/upper80v2_P012_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P012_side",
+     "path": "img/upper80v2_P012_side.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P013",
+   "name": "Both palms supporting cheeks",
+   "name_zh": "双掌托腮（花苞手势）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P013_front",
+     "path": "img/upper80v2_P013_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P014",
+   "name": "Index finger poking cheek",
+   "name_zh": "食指戳脸",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P014_front",
+     "path": "img/upper80v2_P014_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P015",
+   "name": "Both hands covering mouth",
+   "name_zh": "萌袖风・双手掩口",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P015_front",
+     "path": "img/upper80v2_P015_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P015_diag",
+     "path": "img/upper80v2_P015_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P015_side",
+     "path": "img/upper80v2_P015_side.png"
+    },
+    "high": {
+     "id": "upper80v2_P015_high",
+     "path": "img/upper80v2_P015_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P015_low",
+     "path": "img/upper80v2_P015_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P016",
+   "name": "Palms together in please gesture",
+   "name_zh": "拜托手势（双手合十）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P016_front",
+     "path": "img/upper80v2_P016_front.png"
+    },
+    "low": {
+     "id": "upper80v2_P016_low",
+     "path": "img/upper80v2_P016_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P017",
+   "name": "Arms hugging self",
+   "name_zh": "抱紧自己・害羞姿势",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P017_front",
+     "path": "img/upper80v2_P017_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P017_diag",
+     "path": "img/upper80v2_P017_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P017_side",
+     "path": "img/upper80v2_P017_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P017_low",
+     "path": "img/upper80v2_P017_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P018",
+   "name": "Fingers framing viewfinder",
+   "name_zh": "手指取景框",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P018_front",
+     "path": "img/upper80v2_P018_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P019",
+   "name": "Tucking hair behind ear",
+   "name_zh": "将发丝挽至耳后",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P019_front",
+     "path": "img/upper80v2_P019_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P019_diag",
+     "path": "img/upper80v2_P019_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P020",
+   "name": "Both hands cupping face",
+   "name_zh": "双手捧脸",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P020_front",
+     "path": "img/upper80v2_P020_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P021",
+   "name": "Hand salute pose",
+   "name_zh": "敬礼姿势",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P022",
+   "name": "Finger pointing at camera",
+   "name_zh": "手指镜头",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P022_front",
+     "path": "img/upper80v2_P022_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P022_diag",
+     "path": "img/upper80v2_P022_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P022_side",
+     "path": "img/upper80v2_P022_side.png"
+    },
+    "high": {
+     "id": "upper80v2_P022_high",
+     "path": "img/upper80v2_P022_high.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P023",
+   "name": "Yawning, one hand covering mouth",
+   "name_zh": "打哈欠伸懒腰（单手掩口）",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P024",
+   "name": "One hand heart, other hand on chest",
+   "name_zh": "单手比心＋另一手抚胸",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P024_front",
+     "path": "img/upper80v2_P024_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P024_diag",
+     "path": "img/upper80v2_P024_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P024_low",
+     "path": "img/upper80v2_P024_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P025",
+   "name": "Peeking through spread fingers",
+   "name_zh": "从双手指缝间窥视",
+   "category": "cute",
+   "category_zh": "可爱系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P026",
+   "name": "Both hands heart near face, leaning forward, chest squeezed",
+   "name_zh": "双手比心贴脸（前倾挤胸）",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P027",
+   "name": "Hands resting on knees",
+   "name_zh": "雏人形式（双手扶膝）",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P027_front",
+     "path": "img/upper80v2_P027_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P027_diag",
+     "path": "img/upper80v2_P027_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P027_low",
+     "path": "img/upper80v2_P027_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P028",
+   "name": "Elbows squeezing chest, twisting waist",
+   "name_zh": "手肘挤胸・扭转腰身",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P028_front",
+     "path": "img/upper80v2_P028_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P028_diag",
+     "path": "img/upper80v2_P028_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P028_side",
+     "path": "img/upper80v2_P028_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P028_low",
+     "path": "img/upper80v2_P028_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P029",
+   "name": "Shrugging, hands crossed below chest",
+   "name_zh": "耸肩挤胸（双手下方交叠）",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P029_front",
+     "path": "img/upper80v2_P029_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P029_diag",
+     "path": "img/upper80v2_P029_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P029_side",
+     "path": "img/upper80v2_P029_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P029_low",
+     "path": "img/upper80v2_P029_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P030",
+   "name": "Arms crossed under chest lifting",
+   "name_zh": "双臂于胸下交叉托起",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "diag": {
+     "id": "upper80v2_P030_diag",
+     "path": "img/upper80v2_P030_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P031",
+   "name": "Hands lifting chest from below",
+   "name_zh": "双手自下托起",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P031_front",
+     "path": "img/upper80v2_P031_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P031_diag",
+     "path": "img/upper80v2_P031_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P031_low",
+     "path": "img/upper80v2_P031_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P032",
+   "name": "Chest resting on table",
+   "name_zh": "胸伏桌面",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P032_front",
+     "path": "img/upper80v2_P032_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P032_diag",
+     "path": "img/upper80v2_P032_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P032_side",
+     "path": "img/upper80v2_P032_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P032_low",
+     "path": "img/upper80v2_P032_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P033",
+   "name": "Forearms vertical, squeezing from sides",
+   "name_zh": "前臂竖立・从两侧夹紧",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P034",
+   "name": "One arm lifting chest",
+   "name_zh": "单臂托起胸部",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P035",
+   "name": "Hands placed on collarbones",
+   "name_zh": "俯视构图・双手放锁骨",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P035_front",
+     "path": "img/upper80v2_P035_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P035_diag",
+     "path": "img/upper80v2_P035_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P035_low",
+     "path": "img/upper80v2_P035_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P036",
+   "name": "Hands on hips, chest out",
+   "name_zh": "双手掐腰挺胸",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P036_front",
+     "path": "img/upper80v2_P036_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P036_diag",
+     "path": "img/upper80v2_P036_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P036_high",
+     "path": "img/upper80v2_P036_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P036_low",
+     "path": "img/upper80v2_P036_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P037",
+   "name": "Hands squeezing chest from sides",
+   "name_zh": "双手从两侧挤胸",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P037_front",
+     "path": "img/upper80v2_P037_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P037_diag",
+     "path": "img/upper80v2_P037_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P037_low",
+     "path": "img/upper80v2_P037_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P038",
+   "name": "Hands clasped behind back, chest out",
+   "name_zh": "双手背后交握・挺胸",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P038_front",
+     "path": "img/upper80v2_P038_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P038_diag",
+     "path": "img/upper80v2_P038_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P038_side",
+     "path": "img/upper80v2_P038_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P038_low",
+     "path": "img/upper80v2_P038_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P039",
+   "name": "Kneeling, hands forward, body leaning forward",
+   "name_zh": "跪立・双手前撑・身体前压",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P039_front",
+     "path": "img/upper80v2_P039_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P039_diag",
+     "path": "img/upper80v2_P039_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P039_high",
+     "path": "img/upper80v2_P039_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P039_low",
+     "path": "img/upper80v2_P039_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P040",
+   "name": "One elbow on knee, hand on cheek",
+   "name_zh": "单肘撑膝托腮",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P040_front",
+     "path": "img/upper80v2_P040_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P040_diag",
+     "path": "img/upper80v2_P040_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P040_side",
+     "path": "img/upper80v2_P040_side.png"
+    },
+    "high": {
+     "id": "upper80v2_P040_high",
+     "path": "img/upper80v2_P040_high.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P041",
+   "name": "Arms crossed over chest",
+   "name_zh": "双臂抱胸",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P042",
+   "name": "One hand squeezing chest, one hand touching hair",
+   "name_zh": "单手挤胸・单手抚发",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P042_front",
+     "path": "img/upper80v2_P042_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P042_diag",
+     "path": "img/upper80v2_P042_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P042_low",
+     "path": "img/upper80v2_P042_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P043",
+   "name": "One shoulder lowered, body leaning forward",
+   "name_zh": "单肩下沉・身体前倾",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P043_front",
+     "path": "img/upper80v2_P043_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P043_diag",
+     "path": "img/upper80v2_P043_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P043_low",
+     "path": "img/upper80v2_P043_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P044",
+   "name": "Prone, elbows supporting, chest squeezed",
+   "name_zh": "俯卧肘撑挤胸",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P044_front",
+     "path": "img/upper80v2_P044_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P045",
+   "name": "Leaning back, arms squeezed tight",
+   "name_zh": "后仰・双臂夹紧",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P045_front",
+     "path": "img/upper80v2_P045_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P045_diag",
+     "path": "img/upper80v2_P045_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P045_side",
+     "path": "img/upper80v2_P045_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P045_low",
+     "path": "img/upper80v2_P045_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P046",
+   "name": "One arm around waist, one hand on neck",
+   "name_zh": "单臂绕腰・一手抚颈",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P046_front",
+     "path": "img/upper80v2_P046_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P046_diag",
+     "path": "img/upper80v2_P046_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P046_side",
+     "path": "img/upper80v2_P046_side.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P047",
+   "name": "Hands on upper chest squeezing inward",
+   "name_zh": "双手置上胸向内挤",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P047_front",
+     "path": "img/upper80v2_P047_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P047_diag",
+     "path": "img/upper80v2_P047_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P047_low",
+     "path": "img/upper80v2_P047_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P048",
+   "name": "Leaning forward, back of hand on cheek",
+   "name_zh": "手背托腮前倾",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "low": {
+     "id": "upper80v2_P048_low",
+     "path": "img/upper80v2_P048_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P049",
+   "name": "On all fours, downward chest viewpoint",
+   "name_zh": "四肢着地俯视（胸口视角）",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P049_front",
+     "path": "img/upper80v2_P049_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P049_diag",
+     "path": "img/upper80v2_P049_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P049_side",
+     "path": "img/upper80v2_P049_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P049_low",
+     "path": "img/upper80v2_P049_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P050",
+   "name": "Arms wrapped around, lifting chest",
+   "name_zh": "双臂环抱托胸",
+   "category": "cleavage emphasis",
+   "category_zh": "挤胸・强调事业线系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P050_front",
+     "path": "img/upper80v2_P050_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P050_diag",
+     "path": "img/upper80v2_P050_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P050_high",
+     "path": "img/upper80v2_P050_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P050_low",
+     "path": "img/upper80v2_P050_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P051",
+   "name": "Both hands cupping chest",
+   "name_zh": "双手捧胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P051_front",
+     "path": "img/upper80v2_P051_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P051_diag",
+     "path": "img/upper80v2_P051_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P051_low",
+     "path": "img/upper80v2_P051_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P052",
+   "name": "Both hands kneading chest",
+   "name_zh": "双手揉胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P052_front",
+     "path": "img/upper80v2_P052_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P052_diag",
+     "path": "img/upper80v2_P052_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P052_side",
+     "path": "img/upper80v2_P052_side.png"
+    },
+    "high": {
+     "id": "upper80v2_P052_high",
+     "path": "img/upper80v2_P052_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P052_low",
+     "path": "img/upper80v2_P052_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P053",
+   "name": "Both palms covering chest",
+   "name_zh": "手掌遮掩（双手遮蔽）",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P053_front",
+     "path": "img/upper80v2_P053_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P053_diag",
+     "path": "img/upper80v2_P053_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P054",
+   "name": "One hand covering, other hand on waist",
+   "name_zh": "单手遮掩・一手扶腰",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P054_front",
+     "path": "img/upper80v2_P054_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P054_diag",
+     "path": "img/upper80v2_P054_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P054_high",
+     "path": "img/upper80v2_P054_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P054_low",
+     "path": "img/upper80v2_P054_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P055",
+   "name": "One hand kneading chest, one hand touching hair",
+   "name_zh": "单手揉胸・单手撩发",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "low": {
+     "id": "upper80v2_P055_low",
+     "path": "img/upper80v2_P055_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P056",
+   "name": "Pulling down shoulder strap",
+   "name_zh": "褪下肩带动作",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P056_front",
+     "path": "img/upper80v2_P056_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P056_diag",
+     "path": "img/upper80v2_P056_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P056_high",
+     "path": "img/upper80v2_P056_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P056_low",
+     "path": "img/upper80v2_P056_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P057",
+   "name": "Both hands touching hair, leaning back deeply",
+   "name_zh": "双手撩发大幅后仰",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P058",
+   "name": "Both hands behind head, exposing armpits",
+   "name_zh": "双手抱头・展露腋下",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P059",
+   "name": "Fingers sliding along lower chest edge",
+   "name_zh": "手指沿胸下缘滑动",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P059_front",
+     "path": "img/upper80v2_P059_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P059_diag",
+     "path": "img/upper80v2_P059_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P059_side",
+     "path": "img/upper80v2_P059_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P059_low",
+     "path": "img/upper80v2_P059_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P060",
+   "name": "Finger on lips, one hand on chest",
+   "name_zh": "手指抵唇＋单手抚胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P060_front",
+     "path": "img/upper80v2_P060_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P060_diag",
+     "path": "img/upper80v2_P060_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P060_low",
+     "path": "img/upper80v2_P060_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P061",
+   "name": "Fingertips covering front of chest",
+   "name_zh": "指尖遮掩胸前",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P061_front",
+     "path": "img/upper80v2_P061_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P061_diag",
+     "path": "img/upper80v2_P061_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P061_low",
+     "path": "img/upper80v2_P061_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P062",
+   "name": "One hand on chest, one hand on abdomen",
+   "name_zh": "单手抚胸・单手抚腹",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P062_front",
+     "path": "img/upper80v2_P062_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P062_diag",
+     "path": "img/upper80v2_P062_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P062_side",
+     "path": "img/upper80v2_P062_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P062_low",
+     "path": "img/upper80v2_P062_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P063",
+   "name": "Hands behind supporting, chest thrust forward",
+   "name_zh": "双手后撑・挺胸突出",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P063_front",
+     "path": "img/upper80v2_P063_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P063_diag",
+     "path": "img/upper80v2_P063_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P063_side",
+     "path": "img/upper80v2_P063_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P063_low",
+     "path": "img/upper80v2_P063_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P064",
+   "name": "Prone, one hand supporting chest",
+   "name_zh": "俯卧单手托胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P064_front",
+     "path": "img/upper80v2_P064_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P064_diag",
+     "path": "img/upper80v2_P064_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P064_side",
+     "path": "img/upper80v2_P064_side.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P065",
+   "name": "All fours, back arched, looking upward",
+   "name_zh": "四肢着地・挺背后仰仰望",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P065_front",
+     "path": "img/upper80v2_P065_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P065_diag",
+     "path": "img/upper80v2_P065_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P065_side",
+     "path": "img/upper80v2_P065_side.png"
+    },
+    "high": {
+     "id": "upper80v2_P065_high",
+     "path": "img/upper80v2_P065_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P065_low",
+     "path": "img/upper80v2_P065_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P066",
+   "name": "All fours, one hand on chest",
+   "name_zh": "四肢着地・单手抚胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P066_front",
+     "path": "img/upper80v2_P066_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P066_diag",
+     "path": "img/upper80v2_P066_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P066_low",
+     "path": "img/upper80v2_P066_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P067",
+   "name": "Front-facing leopard stretch",
+   "name_zh": "豹式伸展（正面）",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P067_front",
+     "path": "img/upper80v2_P067_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P067_diag",
+     "path": "img/upper80v2_P067_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P067_side",
+     "path": "img/upper80v2_P067_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P067_low",
+     "path": "img/upper80v2_P067_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P068",
+   "name": "Kneeling, leaning back, hand touching heel",
+   "name_zh": "跪立后仰・手触脚跟",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P068_front",
+     "path": "img/upper80v2_P068_front.png"
+    },
+    "low": {
+     "id": "upper80v2_P068_low",
+     "path": "img/upper80v2_P068_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P069",
+   "name": "Kneeling, both hands behind head",
+   "name_zh": "跪立・双手抱后脑",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {}
+  },
+  {
+   "id": "upper80v2_P070",
+   "name": "Finger held at lips",
+   "name_zh": "手指含于唇边",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P070_front",
+     "path": "img/upper80v2_P070_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P070_diag",
+     "path": "img/upper80v2_P070_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P071",
+   "name": "Gripping neck side, leaning back",
+   "name_zh": "抓握颈侧后仰",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P071_front",
+     "path": "img/upper80v2_P071_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P071_diag",
+     "path": "img/upper80v2_P071_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P071_low",
+     "path": "img/upper80v2_P071_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P072",
+   "name": "Both hands pushing inward, chest thrust out",
+   "name_zh": "双手向内挤并挺出",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P072_front",
+     "path": "img/upper80v2_P072_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P072_diag",
+     "path": "img/upper80v2_P072_diag.png"
+    },
+    "side": {
+     "id": "upper80v2_P072_side",
+     "path": "img/upper80v2_P072_side.png"
+    },
+    "low": {
+     "id": "upper80v2_P072_low",
+     "path": "img/upper80v2_P072_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P073",
+   "name": "Lying on side, arms hugging chest",
+   "name_zh": "侧卧・抱胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P073_front",
+     "path": "img/upper80v2_P073_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P073_diag",
+     "path": "img/upper80v2_P073_diag.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P074",
+   "name": "Lying on back, both hands on chest",
+   "name_zh": "仰卧・双手抚胸",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P074_front",
+     "path": "img/upper80v2_P074_front.png"
+    },
+    "low": {
+     "id": "upper80v2_P074_low",
+     "path": "img/upper80v2_P074_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P075",
+   "name": "Lying on back, arms raised, body lifted",
+   "name_zh": "仰卧・双臂上举挺身",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P075_front",
+     "path": "img/upper80v2_P075_front.png"
+    },
+    "low": {
+     "id": "upper80v2_P075_low",
+     "path": "img/upper80v2_P075_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P076",
+   "name": "Leaning forward, hand on inner thigh",
+   "name_zh": "前倾・手放大腿内侧",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P076_front",
+     "path": "img/upper80v2_P076_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P076_diag",
+     "path": "img/upper80v2_P076_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P076_high",
+     "path": "img/upper80v2_P076_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P076_low",
+     "path": "img/upper80v2_P076_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P077",
+   "name": "Reaching behind to unhook clasp",
+   "name_zh": "背后解挂钩动作",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P077_front",
+     "path": "img/upper80v2_P077_front.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P078",
+   "name": "One hand covering, other hand lifting",
+   "name_zh": "单手遮掩・另一手托起",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P078_front",
+     "path": "img/upper80v2_P078_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P078_diag",
+     "path": "img/upper80v2_P078_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P078_high",
+     "path": "img/upper80v2_P078_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P078_low",
+     "path": "img/upper80v2_P078_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P079",
+   "name": "Hand reaching into chest cleavage",
+   "name_zh": "手探入胸前沟壑",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P079_front",
+     "path": "img/upper80v2_P079_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P079_diag",
+     "path": "img/upper80v2_P079_diag.png"
+    },
+    "low": {
+     "id": "upper80v2_P079_low",
+     "path": "img/upper80v2_P079_low.png"
+    }
+   }
+  },
+  {
+   "id": "upper80v2_P080",
+   "name": "Viewed from above, hands on chest, looking up",
+   "name_zh": "俯视视角・双手抚胸・上目线",
+   "category": "sexy, bold",
+   "category_zh": "性感・大胆系",
+   "framing": "upper body",
+   "people": 1,
+   "views": {
+    "front": {
+     "id": "upper80v2_P080_front",
+     "path": "img/upper80v2_P080_front.png"
+    },
+    "diag": {
+     "id": "upper80v2_P080_diag",
+     "path": "img/upper80v2_P080_diag.png"
+    },
+    "high": {
+     "id": "upper80v2_P080_high",
+     "path": "img/upper80v2_P080_high.png"
+    },
+    "low": {
+     "id": "upper80v2_P080_low",
+     "path": "img/upper80v2_P080_low.png"
+    }
+   }
+  },
+  {
+   "id": "pair60_P001",
+   "name": "Facing each other, one knee lifted",
+   "name_zh": "面对面・抱起单膝",
+   "category": "standing couple",
+   "category_zh": "立位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P002",
+   "name": "Lying prone between legs, snuggling",
+   "name_zh": "双腿之间俯卧依偎",
+   "category": "cheek-to-cheek couple",
+   "category_zh": "贴脸系",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P003",
+   "name": "Lifting ankles, legs opened in V",
+   "name_zh": "抬起脚踝・V字打开",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P004",
+   "name": "Legs on shoulders, leaning down pressing",
+   "name_zh": "双腿搭肩俯身压上",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P005",
+   "name": "Hips raised, faces close together",
+   "name_zh": "抬高腰身・面庞贴近",
+   "category": "cheek-to-cheek couple",
+   "category_zh": "贴脸系",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P006",
+   "name": "Reverse interlocked embrace",
+   "name_zh": "倒抱交错",
+   "category": "cheek-to-cheek couple",
+   "category_zh": "贴脸系",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P007",
+   "name": "Standing, hands on knees, leaning forward",
+   "name_zh": "手扶膝前倾站立",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P008",
+   "name": "Sitting, legs intertwined, hands clasped",
+   "name_zh": "双腿交缠・双手相拉",
+   "category": "seated couple",
+   "category_zh": "坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P009",
+   "name": "Back-facing seated, hugged from behind, sitting on lap",
+   "name_zh": "自背后环抱・令其坐于膝上",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P010",
+   "name": "Back-facing seated, side-sitting on lap, embraced",
+   "name_zh": "侧坐于膝上被拥",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P011",
+   "name": "Missionary, legs extended and crossed",
+   "name_zh": "伸腿交叠",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P013",
+   "name": "Rear-entry, front on all fours, rear kneeling",
+   "name_zh": "前方四肢着地・后方跪立",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P014",
+   "name": "Rear-entry, hands on floor, legs held",
+   "name_zh": "手撑地面・双腿被抱",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P015",
+   "name": "Face-to-face, on all fours between legs",
+   "name_zh": "双腿之间四肢着地",
+   "category": "cheek-to-cheek couple",
+   "category_zh": "贴脸系",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P016",
+   "name": "Back-facing seated, legs draped, leaning on lap",
+   "name_zh": "双腿搭放・倚靠膝上",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P017",
+   "name": "Missionary, legs wrapped around waist, embracing",
+   "name_zh": "双腿缠腰相拥",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P018",
+   "name": "Riding, back-facing, sitting on hips",
+   "name_zh": "背向・坐于腰上",
+   "category": "straddling couple",
+   "category_zh": "骑乘位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P019",
+   "name": "Back-facing seated, squatting on lap",
+   "name_zh": "背向・蹲于膝上",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P020",
+   "name": "Side-lying, one leg over shoulder",
+   "name_zh": "侧身・单腿搭肩",
+   "category": "side-lying couple",
+   "category_zh": "侧卧位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P021",
+   "name": "Riding, on top pressing, legs extended",
+   "name_zh": "上方叠压・双腿伸展",
+   "category": "straddling couple",
+   "category_zh": "骑乘位",
+   "framing": "two people",
+   "people": 2,
+   "views": {
+    "front": {
+     "id": "pair60_P021_front",
+     "path": "img/pair60_P021_front.png"
+    }
+   }
+  },
+  {
+   "id": "pair60_P022",
+   "name": "Missionary, wrists crossed overhead, holding knees",
+   "name_zh": "双腕过头交叠・抱膝",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P023",
+   "name": "Riding, face-to-face, sitting on hips",
+   "name_zh": "面对面・坐于腰上",
+   "category": "straddling couple",
+   "category_zh": "骑乘位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P024",
+   "name": "Missionary, lying supine, hips lifted by knees",
+   "name_zh": "仰卧・以膝撑起腰身",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P025",
+   "name": "Back-facing seated, on lap, leaning forward",
+   "name_zh": "膝上・身体前倾",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P026",
+   "name": "Missionary, supine, waist lifted high",
+   "name_zh": "仰卧・腰部被高高抱起",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P030",
+   "name": "Standing, arms extended forward, waist held",
+   "name_zh": "双臂前伸・腰部被扶",
+   "category": "standing couple",
+   "category_zh": "立位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P031",
+   "name": "Riding, sitting leaning against raised knee",
+   "name_zh": "倚靠立起之膝而坐",
+   "category": "straddling couple",
+   "category_zh": "骑乘位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P032",
+   "name": "Face-to-face, on top, bodies intertwined",
+   "name_zh": "上方叠压交错",
+   "category": "cheek-to-cheek couple",
+   "category_zh": "贴脸系",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P034",
+   "name": "Face-to-face, kneeling astride above face",
+   "name_zh": "跨跪于脸部上方",
+   "category": "cheek-to-cheek couple",
+   "category_zh": "贴脸系",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P036",
+   "name": "Sitting, hands braced behind, legs entwined",
+   "name_zh": "双手后撑・双腿缠绕",
+   "category": "seated couple",
+   "category_zh": "坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P037",
+   "name": "Riding, hugging one raised leg",
+   "name_zh": "抱紧抬起之单腿",
+   "category": "straddling couple",
+   "category_zh": "骑乘位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P040",
+   "name": "Missionary, leaning over, kissing chest",
+   "name_zh": "俯身覆上・亲吻胸前",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P041",
+   "name": "Rear-entry, chest on floor, hips raised",
+   "name_zh": "胸贴地・抬胯",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P042",
+   "name": "Face-to-face seated, cross-legged embrace",
+   "name_zh": "盘腿相拥",
+   "category": "seated face-to-face couple",
+   "category_zh": "面对面坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P043",
+   "name": "Missionary, knees pulled to shoulders, holding ankles",
+   "name_zh": "膝盖拉至肩・手握脚踝",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P044",
+   "name": "Back-facing seated, reaching around, hand on chest",
+   "name_zh": "越过背后・手抚胸前",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P045",
+   "name": "Rear-entry, deep forward bend, hands touching floor",
+   "name_zh": "深度前屈・双手触地",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P046",
+   "name": "Riding, sitting with legs extended forward",
+   "name_zh": "双腿前伸而坐",
+   "category": "straddling couple",
+   "category_zh": "骑乘位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P047",
+   "name": "Side-lying, legs crossed, one leg over shoulder",
+   "name_zh": "双腿交叉・单腿搭肩",
+   "category": "side-lying couple",
+   "category_zh": "侧卧位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P048",
+   "name": "Rear-entry, prone, one leg raised",
+   "name_zh": "俯卧抬起单腿",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P049",
+   "name": "Standing close, embracing, legs intertwined",
+   "name_zh": "相拥・双腿交缠",
+   "category": "standing close couple",
+   "category_zh": "立位贴身",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P050",
+   "name": "Standing close, body stretched, one leg raised back",
+   "name_zh": "伸展身体・单腿后举",
+   "category": "standing close couple",
+   "category_zh": "立位贴身",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P051",
+   "name": "Standing close, whispering, hand touching cheek",
+   "name_zh": "耳边低语・手触脸颊",
+   "category": "standing close couple",
+   "category_zh": "立位贴身",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P052",
+   "name": "Standing, wrists raised overhead, held down",
+   "name_zh": "双手腕举过头・被按住",
+   "category": "standing couple",
+   "category_zh": "立位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P053",
+   "name": "Standing, hugged from behind around chest",
+   "name_zh": "自背后环抱胸前",
+   "category": "standing couple",
+   "category_zh": "立位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P054",
+   "name": "Standing close, carried horizontally, back arched",
+   "name_zh": "被横抱・背部后仰",
+   "category": "standing close couple",
+   "category_zh": "立位贴身",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P055",
+   "name": "Seated close, side-sitting, one leg raised straight",
+   "name_zh": "侧坐・单腿高抬伸直",
+   "category": "seated close couple",
+   "category_zh": "坐位贴身",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P056",
+   "name": "Side lying, propped on elbow, looking down from side",
+   "name_zh": "肘撑・从旁俯视",
+   "category": "side-lying couple",
+   "category_zh": "侧卧位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P057",
+   "name": "Lying face down, legs draped, sleeping together",
+   "name_zh": "搭腿同眠",
+   "category": "lying",
+   "category_zh": "趴卧",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P058",
+   "name": "Body close, chin propped between legs",
+   "name_zh": "双腿之间托腮",
+   "category": "close-embrace couple",
+   "category_zh": "贴身",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P059",
+   "name": "Missionary, holding behind knees, legs widely open",
+   "name_zh": "抱住膝弯・大幅打开",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P060",
+   "name": "Missionary, both knees hugged to chest",
+   "name_zh": "双膝抱至胸前",
+   "category": "missionary couple",
+   "category_zh": "正常位（传教士）",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P061",
+   "name": "Rear entry, leaning forward, waist held from behind",
+   "name_zh": "前倾弯腰・自后方扶腰",
+   "category": "from-behind couple",
+   "category_zh": "后入位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P062",
+   "name": "Facing each other seated, on lap, legs wrapped around waist",
+   "name_zh": "膝上・双腿绕腰",
+   "category": "seated face-to-face couple",
+   "category_zh": "面对面坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  },
+  {
+   "id": "pair60_P063",
+   "name": "Seated back to back, knees widely open",
+   "name_zh": "背靠・双膝大幅打开",
+   "category": "seated facing-away couple",
+   "category_zh": "背向坐位",
+   "framing": "two people",
+   "people": 2,
+   "views": {}
+  }
+ ],
+ "quality_gate": {
+  "rule": "DWPose finds as many people as the pose has, and each person has the limbs that define the pose (a limb counts with 2 of its 3 joints): both arms for upper-body poses, 3 of 4 limbs otherwise (dwpose-l384-filled-2)",
+  "views_checked": 1439,
+  "views_kept": 653,
+  "poses_kept": 196,
+  "dropped": {
+   "full_single_P002_front": "fewer than 3 limbs found",
+   "full_single_P004_low": "fewer than 3 limbs found",
+   "full_single_P005_diag": "fewer than 3 limbs found",
+   "full_single_P005_side": "pose_not_detected",
+   "full_single_P005_low": "pose_not_detected",
+   "full_single_P006_low": "fewer than 3 limbs found",
+   "full_single_P008_front": "fewer than 3 limbs found",
+   "full_single_P008_diag": "pose_not_detected",
+   "full_single_P008_side": "pose_not_detected",
+   "full_single_P008_high": "pose_not_detected",
+   "full_single_P008_low": "pose_not_detected",
+   "full_single_P011_front": "fewer than 3 limbs found",
+   "full_single_P011_diag": "pose_not_detected",
+   "full_single_P011_side": "pose_not_detected",
+   "full_single_P011_high": "pose_not_detected",
+   "full_single_P011_low": "pose_not_detected",
+   "full_single_P012_low": "fewer than 3 limbs found",
+   "full_single_P013_front": "fewer than 3 limbs found",
+   "full_single_P013_diag": "fewer than 3 limbs found",
+   "full_single_P013_high": "pose_not_detected",
+   "full_single_P013_low": "fewer than 3 limbs found",
+   "full_single_P014_high": "pose_not_detected",
+   "full_single_P016_side": "fewer than 3 limbs found",
+   "full_single_P016_low": "fewer than 3 limbs found",
+   "full_single_P027_high": "fewer than 3 limbs found",
+   "full_single_P027_low": "fewer than 3 limbs found",
+   "full_single_P029_low": "fewer than 3 limbs found",
+   "full_single_P031_side": "pose_not_detected",
+   "full_single_P031_high": "pose_not_detected",
+   "full_single_P032_front": "pose_not_detected",
+   "full_single_P032_diag": "pose_not_detected",
+   "full_single_P032_side": "fewer than 3 limbs found",
+   "full_single_P032_high": "pose_not_detected",
+   "full_single_P032_low": "pose_not_detected",
+   "full_single_P033_high": "pose_not_detected",
+   "full_single_P034_side": "pose_not_detected",
+   "full_single_P034_high": "pose_not_detected",
+   "full_single_P035_high": "pose_not_detected",
+   "full_single_P035_low": "fewer than 3 limbs found",
+   "full_single_P036_side": "pose_not_detected",
+   "full_single_P036_high": "pose_not_detected",
+   "full_single_P036_low": "pose_not_detected",
+   "full_single_P037_high": "fewer than 3 limbs found",
+   "full_single_P038_diag": "pose_not_detected",
+   "full_single_P039_front": "fewer than 3 limbs found",
+   "full_single_P039_side": "pose_not_detected",
+   "full_single_P039_high": "pose_not_detected",
+   "full_single_P040_diag": "pose_not_detected",
+   "full_single_P040_side": "pose_not_detected",
+   "full_single_P040_high": "pose_not_detected",
+   "full_single_P040_low": "pose_not_detected",
+   "full_single_P041_side": "pose_not_detected",
+   "full_single_P041_high": "pose_not_detected",
+   "full_single_P042_front": "fewer than 3 limbs found",
+   "full_single_P042_side": "fewer than 3 limbs found",
+   "full_single_P042_high": "fewer than 3 limbs found",
+   "full_single_P042_low": "fewer than 3 limbs found",
+   "full_single_P043_front": "pose_not_detected",
+   "full_single_P043_diag": "pose_not_detected",
+   "full_single_P043_side": "pose_not_detected",
+   "full_single_P043_high": "pose_not_detected",
+   "full_single_P043_low": "pose_not_detected",
+   "full_single_P044_diag": "fewer than 3 limbs found",
+   "full_single_P044_side": "pose_not_detected",
+   "full_single_P044_high": "pose_not_detected",
+   "full_single_P045_side": "pose_not_detected",
+   "full_single_P046_side": "fewer than 3 limbs found",
+   "full_single_P046_low": "fewer than 3 limbs found",
+   "full_single_P047_side": "pose_not_detected",
+   "full_single_P047_low": "fewer than 3 limbs found",
+   "full_single_P048_side": "pose_not_detected",
+   "full_single_P048_high": "pose_not_detected",
+   "full_single_P049_low": "pose_not_detected",
+   "full_single_P050_front": "pose_not_detected",
+   "full_single_P050_diag": "pose_not_detected",
+   "full_single_P050_side": "pose_not_detected",
+   "full_single_P050_high": "pose_not_detected",
+   "full_single_P050_low": "pose_not_detected",
+   "full_single_P051_diag": "fewer than 3 limbs found",
+   "full_single_P051_side": "fewer than 3 limbs found",
+   "full_single_P051_high": "pose_not_detected",
+   "full_single_P051_low": "fewer than 3 limbs found",
+   "full_single_P054_front": "pose_not_detected",
+   "full_single_P054_diag": "pose_not_detected",
+   "full_single_P054_side": "pose_not_detected",
+   "full_single_P054_high": "pose_not_detected",
+   "full_single_P054_low": "pose_not_detected",
+   "full_single_P056_side": "pose_not_detected",
+   "full_single_P056_high": "pose_not_detected",
+   "full_single_P057_front": "fewer than 3 limbs found",
+   "full_single_P057_diag": "fewer than 3 limbs found",
+   "full_single_P057_side": "pose_not_detected",
+   "full_single_P057_high": "pose_not_detected",
+   "full_single_P057_low": "pose_not_detected",
+   "full_single_P058_front": "pose_not_detected",
+   "full_single_P058_diag": "pose_not_detected",
+   "full_single_P058_side": "fewer than 3 limbs found",
+   "full_single_P058_high": "pose_not_detected",
+   "full_single_P058_low": "pose_not_detected",
+   "full_single_P059_low": "pose_not_detected",
+   "full_single_P061_high": "pose_not_detected",
+   "full_single_P062_side": "fewer than 3 limbs found",
+   "full_single_P062_high": "fewer than 3 limbs found",
+   "full_single_P063_side": "pose_not_detected",
+   "full_single_P063_high": "pose_not_detected",
+   "full_single_P064_side": "pose_not_detected",
+   "full_single_P064_high": "pose_not_detected",
+   "full_single_P065_front": "fewer than 3 limbs found",
+   "full_single_P065_diag": "fewer than 3 limbs found",
+   "full_single_P065_side": "pose_not_detected",
+   "full_single_P065_high": "fewer than 3 limbs found",
+   "full_single_P066_side": "pose_not_detected",
+   "full_single_P066_high": "pose_not_detected",
+   "full_single_P067_high": "pose_not_detected",
+   "full_single_P068_diag": "pose_not_detected",
+   "full_single_P068_side": "pose_not_detected",
+   "full_single_P068_high": "pose_not_detected",
+   "full_single_P069_high": "pose_not_detected",
+   "full_single_P072_high": "fewer than 3 limbs found",
+   "full_single_P073_high": "fewer than 3 limbs found",
+   "full_single_P074_diag": "pose_not_detected",
+   "full_single_P074_side": "pose_not_detected",
+   "full_single_P074_high": "pose_not_detected",
+   "full_single_P078_side": "pose_not_detected",
+   "full_single_P078_high": "pose_not_detected",
+   "full_single_P078_low": "pose_not_detected",
+   "full_sexy_P001_low": "fewer than 3 limbs found",
+   "full_sexy_P005_diag": "fewer than 3 limbs found",
+   "full_sexy_P005_low": "pose_not_detected",
+   "full_sexy_P006_low": "fewer than 3 limbs found",
+   "full_sexy_P008_front": "fewer than 3 limbs found",
+   "full_sexy_P008_side": "fewer than 3 limbs found",
+   "full_sexy_P009_front": "fewer than 3 limbs found",
+   "full_sexy_P009_diag": "fewer than 3 limbs found",
+   "full_sexy_P009_side": "fewer than 3 limbs found",
+   "full_sexy_P009_low": "fewer than 3 limbs found",
+   "full_sexy_P011_high": "fewer than 3 limbs found",
+   "full_sexy_P011_low": "pose_not_detected",
+   "full_sexy_P012_high": "pose_not_detected",
+   "full_sexy_P012_low": "pose_not_detected",
+   "full_sexy_P014_front": "pose_not_detected",
+   "full_sexy_P014_diag": "pose_not_detected",
+   "full_sexy_P014_side": "pose_not_detected",
+   "full_sexy_P014_high": "fewer than 3 limbs found",
+   "full_sexy_P014_low": "pose_not_detected",
+   "full_sexy_P017_side": "fewer than 3 limbs found",
+   "full_sexy_P021_front": "fewer than 3 limbs found",
+   "full_sexy_P021_side": "pose_not_detected",
+   "full_sexy_P021_high": "fewer than 3 limbs found",
+   "full_sexy_P021_low": "pose_not_detected",
+   "full_sexy_P022_low": "fewer than 3 limbs found",
+   "full_sexy_P024_side": "fewer than 3 limbs found",
+   "full_sexy_P024_low": "fewer than 3 limbs found",
+   "full_sexy_P025_side": "fewer than 3 limbs found",
+   "full_sexy_P026_front": "pose_not_detected",
+   "full_sexy_P026_diag": "pose_not_detected",
+   "full_sexy_P026_side": "pose_not_detected",
+   "full_sexy_P026_high": "pose_not_detected",
+   "full_sexy_P026_low": "pose_not_detected",
+   "full_sexy_P027_diag": "fewer than 3 limbs found",
+   "full_sexy_P027_side": "pose_not_detected",
+   "full_sexy_P027_high": "pose_not_detected",
+   "full_sexy_P027_low": "pose_not_detected",
+   "full_sexy_P030_front": "fewer than 3 limbs found",
+   "full_sexy_P030_side": "fewer than 3 limbs found",
+   "full_sexy_P030_high": "pose_not_detected",
+   "full_sexy_P030_low": "fewer than 3 limbs found",
+   "full_sexy_P031_front": "fewer than 3 limbs found",
+   "full_sexy_P031_diag": "fewer than 3 limbs found",
+   "full_sexy_P031_side": "pose_not_detected",
+   "full_sexy_P031_high": "pose_not_detected",
+   "full_sexy_P031_low": "pose_not_detected",
+   "full_sexy_P032_high": "fewer than 3 limbs found",
+   "full_sexy_P033_side": "fewer than 3 limbs found",
+   "full_sexy_P034_front": "pose_not_detected",
+   "full_sexy_P034_diag": "pose_not_detected",
+   "full_sexy_P034_side": "pose_not_detected",
+   "full_sexy_P034_high": "pose_not_detected",
+   "full_sexy_P034_low": "pose_not_detected",
+   "full_sexy_P036_side": "fewer than 3 limbs found",
+   "full_sexy_P036_low": "fewer than 3 limbs found",
+   "full_sexy_P037_front": "pose_not_detected",
+   "full_sexy_P037_diag": "pose_not_detected",
+   "full_sexy_P037_side": "pose_not_detected",
+   "full_sexy_P037_high": "pose_not_detected",
+   "full_sexy_P037_low": "pose_not_detected",
+   "full_sexy_P038_front": "pose_not_detected",
+   "full_sexy_P038_diag": "fewer than 3 limbs found",
+   "full_sexy_P038_side": "pose_not_detected",
+   "full_sexy_P038_high": "pose_not_detected",
+   "full_sexy_P038_low": "pose_not_detected",
+   "full_sexy_P039_side": "fewer than 3 limbs found",
+   "full_sexy_P039_low": "pose_not_detected",
+   "full_sexy_P040_high": "pose_not_detected",
+   "full_sexy_P040_low": "pose_not_detected",
+   "full_sexy_P042_side": "pose_not_detected",
+   "full_sexy_P043_side": "fewer than 3 limbs found",
+   "full_sexy_P043_low": "pose_not_detected",
+   "full_sexy_P044_high": "fewer than 3 limbs found",
+   "full_sexy_P044_low": "pose_not_detected",
+   "full_sexy_P045_front": "fewer than 3 limbs found",
+   "full_sexy_P045_side": "fewer than 3 limbs found",
+   "full_sexy_P045_low": "pose_not_detected",
+   "full_sexy_P046_front": "pose_not_detected",
+   "full_sexy_P046_diag": "fewer than 3 limbs found",
+   "full_sexy_P046_high": "pose_not_detected",
+   "full_sexy_P046_low": "pose_not_detected",
+   "full_sexy_P047_front": "pose_not_detected",
+   "full_sexy_P047_diag": "pose_not_detected",
+   "full_sexy_P047_side": "pose_not_detected",
+   "full_sexy_P047_high": "pose_not_detected",
+   "full_sexy_P047_low": "pose_not_detected",
+   "full_sexy_P048_front": "fewer than 3 limbs found",
+   "full_sexy_P048_high": "pose_not_detected",
+   "full_sexy_P050_front": "pose_not_detected",
+   "full_sexy_P050_diag": "pose_not_detected",
+   "full_sexy_P050_side": "pose_not_detected",
+   "full_sexy_P050_high": "pose_not_detected",
+   "full_sexy_P050_low": "pose_not_detected",
+   "full_sexy_P052_front": "fewer than 3 limbs found",
+   "full_sexy_P052_high": "pose_not_detected",
+   "full_sexy_P052_low": "pose_not_detected",
+   "full_sexy_P053_front": "pose_not_detected",
+   "full_sexy_P053_diag": "pose_not_detected",
+   "full_sexy_P053_side": "pose_not_detected",
+   "full_sexy_P053_high": "pose_not_detected",
+   "full_sexy_P053_low": "pose_not_detected",
+   "full_sexy_P054_high": "pose_not_detected",
+   "full_sexy_P054_low": "fewer than 3 limbs found",
+   "full_sexy_P055_front": "pose_not_detected",
+   "full_sexy_P055_diag": "pose_not_detected",
+   "full_sexy_P055_side": "pose_not_detected",
+   "full_sexy_P055_high": "pose_not_detected",
+   "full_sexy_P055_low": "pose_not_detected",
+   "full_sexy_P056_front": "pose_not_detected",
+   "full_sexy_P056_side": "fewer than 3 limbs found",
+   "full_sexy_P056_high": "fewer than 3 limbs found",
+   "full_sexy_P056_low": "pose_not_detected",
+   "full_sexy_P058_front": "pose_not_detected",
+   "full_sexy_P058_diag": "pose_not_detected",
+   "full_sexy_P058_side": "pose_not_detected",
+   "full_sexy_P058_high": "pose_not_detected",
+   "full_sexy_P058_low": "pose_not_detected",
+   "full_sexy_P059_front": "pose_not_detected",
+   "full_sexy_P059_diag": "pose_not_detected",
+   "full_sexy_P059_side": "pose_not_detected",
+   "full_sexy_P059_high": "pose_not_detected",
+   "full_sexy_P059_low": "pose_not_detected",
+   "full_sexy_P060_front": "fewer than 3 limbs found",
+   "full_sexy_P060_diag": "fewer than 3 limbs found",
+   "full_sexy_P060_side": "fewer than 3 limbs found",
+   "full_sexy_P060_high": "fewer than 3 limbs found",
+   "full_sexy_P060_low": "pose_not_detected",
+   "full_sexy_P061_low": "fewer than 3 limbs found",
+   "full_sexy_P062_front": "pose_not_detected",
+   "full_sexy_P062_diag": "pose_not_detected",
+   "full_sexy_P062_side": "pose_not_detected",
+   "full_sexy_P062_high": "pose_not_detected",
+   "full_sexy_P062_low": "fewer than 3 limbs found",
+   "full_sexy_P063_front": "pose_not_detected",
+   "full_sexy_P063_diag": "pose_not_detected",
+   "full_sexy_P063_high": "pose_not_detected",
+   "full_sexy_P063_low": "pose_not_detected",
+   "full_sexy_P064_front": "pose_not_detected",
+   "full_sexy_P064_diag": "fewer than 3 limbs found",
+   "full_sexy_P064_side": "fewer than 3 limbs found",
+   "full_sexy_P064_high": "fewer than 3 limbs found",
+   "full_sexy_P064_low": "pose_not_detected",
+   "full_sexy_P066_side": "pose_not_detected",
+   "full_sexy_P067_front": "pose_not_detected",
+   "full_sexy_P067_diag": "pose_not_detected",
+   "full_sexy_P067_side": "pose_not_detected",
+   "full_sexy_P067_high": "pose_not_detected",
+   "full_sexy_P067_low": "pose_not_detected",
+   "full_sexy_P068_front": "pose_not_detected",
+   "full_sexy_P068_diag": "pose_not_detected",
+   "full_sexy_P068_side": "pose_not_detected",
+   "full_sexy_P069_front": "pose_not_detected",
+   "full_sexy_P069_diag": "pose_not_detected",
+   "full_sexy_P069_side": "pose_not_detected",
+   "full_sexy_P069_low": "pose_not_detected",
+   "full_sexy_P070_low": "fewer than 3 limbs found",
+   "full_sexy_P072_front": "pose_not_detected",
+   "full_sexy_P072_diag": "pose_not_detected",
+   "full_sexy_P072_side": "pose_not_detected",
+   "full_sexy_P072_low": "pose_not_detected",
+   "full_sexy_P074_diag": "pose_not_detected",
+   "full_sexy_P074_high": "pose_not_detected",
+   "full_sexy_P074_low": "fewer than 3 limbs found",
+   "full_sexy_P075_diag": "fewer than 3 limbs found",
+   "full_sexy_P075_side": "pose_not_detected",
+   "full_sexy_P076_front": "pose_not_detected",
+   "full_sexy_P076_diag": "pose_not_detected",
+   "full_sexy_P076_side": "pose_not_detected",
+   "full_sexy_P076_high": "pose_not_detected",
+   "full_sexy_P076_low": "pose_not_detected",
+   "full_sexy_P077_front": "pose_not_detected",
+   "full_sexy_P077_diag": "pose_not_detected",
+   "full_sexy_P077_side": "pose_not_detected",
+   "full_sexy_P077_high": "pose_not_detected",
+   "full_sexy_P077_low": "pose_not_detected",
+   "full_sexy_P078_front": "pose_not_detected",
+   "full_sexy_P078_diag": "pose_not_detected",
+   "full_sexy_P078_side": "pose_not_detected",
+   "full_sexy_P078_high": "pose_not_detected",
+   "full_sexy_P078_low": "pose_not_detected",
+   "full_sexy_P079_front": "pose_not_detected",
+   "full_sexy_P079_side": "pose_not_detected",
+   "full_sexy_P079_high": "pose_not_detected",
+   "full_sexy_P079_low": "pose_not_detected",
+   "upper80v2_P001_front": "arms not found",
+   "upper80v2_P001_side": "pose_not_detected",
+   "upper80v2_P001_high": "pose_not_detected",
+   "upper80v2_P001_low": "pose_not_detected",
+   "upper80v2_P002_front": "pose_not_detected",
+   "upper80v2_P002_diag": "pose_not_detected",
+   "upper80v2_P002_side": "pose_not_detected",
+   "upper80v2_P002_high": "pose_not_detected",
+   "upper80v2_P002_low": "pose_not_detected",
+   "upper80v2_P003_high": "pose_not_detected",
+   "upper80v2_P003_low": "arms not found",
+   "upper80v2_P004_diag": "pose_not_detected",
+   "upper80v2_P004_side": "pose_not_detected",
+   "upper80v2_P004_high": "pose_not_detected",
+   "upper80v2_P004_low": "pose_not_detected",
+   "upper80v2_P005_front": "pose_not_detected",
+   "upper80v2_P005_diag": "pose_not_detected",
+   "upper80v2_P005_high": "arms not found",
+   "upper80v2_P005_low": "pose_not_detected",
+   "upper80v2_P006_diag": "arms not found",
+   "upper80v2_P006_side": "pose_not_detected",
+   "upper80v2_P006_high": "pose_not_detected",
+   "upper80v2_P006_low": "pose_not_detected",
+   "upper80v2_P007_front": "pose_not_detected",
+   "upper80v2_P007_diag": "pose_not_detected",
+   "upper80v2_P007_high": "pose_not_detected",
+   "upper80v2_P007_low": "arms not found",
+   "upper80v2_P008_side": "pose_not_detected",
+   "upper80v2_P008_high": "pose_not_detected",
+   "upper80v2_P009_side": "arms not found",
+   "upper80v2_P010_side": "pose_not_detected",
+   "upper80v2_P010_high": "pose_not_detected",
+   "upper80v2_P010_low": "pose_not_detected",
+   "upper80v2_P011_side": "pose_not_detected",
+   "upper80v2_P011_high": "pose_not_detected",
+   "upper80v2_P011_low": "arms not found",
+   "upper80v2_P012_high": "pose_not_detected",
+   "upper80v2_P012_low": "pose_not_detected",
+   "upper80v2_P013_diag": "arms not found",
+   "upper80v2_P013_side": "pose_not_detected",
+   "upper80v2_P013_high": "pose_not_detected",
+   "upper80v2_P013_low": "pose_not_detected",
+   "upper80v2_P014_diag": "arms not found",
+   "upper80v2_P014_side": "arms not found",
+   "upper80v2_P014_high": "pose_not_detected",
+   "upper80v2_P014_low": "pose_not_detected",
+   "upper80v2_P016_diag": "arms not found",
+   "upper80v2_P016_side": "pose_not_detected",
+   "upper80v2_P016_high": "pose_not_detected",
+   "upper80v2_P017_high": "pose_not_detected",
+   "upper80v2_P018_diag": "pose_not_detected",
+   "upper80v2_P018_side": "pose_not_detected",
+   "upper80v2_P018_high": "pose_not_detected",
+   "upper80v2_P018_low": "pose_not_detected",
+   "upper80v2_P019_side": "pose_not_detected",
+   "upper80v2_P019_high": "pose_not_detected",
+   "upper80v2_P019_low": "pose_not_detected",
+   "upper80v2_P020_diag": "arms not found",
+   "upper80v2_P020_side": "pose_not_detected",
+   "upper80v2_P020_high": "pose_not_detected",
+   "upper80v2_P020_low": "pose_not_detected",
+   "upper80v2_P021_front": "pose_not_detected",
+   "upper80v2_P021_diag": "pose_not_detected",
+   "upper80v2_P021_side": "pose_not_detected",
+   "upper80v2_P021_high": "pose_not_detected",
+   "upper80v2_P021_low": "pose_not_detected",
+   "upper80v2_P022_low": "arms not found",
+   "upper80v2_P023_front": "pose_not_detected",
+   "upper80v2_P023_diag": "pose_not_detected",
+   "upper80v2_P023_side": "pose_not_detected",
+   "upper80v2_P023_high": "pose_not_detected",
+   "upper80v2_P023_low": "pose_not_detected",
+   "upper80v2_P024_side": "pose_not_detected",
+   "upper80v2_P024_high": "arms not found",
+   "upper80v2_P025_front": "pose_not_detected",
+   "upper80v2_P025_diag": "arms not found",
+   "upper80v2_P025_side": "pose_not_detected",
+   "upper80v2_P025_high": "pose_not_detected",
+   "upper80v2_P025_low": "pose_not_detected",
+   "upper80v2_P026_front": "pose_not_detected",
+   "upper80v2_P026_diag": "pose_not_detected",
+   "upper80v2_P026_side": "arms not found",
+   "upper80v2_P026_high": "pose_not_detected",
+   "upper80v2_P026_low": "pose_not_detected",
+   "upper80v2_P027_side": "arms not found",
+   "upper80v2_P027_high": "pose_not_detected",
+   "upper80v2_P028_high": "pose_not_detected",
+   "upper80v2_P029_high": "pose_not_detected",
+   "upper80v2_P030_front": "arms not found",
+   "upper80v2_P030_side": "pose_not_detected",
+   "upper80v2_P030_high": "pose_not_detected",
+   "upper80v2_P030_low": "pose_not_detected",
+   "upper80v2_P031_side": "pose_not_detected",
+   "upper80v2_P031_high": "pose_not_detected",
+   "upper80v2_P032_high": "pose_not_detected",
+   "upper80v2_P033_front": "pose_not_detected",
+   "upper80v2_P033_diag": "arms not found",
+   "upper80v2_P033_side": "pose_not_detected",
+   "upper80v2_P033_high": "pose_not_detected",
+   "upper80v2_P033_low": "pose_not_detected",
+   "upper80v2_P034_front": "arms not found",
+   "upper80v2_P034_diag": "arms not found",
+   "upper80v2_P034_side": "pose_not_detected",
+   "upper80v2_P034_high": "pose_not_detected",
+   "upper80v2_P034_low": "pose_not_detected",
+   "upper80v2_P035_side": "pose_not_detected",
+   "upper80v2_P035_high": "pose_not_detected",
+   "upper80v2_P036_side": "pose_not_detected",
+   "upper80v2_P037_side": "pose_not_detected",
+   "upper80v2_P037_high": "pose_not_detected",
+   "upper80v2_P038_high": "pose_not_detected",
+   "upper80v2_P039_side": "arms not found",
+   "upper80v2_P040_low": "arms not found",
+   "upper80v2_P041_front": "arms not found",
+   "upper80v2_P041_diag": "arms not found",
+   "upper80v2_P041_side": "pose_not_detected",
+   "upper80v2_P041_high": "pose_not_detected",
+   "upper80v2_P041_low": "pose_not_detected",
+   "upper80v2_P042_side": "pose_not_detected",
+   "upper80v2_P042_high": "pose_not_detected",
+   "upper80v2_P043_side": "pose_not_detected",
+   "upper80v2_P043_high": "pose_not_detected",
+   "upper80v2_P044_diag": "pose_not_detected",
+   "upper80v2_P044_side": "pose_not_detected",
+   "upper80v2_P044_high": "pose_not_detected",
+   "upper80v2_P044_low": "pose_not_detected",
+   "upper80v2_P045_high": "pose_not_detected",
+   "upper80v2_P046_high": "pose_not_detected",
+   "upper80v2_P046_low": "pose_not_detected",
+   "upper80v2_P047_side": "pose_not_detected",
+   "upper80v2_P047_high": "pose_not_detected",
+   "upper80v2_P048_front": "pose_not_detected",
+   "upper80v2_P048_diag": "arms not found",
+   "upper80v2_P048_side": "pose_not_detected",
+   "upper80v2_P048_high": "pose_not_detected",
+   "upper80v2_P049_high": "pose_not_detected",
+   "upper80v2_P050_side": "pose_not_detected",
+   "upper80v2_P051_side": "pose_not_detected",
+   "upper80v2_P051_high": "pose_not_detected",
+   "upper80v2_P053_side": "pose_not_detected",
+   "upper80v2_P053_high": "pose_not_detected",
+   "upper80v2_P053_low": "pose_not_detected",
+   "upper80v2_P054_side": "pose_not_detected",
+   "upper80v2_P055_front": "arms not found",
+   "upper80v2_P055_diag": "arms not found",
+   "upper80v2_P055_side": "pose_not_detected",
+   "upper80v2_P055_high": "pose_not_detected",
+   "upper80v2_P056_side": "pose_not_detected",
+   "upper80v2_P057_front": "pose_not_detected",
+   "upper80v2_P057_diag": "pose_not_detected",
+   "upper80v2_P057_side": "pose_not_detected",
+   "upper80v2_P057_high": "pose_not_detected",
+   "upper80v2_P057_low": "pose_not_detected",
+   "upper80v2_P058_front": "pose_not_detected",
+   "upper80v2_P058_diag": "pose_not_detected",
+   "upper80v2_P058_side": "pose_not_detected",
+   "upper80v2_P058_high": "pose_not_detected",
+   "upper80v2_P058_low": "pose_not_detected",
+   "upper80v2_P059_high": "pose_not_detected",
+   "upper80v2_P060_side": "arms not found",
+   "upper80v2_P060_high": "pose_not_detected",
+   "upper80v2_P061_side": "pose_not_detected",
+   "upper80v2_P061_high": "pose_not_detected",
+   "upper80v2_P062_high": "pose_not_detected",
+   "upper80v2_P063_high": "pose_not_detected",
+   "upper80v2_P064_high": "pose_not_detected",
+   "upper80v2_P064_low": "arms not found",
+   "upper80v2_P066_side": "arms not found",
+   "upper80v2_P066_high": "pose_not_detected",
+   "upper80v2_P067_high": "pose_not_detected",
+   "upper80v2_P068_diag": "arms not found",
+   "upper80v2_P068_side": "pose_not_detected",
+   "upper80v2_P068_high": "pose_not_detected",
+   "upper80v2_P069_front": "pose_not_detected",
+   "upper80v2_P069_diag": "pose_not_detected",
+   "upper80v2_P069_side": "pose_not_detected",
+   "upper80v2_P069_high": "pose_not_detected",
+   "upper80v2_P069_low": "pose_not_detected",
+   "upper80v2_P070_side": "arms not found",
+   "upper80v2_P070_high": "pose_not_detected",
+   "upper80v2_P070_low": "pose_not_detected",
+   "upper80v2_P071_side": "pose_not_detected",
+   "upper80v2_P071_high": "pose_not_detected",
+   "upper80v2_P072_high": "pose_not_detected",
+   "upper80v2_P073_side": "pose_not_detected",
+   "upper80v2_P073_high": "pose_not_detected",
+   "upper80v2_P073_low": "pose_not_detected",
+   "upper80v2_P074_diag": "arms not found",
+   "upper80v2_P074_side": "pose_not_detected",
+   "upper80v2_P074_high": "pose_not_detected",
+   "upper80v2_P075_diag": "pose_not_detected",
+   "upper80v2_P075_side": "pose_not_detected",
+   "upper80v2_P075_high": "pose_not_detected",
+   "upper80v2_P076_side": "pose_not_detected",
+   "upper80v2_P077_diag": "pose_not_detected",
+   "upper80v2_P077_side": "pose_not_detected",
+   "upper80v2_P077_high": "pose_not_detected",
+   "upper80v2_P077_low": "pose_not_detected",
+   "upper80v2_P078_side": "pose_not_detected",
+   "upper80v2_P079_side": "pose_not_detected",
+   "upper80v2_P079_high": "pose_not_detected",
+   "upper80v2_P080_side": "pose_not_detected",
+   "pair60_P001_front": "found 1 of 2 people",
+   "pair60_P001_diag": "found 1 of 2 people",
+   "pair60_P001_side": "found 1 of 2 people",
+   "pair60_P001_high": "pose_not_detected",
+   "pair60_P001_low": "pose_not_detected",
+   "pair60_P002_front": "found 1 of 2 people",
+   "pair60_P002_diag": "found 1 of 2 people",
+   "pair60_P002_side": "pose_not_detected",
+   "pair60_P002_high": "found 1 of 2 people",
+   "pair60_P002_low": "found 1 of 2 people",
+   "pair60_P003_front": "found 1 of 2 people",
+   "pair60_P003_diag": "found 1 of 2 people",
+   "pair60_P003_side": "found 1 of 2 people",
+   "pair60_P003_high": "found 1 of 2 people",
+   "pair60_P003_low": "found 1 of 2 people",
+   "pair60_P004_front": "pose_not_detected",
+   "pair60_P004_diag": "found 1 of 2 people",
+   "pair60_P004_side": "found 1 of 2 people",
+   "pair60_P004_high": "pose_not_detected",
+   "pair60_P004_low": "found 1 of 2 people",
+   "pair60_P005_front": "found 1 of 2 people",
+   "pair60_P005_diag": "found 1 of 2 people",
+   "pair60_P005_side": "found 1 of 2 people",
+   "pair60_P005_high": "found 1 of 2 people",
+   "pair60_P005_low": "found 1 of 2 people",
+   "pair60_P006_front": "found 1 of 2 people",
+   "pair60_P006_diag": "found 1 of 2 people",
+   "pair60_P006_side": "found 1 of 2 people",
+   "pair60_P006_high": "found 1 of 2 people",
+   "pair60_P006_low": "pose_not_detected",
+   "pair60_P007_front": "found 1 of 2 people",
+   "pair60_P007_diag": "found 1 of 2 people",
+   "pair60_P007_side": "found 1 of 2 people",
+   "pair60_P007_high": "found 1 of 2 people",
+   "pair60_P007_low": "found 1 of 2 people",
+   "pair60_P008_front": "found 1 of 2 people",
+   "pair60_P008_diag": "found 1 of 2 people",
+   "pair60_P008_side": "found 1 of 2 people",
+   "pair60_P008_high": "pose_not_detected",
+   "pair60_P008_low": "pose_not_detected",
+   "pair60_P009_front": "found 1 of 2 people",
+   "pair60_P009_diag": "found 1 of 2 people",
+   "pair60_P009_side": "found 1 of 2 people",
+   "pair60_P009_high": "found 1 of 2 people",
+   "pair60_P009_low": "found 1 of 2 people",
+   "pair60_P010_front": "found 1 of 2 people",
+   "pair60_P010_diag": "found 1 of 2 people",
+   "pair60_P010_side": "found 1 of 2 people",
+   "pair60_P010_high": "found 1 of 2 people",
+   "pair60_P010_low": "found 1 of 2 people",
+   "pair60_P011_front": "found 1 of 2 people",
+   "pair60_P011_diag": "found 1 of 2 people",
+   "pair60_P011_side": "found 1 of 2 people",
+   "pair60_P011_high": "found 1 of 2 people",
+   "pair60_P011_low": "found 1 of 2 people",
+   "pair60_P013_front": "found 1 of 2 people",
+   "pair60_P013_diag": "found 1 of 2 people",
+   "pair60_P013_side": "found 1 of 2 people",
+   "pair60_P013_high": "found 1 of 2 people",
+   "pair60_P013_low": "found 1 of 2 people",
+   "pair60_P014_front": "found 1 of 2 people",
+   "pair60_P014_diag": "found 1 of 2 people",
+   "pair60_P014_side": "found 1 of 2 people",
+   "pair60_P014_high": "found 1 of 2 people",
+   "pair60_P014_low": "found 1 of 2 people",
+   "pair60_P015_front": "found 1 of 2 people",
+   "pair60_P015_diag": "found 1 of 2 people",
+   "pair60_P015_side": "found 1 of 2 people",
+   "pair60_P015_high": "found 1 of 2 people",
+   "pair60_P015_low": "found 1 of 2 people",
+   "pair60_P016_front": "found 1 of 2 people",
+   "pair60_P016_diag": "found 1 of 2 people",
+   "pair60_P016_side": "found 1 of 2 people",
+   "pair60_P016_high": "found 1 of 2 people",
+   "pair60_P016_low": "found 1 of 2 people",
+   "pair60_P017_front": "found 1 of 2 people",
+   "pair60_P017_diag": "found 1 of 2 people",
+   "pair60_P017_side": "found 1 of 2 people",
+   "pair60_P017_high": "found 1 of 2 people",
+   "pair60_P017_low": "found 1 of 2 people",
+   "pair60_P018_front": "pose_not_detected",
+   "pair60_P018_diag": "found 1 of 2 people",
+   "pair60_P018_side": "pose_not_detected",
+   "pair60_P018_high": "pose_not_detected",
+   "pair60_P018_low": "found 1 of 2 people",
+   "pair60_P019_front": "found 1 of 2 people",
+   "pair60_P019_diag": "found 1 of 2 people",
+   "pair60_P019_side": "found 1 of 2 people",
+   "pair60_P019_high": "found 1 of 2 people",
+   "pair60_P019_low": "found 1 of 2 people",
+   "pair60_P020_front": "found 1 of 2 people",
+   "pair60_P020_diag": "found 1 of 2 people",
+   "pair60_P020_side": "found 1 of 2 people",
+   "pair60_P020_high": "found 1 of 2 people",
+   "pair60_P020_low": "found 1 of 2 people",
+   "pair60_P021_diag": "found 1 of 2 people",
+   "pair60_P021_side": "found 1 of 2 people",
+   "pair60_P021_high": "found 1 of 2 people",
+   "pair60_P021_low": "found 1 of 2 people",
+   "pair60_P022_front": "found 1 of 2 people",
+   "pair60_P022_diag": "found 1 of 2 people",
+   "pair60_P022_side": "found 1 of 2 people",
+   "pair60_P022_high": "pose_not_detected",
+   "pair60_P022_low": "found 1 of 2 people",
+   "pair60_P023_front": "found 1 of 2 people",
+   "pair60_P023_diag": "found 1 of 2 people",
+   "pair60_P023_side": "found 1 of 2 people",
+   "pair60_P023_high": "found 1 of 2 people",
+   "pair60_P023_low": "found 1 of 2 people",
+   "pair60_P024_front": "found 1 of 2 people",
+   "pair60_P024_diag": "found 1 of 2 people",
+   "pair60_P024_side": "found 1 of 2 people",
+   "pair60_P024_high": "pose_not_detected",
+   "pair60_P024_low": "found 1 of 2 people",
+   "pair60_P025_front": "found 1 of 2 people",
+   "pair60_P025_diag": "found 1 of 2 people",
+   "pair60_P025_side": "found 1 of 2 people",
+   "pair60_P025_high": "found 1 of 2 people",
+   "pair60_P025_low": "found 1 of 2 people",
+   "pair60_P026_front": "found 1 of 2 people",
+   "pair60_P026_diag": "found 1 of 2 people",
+   "pair60_P026_side": "found 1 of 2 people",
+   "pair60_P026_high": "pose_not_detected",
+   "pair60_P026_low": "found 1 of 2 people",
+   "pair60_P030_front": "found 1 of 2 people",
+   "pair60_P030_diag": "found 1 of 2 people",
+   "pair60_P030_side": "found 1 of 2 people",
+   "pair60_P030_high": "found 1 of 2 people",
+   "pair60_P030_low": "found 1 of 2 people",
+   "pair60_P031_front": "found 1 of 2 people",
+   "pair60_P031_diag": "found 1 of 2 people",
+   "pair60_P031_side": "found 1 of 2 people",
+   "pair60_P031_high": "found 1 of 2 people",
+   "pair60_P031_low": "found 1 of 2 people",
+   "pair60_P032_front": "pose_not_detected",
+   "pair60_P032_diag": "found 1 of 2 people",
+   "pair60_P032_side": "found 1 of 2 people",
+   "pair60_P032_high": "pose_not_detected",
+   "pair60_P032_low": "found 1 of 2 people",
+   "pair60_P034_front": "found 1 of 2 people",
+   "pair60_P034_diag": "found 1 of 2 people",
+   "pair60_P034_side": "found 1 of 2 people",
+   "pair60_P034_high": "found 1 of 2 people",
+   "pair60_P034_low": "found 1 of 2 people",
+   "pair60_P036_front": "found 1 of 2 people",
+   "pair60_P036_diag": "found 1 of 2 people",
+   "pair60_P036_side": "found 1 of 2 people",
+   "pair60_P036_high": "pose_not_detected",
+   "pair60_P036_low": "found 1 of 2 people",
+   "pair60_P037_front": "found 1 of 2 people",
+   "pair60_P037_diag": "found 1 of 2 people",
+   "pair60_P037_side": "found 1 of 2 people",
+   "pair60_P037_high": "pose_not_detected",
+   "pair60_P037_low": "found 1 of 2 people",
+   "pair60_P040_front": "found 1 of 2 people",
+   "pair60_P040_diag": "found 1 of 2 people",
+   "pair60_P040_side": "found 1 of 2 people",
+   "pair60_P040_high": "pose_not_detected",
+   "pair60_P040_low": "pose_not_detected",
+   "pair60_P041_front": "found 1 of 2 people",
+   "pair60_P041_diag": "found 1 of 2 people",
+   "pair60_P041_side": "found 1 of 2 people",
+   "pair60_P041_high": "found 1 of 2 people",
+   "pair60_P041_low": "found 1 of 2 people",
+   "pair60_P042_front": "found 1 of 2 people",
+   "pair60_P042_diag": "found 1 of 2 people",
+   "pair60_P042_side": "found 1 of 2 people",
+   "pair60_P042_high": "pose_not_detected",
+   "pair60_P042_low": "pose_not_detected",
+   "pair60_P043_front": "found 1 of 2 people",
+   "pair60_P043_diag": "found 1 of 2 people",
+   "pair60_P043_side": "found 1 of 2 people",
+   "pair60_P043_high": "found 1 of 2 people",
+   "pair60_P043_low": "found 1 of 2 people",
+   "pair60_P044_front": "found 1 of 2 people",
+   "pair60_P044_diag": "found 1 of 2 people",
+   "pair60_P044_side": "found 1 of 2 people",
+   "pair60_P044_high": "found 1 of 2 people",
+   "pair60_P044_low": "found 1 of 2 people",
+   "pair60_P045_front": "found 1 of 2 people",
+   "pair60_P045_diag": "found 1 of 2 people",
+   "pair60_P045_side": "found 1 of 2 people",
+   "pair60_P045_high": "found 1 of 2 people",
+   "pair60_P045_low": "found 1 of 2 people",
+   "pair60_P046_front": "found 1 of 2 people",
+   "pair60_P046_diag": "found 1 of 2 people",
+   "pair60_P046_side": "found 1 of 2 people",
+   "pair60_P046_high": "found 1 of 2 people",
+   "pair60_P046_low": "found 1 of 2 people",
+   "pair60_P047_front": "found 1 of 2 people",
+   "pair60_P047_diag": "found 1 of 2 people",
+   "pair60_P047_side": "found 1 of 2 people",
+   "pair60_P047_high": "pose_not_detected",
+   "pair60_P047_low": "pose_not_detected",
+   "pair60_P048_front": "found 1 of 2 people",
+   "pair60_P048_diag": "found 1 of 2 people",
+   "pair60_P048_side": "found 1 of 2 people",
+   "pair60_P048_high": "found 1 of 2 people",
+   "pair60_P048_low": "found 1 of 2 people",
+   "pair60_P049_front": "found 1 of 2 people",
+   "pair60_P049_diag": "found 1 of 2 people",
+   "pair60_P049_side": "found 1 of 2 people",
+   "pair60_P049_high": "pose_not_detected",
+   "pair60_P049_low": "found 1 of 2 people",
+   "pair60_P050_front": "found 1 of 2 people",
+   "pair60_P050_diag": "found 1 of 2 people",
+   "pair60_P050_side": "found 1 of 2 people",
+   "pair60_P050_high": "pose_not_detected",
+   "pair60_P050_low": "found 1 of 2 people",
+   "pair60_P051_front": "found 1 of 2 people",
+   "pair60_P051_diag": "found 1 of 2 people",
+   "pair60_P051_side": "found 1 of 2 people",
+   "pair60_P051_high": "found 1 of 2 people",
+   "pair60_P051_low": "found 1 of 2 people",
+   "pair60_P052_front": "found 1 of 2 people",
+   "pair60_P052_diag": "found 1 of 2 people",
+   "pair60_P052_side": "found 1 of 2 people",
+   "pair60_P052_high": "found 1 of 2 people",
+   "pair60_P052_low": "found 1 of 2 people",
+   "pair60_P053_front": "found 1 of 2 people",
+   "pair60_P053_diag": "found 1 of 2 people",
+   "pair60_P053_side": "found 1 of 2 people",
+   "pair60_P053_high": "found 1 of 2 people",
+   "pair60_P053_low": "found 1 of 2 people",
+   "pair60_P054_front": "found 1 of 2 people",
+   "pair60_P054_diag": "found 1 of 2 people",
+   "pair60_P054_side": "found 1 of 2 people",
+   "pair60_P054_high": "found 1 of 2 people",
+   "pair60_P054_low": "found 1 of 2 people",
+   "pair60_P055_front": "found 1 of 2 people",
+   "pair60_P055_diag": "found 1 of 2 people",
+   "pair60_P055_side": "found 1 of 2 people",
+   "pair60_P055_high": "found 1 of 2 people",
+   "pair60_P055_low": "found 1 of 2 people",
+   "pair60_P056_front": "found 1 of 2 people",
+   "pair60_P056_diag": "found 1 of 2 people",
+   "pair60_P056_side": "found 1 of 2 people",
+   "pair60_P056_high": "found 1 of 2 people",
+   "pair60_P056_low": "found 1 of 2 people",
+   "pair60_P057_front": "found 1 of 2 people",
+   "pair60_P057_diag": "found 1 of 2 people",
+   "pair60_P057_side": "found 1 of 2 people",
+   "pair60_P057_high": "found 1 of 2 people",
+   "pair60_P057_low": "found 1 of 2 people",
+   "pair60_P058_front": "found 1 of 2 people",
+   "pair60_P058_diag": "found 1 of 2 people",
+   "pair60_P058_side": "found 1 of 2 people",
+   "pair60_P058_high": "found 1 of 2 people",
+   "pair60_P058_low": "found 1 of 2 people",
+   "pair60_P059_front": "found 1 of 2 people",
+   "pair60_P059_diag": "found 1 of 2 people",
+   "pair60_P059_side": "found 1 of 2 people",
+   "pair60_P059_high": "found 1 of 2 people",
+   "pair60_P059_low": "found 1 of 2 people",
+   "pair60_P060_front": "found 1 of 2 people",
+   "pair60_P060_diag": "found 1 of 2 people",
+   "pair60_P060_side": "found 1 of 2 people",
+   "pair60_P060_high": "pose_not_detected",
+   "pair60_P060_low": "found 1 of 2 people",
+   "pair60_P061_front": "found 1 of 2 people",
+   "pair60_P061_diag": "found 1 of 2 people",
+   "pair60_P061_side": "found 1 of 2 people",
+   "pair60_P061_high": "found 1 of 2 people",
+   "pair60_P061_low": "found 1 of 2 people",
+   "pair60_P062_front": "found 1 of 2 people",
+   "pair60_P062_diag": "pose_not_detected",
+   "pair60_P062_side": "pose_not_detected",
+   "pair60_P062_high": "pose_not_detected",
+   "pair60_P062_low": "found 1 of 2 people",
+   "pair60_P063_front": "found 1 of 2 people",
+   "pair60_P063_diag": "found 1 of 2 people",
+   "pair60_P063_side": "found 1 of 2 people",
+   "pair60_P063_high": "found 1 of 2 people",
+   "pair60_P063_low": "found 1 of 2 people"
+  }
+ }
+}

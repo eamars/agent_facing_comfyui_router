@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'moss-image-sft', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'pose', 'moss-image-sft', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -9,7 +9,7 @@ $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $Comfy = Join-Path $Root 'ComfyUI'
 $ModelRoot = Join-Path $Comfy 'models'
 $SigLIP2Root = Join-Path $ModelRoot 'siglip2\siglip2-base-patch16-512'
-$ControlNetAuxAnnotators = Join-Path $Comfy 'custom_nodes\comfyui_controlnet_aux\ckpts\lllyasviel\Annotators'
+$DWPoseRoot = Join-Path $Comfy 'custom_nodes\comfyui_controlnet_aux\ckpts\yzd-v\DWPose'
 # MOSS-Image ships as a Hugging Face component directory; its ComfyUI HF loader reads it in place.
 $MossImageRoot = Join-Path $ModelRoot 'moss-image\MOSS-Image-SFT'
 $MossImageRevision = 'daf706d2e1c7a6369c17b6d1658671aee6db1ebe'
@@ -311,27 +311,23 @@ $AssetSets = @{
             Path = (Join-Path $ModelRoot 'controlnet\xinsir-controlnet-openpose-sdxl-1.0.safetensors')
             Bytes = [int64]2502139104
             Sha256 = 'B8524E557A7DF60D081F5D4A0EB109967D107DF217943BF88C2D99B9EBCC06C5'
+        }
+    )
+    # Pose add-on: DWPose turns every pose input (library sketch or upload) into the canonical skeleton.
+    'pose' = @(
+        [pscustomobject]@{
+            Name = 'DWPose YOLOX-L person detector'
+            Url = 'https://huggingface.co/yzd-v/DWPose/resolve/main/yolox_l.onnx?download=true'
+            Path = (Join-Path $DWPoseRoot 'yolox_l.onnx')
+            Bytes = [int64]216746733
+            Sha256 = '7860AE79DE6C89A3C1EB72AE9A2756C0CCFBE04B7791BB5880AFABD97855A411'
         },
         [pscustomobject]@{
-            Name = 'OpenPose body detector annotator weight'
-            Url = 'https://huggingface.co/lllyasviel/Annotators/resolve/main/body_pose_model.pth?download=true'
-            Path = (Join-Path $ControlNetAuxAnnotators 'body_pose_model.pth')
-            Bytes = [int64]209267595
-            Sha256 = '25A948C16078B0F08E236BDA51A385D855EF4C153598947C28C0D47ED94BB746'
-        },
-        [pscustomobject]@{
-            Name = 'OpenPose hand detector annotator weight'
-            Url = 'https://huggingface.co/lllyasviel/Annotators/resolve/main/hand_pose_model.pth?download=true'
-            Path = (Join-Path $ControlNetAuxAnnotators 'hand_pose_model.pth')
-            Bytes = [int64]147341049
-            Sha256 = 'B76B00D1750901ABD07B9F9D8C98CC3385B8FE834A26D4B4F0AAD439E75FC600'
-        },
-        [pscustomobject]@{
-            Name = 'OpenPose face detector annotator weight'
-            Url = 'https://huggingface.co/lllyasviel/Annotators/resolve/main/facenet.pth?download=true'
-            Path = (Join-Path $ControlNetAuxAnnotators 'facenet.pth')
-            Bytes = [int64]153718792
-            Sha256 = '8BEB52E548624FFCC4AED12AF7AEE7DCBFAEEA420C75609FEE999FE7ADD79D43'
+            Name = 'DWPose whole-body pose estimator 384'
+            Url = 'https://huggingface.co/yzd-v/DWPose/resolve/main/dw-ll_ucoco_384.onnx?download=true'
+            Path = (Join-Path $DWPoseRoot 'dw-ll_ucoco_384.onnx')
+            Bytes = [int64]134399116
+            Sha256 = '724F4FF2439ED61AFB86FB8A1951EC39C6220682803B4A8BD4F598CD913B1843'
         }
     )
 }
@@ -356,7 +352,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'pose', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

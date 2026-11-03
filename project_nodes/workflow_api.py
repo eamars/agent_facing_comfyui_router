@@ -29,6 +29,8 @@ import folder_paths
 from comfy_execution.jobs import validate_job_id
 from server import PromptServer
 
+from project_nodes import pose as pose_addon
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 COMFY_ROOT = PROJECT_ROOT / "ComfyUI"
@@ -112,7 +114,33 @@ def _read_catalog() -> dict[str, Any]:
         if not isinstance(model_registry, list):
             raise ApiError(500, "Model registry has an invalid schema")
         catalog["model_registry"] = model_registry
+    _annotate_pose_routes(catalog)
     return catalog
+
+
+# input_mode values that pick routes able to take parameters.pose.
+POSE_INPUT_MODES = ("openpose-control", "pose")
+
+
+def _annotate_pose_routes(catalog: dict[str, Any]) -> None:
+    """Give each route its family's pose adapter; generation routes also match input_mode openpose-control."""
+    for entry in catalog["workflows"]:
+        if not isinstance(entry, dict):
+            continue
+        adapter = pose_addon.adapter_for(catalog, entry)
+        if adapter is None:
+            entry["pose"] = {"supported": False}
+            continue
+        entry["pose"] = {"supported": True, "adapter": adapter["id"], "mechanism": adapter["mechanism"],
+                         "model_ids": adapter["model_ids"], "default_strength": adapter["default_strength"],
+                         "measured_fidelity": adapter.get("measured_fidelity")}
+        entry.setdefault("control_ports", {})["controlnet"] = adapter["mechanism"].startswith("controlnet")
+        modes = entry.get("capabilities", {}).get("input_modes", [])
+        if "text-to-image" in modes:  # face-reference and inpaint routes take pose too but keep their own selector
+            modes.extend(mode for mode in POSE_INPUT_MODES if mode not in modes)
+            routing_modes = entry.get("routing", {}).get("input_modes")
+            if isinstance(routing_modes, list):
+                routing_modes.extend(mode for mode in POSE_INPUT_MODES if mode not in routing_modes)
 
 
 def _is_workflow(entry: dict[str, Any], workflow_id: Any) -> bool:
@@ -262,6 +290,7 @@ def _public_entry(
         "defaults",
         "resource_limits",
         "control_ports",
+        "pose",
     )
     result = {key: entry[key] for key in public_keys if key in entry}
     result["file"] = entry.get("file")
@@ -296,6 +325,10 @@ def _public_entry(
         result["unavailable_model_ids"] = [model["id"] for model in result["models"]
                                            if not model["ready"] or not model.get("routeable", False)]
         result["ready"] = not result["missing_files"] and not missing_model_ids and not model_missing_files and not result["unavailable_model_ids"]
+        if result.get("pose", {}).get("supported"):
+            # Pose is optional: a missing adapter model disables pose, not the route.
+            pose_models = [models_by_id.get(model_id) for model_id in result["pose"]["model_ids"]]
+            result["pose"] = {**result["pose"], "ready": all(model and _public_model(model)["ready"] for model in pose_models)}
     import nodes
     try:
         graph = _read_workflow(entry)
@@ -328,8 +361,11 @@ def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str,
             if contract.get("required") and name != "prompt" and name not in required:
                 required.append(name)
     for name, spec in properties.items():
-        if name in entry["bindings"] and name not in {"prompt", "seed", "input_image", "mask_image", "face_image", "control_image"}:
+        if name in entry["bindings"] and name not in {"prompt", "seed", "input_image", "mask_image", "face_image"}:
             spec["default"] = _binding_value(graph, entry, name)
+    if entry.get("pose", {}).get("supported"):
+        properties["pose"] = copy.deepcopy(templates["pose"])
+        properties["pose_strength"] = {**copy.deepcopy(templates["pose_strength"]), "default": entry["pose"]["default_strength"]}
     if "seed" in properties:
         properties["seed"]["description"] = "Random when omitted; the effective seed is returned in the response."
     if _image_inputs(entry):
@@ -517,7 +553,7 @@ def _fit_inputs(entry: dict[str, Any], parameters: dict[str, Any], image_info: d
     """
     budget = _resource_limits(entry)["max_total_pixels"]
     image_mode = entry.get("input_contract", {}).get("image", {}).get("mode")
-    for name in ("input_image", "mask_image", "face_image", "control_image"):
+    for name in ("input_image", "mask_image", "face_image"):
         if name not in image_info:
             continue
         info = image_info[name]
@@ -680,7 +716,8 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
         "mask_file": "mask_image",
         "face_reference": "face_image",
         "reference_face": "face_image",
-        "pose_image": "control_image",
+        "pose_image": "pose",
+        "control_image": "pose",  # the retired OpenPose route's parameter
     }
     parameter_names = {
         "prompt",
@@ -700,10 +737,8 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
         "mask_channel",
         "grow_mask_by",
         "face_image",
-        "control_image",
-        "control_strength",
-        "control_start_percent",
-        "control_end_percent",
+        "pose",
+        "pose_strength",
         "ipadapter_weight",
         "input_fit",
         "image",
@@ -714,6 +749,7 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
         "face_reference",
         "reference_face",
         "pose_image",
+        "control_image",
         "loras",
     }
     envelope = {"workflow", "workflow_id", "parameters", "prompt_granularity", "client_id", "dry_run"}
@@ -731,11 +767,17 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list[dict[str, Any]] | None = None) -> dict[str, Any]:
-    """Bind a request into the route's graph. Fitted input copies are appended to fit_report; the caller deletes them."""
+def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list[dict[str, Any]] | None = None,
+                   pose_request: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Bind a request into the route's graph. Fitted input copies are appended to fit_report; the caller deletes them.
+
+    pose_request comes from _resolve_pose; the skeleton is drawn for the final output size and attached last.
+    """
     fit_report = [] if fit_report is None else fit_report
     graph = copy.deepcopy(_read_workflow(entry))
     parameters = _request_parameters(body)
+    parameters.pop("pose", None)
+    pose_strength = parameters.pop("pose_strength", None)
     allowed = set(entry.get("bindings", {}))
     # Strength bindings are internal; expose only the documented loras object.
     for spec in entry.get("lora_bindings", {}).values():
@@ -759,7 +801,7 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
     if "seed" not in parameters:
         parameters["seed"] = secrets.randbelow(2**53)
     image_info: dict[str, dict[str, Any]] = {}
-    for name in ("input_image", "mask_image", "face_image", "control_image"):
+    for name in ("input_image", "mask_image", "face_image"):
         if name in parameters:
             normalized, path = _resolve_input_file(parameters[name], name)
             parameters[name] = normalized
@@ -789,6 +831,10 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
             height = round(source["height"] * width / source["width"])
         parameters.setdefault("width", max(64, width // 8 * 8))
         parameters.setdefault("height", max(64, height // 8 * 8))
+    elif pose_request and "width" in entry.get("bindings", {}) and "width" not in parameters and "height" not in parameters:
+        # Without a requested size the output takes the pose image's aspect at the route's default pixel count.
+        default_pixels = _binding_value(graph, entry, "width") * _binding_value(graph, entry, "height")
+        parameters["width"], parameters["height"] = pose_addon.output_size(pose_request["skeleton"], default_pixels)
 
     text_limits = {"prompt": MAX_PROMPT_LENGTH, "negative_prompt": MAX_PROMPT_LENGTH}
     integer_limits = {
@@ -802,9 +848,6 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
     float_limits = {
         "cfg": (0.0, 30.0),
         "denoise": (0.0, 1.0),
-        "control_strength": (0.0, 10.0),
-        "control_start_percent": (0.0, 1.0),
-        "control_end_percent": (0.0, 1.0),
         "ipadapter_weight": (-1.0, 3.0),
     }
     for name, maximum in text_limits.items():
@@ -817,7 +860,7 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
         if isinstance(image_binding, dict):
             _set_binding(graph, entry, "input_image", image_name)
 
-    for parameter_name in ("mask_image", "face_image", "control_image"):
+    for parameter_name in ("mask_image", "face_image"):
         if parameter_name not in parameters:
             continue
         file_name, _ = _resolve_input_file(parameters[parameter_name], parameter_name)
@@ -838,7 +881,6 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
             ("image", "input_image"),
             ("mask", "mask_image"),
             ("face", "face_image"),
-            ("control_image", "control_image"),
         )
         for contract_name, parameter_name in required_inputs:
             contract = input_contract.get(contract_name)
@@ -894,11 +936,67 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
         if _binding_value(graph, entry, "mask_channel") == "alpha" and not image_info["mask_image"]["alpha"]:
             raise ApiError(400, "mask_channel=alpha requires a mask with transparency; transparent pixels are redrawn",
                            code="mask_alpha_missing")
-    if "control_start_percent" in entry["bindings"]:
-        if _binding_value(graph, entry, "control_start_percent") > _binding_value(graph, entry, "control_end_percent"):
-            raise ApiError(400, "control_start_percent must not exceed control_end_percent")
+    if pose_request:
+        strength = entry["pose"]["default_strength"] if pose_strength is None else _as_float("pose_strength", pose_strength, 0.0, 1.0)
+        width, height = _binding_value(graph, entry, "width"), _binding_value(graph, entry, "height")
+        skeleton_image = pose_addon.render(pose_request["skeleton"], width, height)
+        pose_addon.attach(graph, pose_request["adapter"], skeleton_image, strength)
+        pose_request.update(strength=strength, skeleton_image=skeleton_image, size=[width, height])
+    elif pose_strength is not None:
+        raise ApiError(400, "pose_strength needs parameters.pose", code="invalid_parameter")
     _resource_request(graph, entry)
     return graph
+
+
+def _resolve_pose(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any] | None:
+    """Turn parameters.pose (library view id or uploaded image) into the route's adapter plus a skeleton.
+
+    Blocking (gallery fetch, DWPose on CPU): call it from a worker thread.
+    """
+    parameters = _request_parameters(body)
+    if "pose" not in parameters:
+        return None
+    if not entry.get("pose", {}).get("supported"):
+        catalog = _read_catalog()
+        routes = [item["id"] for item in catalog["workflows"] if isinstance(item, dict) and item.get("pose", {}).get("supported")
+                  and "text-to-image" in item.get("capabilities", {}).get("input_modes", [])]
+        raise ApiError(400, f"Workflow {entry['id']} does not take a pose yet; leave pose out and describe it in the prompt, "
+                            "or use one of routes_with_pose if it suits the request", {"routes_with_pose": routes}, code="pose_unsupported")
+    adapter = pose_addon.adapter_for(_read_catalog(), entry)
+    public_pose = _public_entry(entry, _read_catalog().get("model_registry", []))["pose"]
+    if not public_pose.get("ready"):
+        raise ApiError(409, "Pose dependencies are not installed; run scripts/download_models.ps1 -Profile pose",
+                       public_pose, code="pose_unavailable")
+    value = _as_text("pose", parameters["pose"], MAX_INPUT_IMAGE_LENGTH).strip()
+    found = pose_addon.lookup(value)
+    if found:
+        library_pose, angle = found
+        source_name = pose_addon.library_image(library_pose, angle)
+        source = {"source": "library", "id": library_pose["views"][angle]["id"], "name": library_pose["name"],
+                  "angle": pose_addon.ANGLES[angle], "people": library_pose["people"]}
+    else:
+        try:
+            source_name, path = _resolve_input_file(value, "pose")
+        except ApiError as exc:
+            if exc.code == "input_not_found" and pose_addon.looks_like_library_id(value):
+                raise ApiError(400, f"{value} is neither a pose library id nor an uploaded image; find library poses "
+                                    "with GET /project/poses?q=", code="pose_unknown_id") from exc
+            raise
+        _image_info(path, "pose")
+        source = {"source": "upload", "file": source_name}
+    skeleton = pose_addon.skeleton(source_name)
+    return {**source, "people_detected": len(skeleton["people"]), "found_by": skeleton["found_by"],
+            "skeleton": skeleton, "adapter": adapter}
+
+
+def _pose_summary(pose_request: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not pose_request:
+        return None
+    folder, _, file_name = pose_request["skeleton_image"].rpartition("/")
+    summary = {key: pose_request[key] for key in ("source", "id", "name", "angle", "file", "people_detected", "found_by",
+                                                   "strength", "size") if key in pose_request}
+    return {**summary, "adapter": pose_request["adapter"]["id"],
+            "skeleton_url": "/view?" + urlencode({"filename": file_name, "subfolder": folder, "type": "input"})}
 
 
 def _normalise_match_text(value: Any) -> str:
@@ -1277,7 +1375,8 @@ def _image_inputs(entry: dict[str, Any]) -> list[str]:
     """Image parameters _prepare_graph accepts for this route."""
     bindings = entry.get("bindings", {})
     accepted = ["input_image"] if entry.get("input_contract", {}).get("image", {}).get("supported") or "input_image" in bindings else []
-    return accepted + [name for name in ("mask_image", "face_image", "control_image") if name in bindings]
+    accepted += [name for name in ("mask_image", "face_image") if name in bindings]
+    return accepted + (["pose"] if entry.get("pose", {}).get("supported") else [])
 
 
 # Reference-image intents, keyed by the contract mode that implements them.
@@ -1294,9 +1393,6 @@ _REFERENCE_USES = (
     ("face-reference", "face-reference", "face_image",
      "Put the same face/character into a new scene described by the prompt.",
      "IPAdapter conditioning, not FaceID. Outfit, pose and background come from the prompt at the default weight; on the Anima route weights of 0.8-1.0 copy the reference's outfit and background."),
-    ("openpose-source-image", "openpose-control", "control_image",
-     "Copy the body pose of a person in an uploaded image.",
-     "The route extracts an OpenPose skeleton; clothing, face and scene come from the prompt."),
 )
 
 
@@ -1308,6 +1404,12 @@ def _reference_uses(workflows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                          for contract in entry.get("input_contract", {}).values())]
         if routes:
             uses.append({"intent": intent, "input_mode": input_mode, "parameter": parameter, "routes": routes, "behaviour": behaviour})
+    pose_routes = [entry["id"] for entry in workflows if entry.get("pose", {}).get("supported")]
+    if pose_routes:
+        uses.append({"intent": "Copy the body pose of a person in an uploaded photo, illustration or sketch.",
+                     "input_mode": "openpose-control", "parameter": "pose", "routes": pose_routes,
+                     "behaviour": "The service extracts the skeleton; clothing, face and scene still come from the prompt. "
+                                  "It can be combined with the route's other inputs. Library poses need no upload (see poses)."})
     return uses
 
 
@@ -1327,11 +1429,12 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "protocol": "project-comfyui-agent/v1",
-        "api_version": "1.5.0",
+        "api_version": "1.6.0",
         "route_table": [{"id": entry["id"], "family": entry["family"],
                          "control_ports": entry.get("control_ports", {}),
                          "required_fields": entry.get("input_contract", {}).get("required_fields", []),
                          "image_inputs": _image_inputs(entry),
+                         "pose": entry.get("pose", {}).get("supported", False),
                          "recommended": entry.get("agent_hints", {}).get("recommended", {}),
                          "explicit_only": entry.get("routing", {}).get("explicit_only", False),
                          # The words /project/resolve matches, so agents choose from a menu instead of guessing.
@@ -1345,7 +1448,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "agent_startup_rule": "Read the preferred entrypoint before treating the root path as a ComfyUI client surface.",
         },
         "service": {
-            "description": "Named workflow selection, reference-image upload, and text-to-image, image edit, image-to-image, inpaint, face-reference and pose-control job API for this ComfyUI server.",
+            "description": "Named workflow selection, reference-image upload, pose library, and text-to-image, image edit, image-to-image, inpaint, face-reference and pose job API for this ComfyUI server.",
             "authentication": "none",
             "api_base": "/project",
             "native_comfyui_api": "available",
@@ -1376,7 +1479,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                     "subfolder": "optional relative input subfolder",
                 },
                 "response_fields": ["name", "subfolder", "type"],
-                "use_as": "Combine response subfolder and name with '/' and pass it as the selected route's image parameter (route_table[].image_inputs): input_image, mask_image, face_image or control_image.",
+                "use_as": "Combine response subfolder and name with '/' and pass it as the selected route's image parameter (route_table[].image_inputs): input_image, mask_image, face_image or pose.",
             },
             "reference_uses": _reference_uses(ready_workflows),
             "input_fit": {
@@ -1389,6 +1492,31 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "text_only_routes": [entry["id"] for entry in ready_workflows if not _image_inputs(entry)],
             "reference_rule": "Upload or discover the reference before submitting /project/prompt; the named API accepts only a relative input-directory filename, never a host path or URL.",
         },
+        "poses": {
+            "parameter": "parameters.pose",
+            "when": "Send pose when the requester asks for a specific body pose or hand gesture, or gives a pose image. Otherwise leave it out.",
+            "value": "A pose id from the pose library, or the name of an uploaded image (from /project/inputs) whose pose should be copied.",
+            "search": {
+                "method": "GET", "path": "/project/poses",
+                "query": {"q": "words; matches English or Chinese pose names", "people": "1 or 2",
+                          "angle": "front, diag, side, high or low", "limit": "1-20, default 8"},
+                "returns": "Each result has views: one view id per camera angle: front, diag (three-quarter), side, "
+                           "high (camera above, looking down), low (camera below, looking up). Pass the view id for the angle "
+                           "you want, or the pose id for the front view.",
+            },
+            "no_match": "If no library pose fits the request, leave pose out and describe the pose in the prompt.",
+            "prompt": "Also name the pose in the prompt (e.g. sitting, knee up, hand on chin): on Illustrious routes seated and "
+                      "kneeling poses often stay standing when only the skeleton asks for them.",
+            "pose_strength": "Optional parameters.pose_strength 0-1 (default 0.8): how strictly the pose is followed.",
+            "routing": "Not every route takes a pose yet (route_table[].pose). When sending pose, add input_mode "
+                       "'openpose-control' to /project/resolve so only routes that take one are chosen. A named character "
+                       "comes first: if that drops the character's own route (selection.fallback is true), resolve without "
+                       "input_mode, keep the character's route and describe the pose in the prompt.",
+            "output_size": "Without width and height the output follows the pose image's aspect ratio.",
+            "response": "The queued or dry-run response has a pose object: the pose used, people_detected and skeleton_url, "
+                        "the skeleton the model follows.",
+            "library_size": sum(1 for item in pose_addon.library().get("poses", {}).values() if item["views"]),
+        },
         "error_codes": {
             "input_not_found": "The named input file is not in ComfyUI's input directory; upload it or check GET /project/inputs.",
             "input_invalid_path": "The input name is not a relative path inside the input directory.",
@@ -1400,6 +1528,11 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "mask_alpha_missing": "mask_channel=alpha was requested but the mask has no transparency.",
             "unsupported_parameter": "The route does not expose this parameter (for example an image sent to a text-only route).",
             "invalid_parameter": "A parameter value is outside its allowed set.",
+            "pose_unsupported": "The selected route does not take a pose yet; details.routes_with_pose lists routes that do.",
+            "pose_unknown_id": "The pose value is neither a library pose id nor an uploaded image; search GET /project/poses.",
+            "pose_not_detected": "No human body pose was found in the pose image; use a clearer image of the whole body.",
+            "pose_fetch_failed": "The library sketch could not be fetched from the pose gallery; retry later or pick another pose.",
+            "pose_unavailable": "Pose dependencies are not installed on this server.",
             "out_of_memory": "Job error.code: the job ran out of RAM/VRAM while running.",
         },
         "instructions": [
@@ -1415,14 +1548,14 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "Supply parameters.prompt explicitly (empty string is allowed); subject is a compatibility alias. Suggested subject/appearance details are prompt-writing advice, not separate required API fields. Seed is random when omitted.",
             "Responses include identical prompt_id/job_id, applied_parameters, ignored_parameters (empty; unknown fields are rejected), effective_parameters, resource budgets and advisory warnings (sampling ranges, over_pixel_budget); warnings never block a job. dry_run validates without executing.",
             "When the requester supplies an image, first decide what it is for using input_files.reference_uses (instruction edit, restyle/vary, inpaint, face reference or pose), then resolve with that input_mode. Send only the image parameters listed in route_table[].image_inputs; text_only_routes accept none.",
-            "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then pass the returned relative name as the route's image parameter: input_image for instruction edit, image-to-image or the inpaint source, mask_image for the inpaint mask, face_image for face reference, or control_image for OpenPose control.",
+            "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then pass the returned relative name as the route's image parameter: input_image for instruction edit, image-to-image or the inpaint source, mask_image for the inpaint mask, face_image for face reference, or pose for a pose to copy.",
+            "For a specific body pose or hand gesture, follow the poses section: search GET /project/poses, then pass a view id (or an uploaded pose image) as parameters.pose.",
             "Image inputs are fitted automatically (input_fit=downscale). When the response has input_downscaled, input_resized or input_first_frame warnings, tell the requester the image was adjusted and give original_size and used_size. Send input_fit=none only when the requester needs the original size; then relay any refusal's error.code and message.",
             "Use a unique basename for each new upload. With overwrite=false, the native ComfyUI endpoint may return an existing same-name file; delete only input names that this caller owns.",
             "GET /project/resources returns an advisory selected-device memory snapshot and configured queue/input limits; it is diagnostic information, not a reservation.",
             "If a job fails with error.code out_of_memory, report it to the requester with the current GET /project/resources snapshot before resubmitting.",
             "For inpaint, upload a source image and a mask with the same aspect ratio (normally the same size). RGB white/red pixels are redrawn; alpha masks redraw transparent pixels. denoise 1.0 (default) replaces the masked region; lower keeps more of the original inside it. Unmasked original pixels are composited back after decode.",
             "For face-reference, pass face_image to a face-reference route; it is not FaceID recognition. Use a head-and-shoulders crop. The Anima route encodes the whole reference: keep ipadapter_weight at its 0.6 default unless likeness matters more than the prompted outfit and scene, since 0.8-1.0 copies the reference's outfit and background.",
-            "For openpose-control, use control_image with the OpenPose route; the route preprocesses the supplied source/control image before applying the SDXL ControlNet.",
             "After confirming a file is no longer needed, DELETE /project/inputs/{name}; only a single regular input file is removed.",
             "The upload response is an input filename, not an output-job reference; automatic output-to-input bindings are not yet implemented.",
             "POST /project/generate (or /project/prompt) returns prompt_id; poll GET /project/jobs/{prompt_id} until state is succeeded or failed.",
@@ -1444,7 +1577,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                 "resource_limits",
             ],
             "matching_order": [
-                "honor routing.required_selectors for capability-specific routes such as inpaint, face-reference and openpose-control",
+                "honor routing.required_selectors for capability-specific routes such as inpaint and face-reference",
                 "content_mode against routing.content_modes and capabilities.nsfw_capable",
                 "domain/content mode/style against the workflow's routing selectors and model capabilities",
                 "input_type/input_mode against capabilities.input_types and capabilities.input_modes",
@@ -1452,7 +1585,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                 "model readiness and compatibility_notes",
             ],
             "recommended_operation": "POST /project/resolve",
-            "routing_boundary": "Routing selects a workflow/model combination only. Character, outfit, pose and other subject details belong in the final prompt.",
+            "routing_boundary": "Routing selects a workflow/model combination only. Character, outfit and other subject details belong in the final prompt; an exact body pose goes in parameters.pose.",
         },
         "prompting": {
             "granularity_levels": [
@@ -1475,7 +1608,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             ],
             "selection_rule": "Use the selected workflow's prompting.granularity.recommended value unless the caller explicitly requests another accepted level.",
             "agent_supplies_final_prompt": True,
-            "input_rule": "Use only the selected workflow's declared input_contract. Upload or discover the declared input first, then provide input_image, mask_image, face_image or control_image exactly as documented; text-to-image does not require an input file.",
+            "input_rule": "Use only the selected workflow's declared input_contract. Upload or discover the declared input first, then provide input_image, mask_image, face_image or pose exactly as documented; text-to-image does not require an input file.",
         },
         "routing_boundary": {
             "route_selectors": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
@@ -1554,7 +1687,13 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                     "overwrite": "optional true/false",
                     "subfolder": "optional relative subfolder",
                 },
-                "response": "Join returned subfolder and name with '/' and pass it as the selected route's image parameter (input_image, mask_image, face_image or control_image).",
+                "response": "Join returned subfolder and name with '/' and pass it as the selected route's image parameter (input_image, mask_image, face_image or pose).",
+            },
+            {
+                "id": "search_poses",
+                "method": "GET",
+                "path": "/project/poses",
+                "description": "Search the pose library; pass a returned view id as parameters.pose.",
             },
             {
                 "id": "list_workflows",
@@ -1688,6 +1827,29 @@ def _openapi_document() -> dict[str, Any]:
                     "summary": "Get the agent operating guide",
                     "responses": {"200": {"description": "Agent manifest"}},
                 }
+            },
+            "/project/poses": {
+                "get": {
+                    "operationId": "searchPoses",
+                    "summary": "Search the pose library",
+                    "description": "Rank library poses by words in their English or Chinese names. Pass a returned view id (or pose id for the front view) as parameters.pose.",
+                    "parameters": [
+                        {"name": "q", "in": "query", "schema": {"type": "string", "maxLength": 256}},
+                        {"name": "people", "in": "query", "schema": {"type": "integer", "enum": [1, 2]}},
+                        {"name": "angle", "in": "query", "schema": {"type": "string", "enum": list(pose_addon.ANGLES)}},
+                        {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 20, "default": 8}},
+                    ],
+                    "responses": {"200": {"description": "Ranked poses; each has one view id per camera angle",
+                                          "content": {"application/json": {"schema": {"type": "object", "properties": {
+                                              "results": {"type": "array", "items": {"type": "object", "properties": {
+                                                  "id": {"type": "string"}, "name": {"type": "string"}, "name_zh": {"type": "string"},
+                                                  "category": {"type": "string"}, "framing": {"type": "string"},
+                                                  "people": {"type": "integer"}, "match_score": {"type": "number"},
+                                                  "views": {"type": "object", "additionalProperties": {"type": "string"}},
+                                              }}},
+                                              "angle_hint": {"type": ["string", "null"]},
+                                          }}}}}},
+                },
             },
             "/project/inputs": {
                 "get": {
@@ -2102,25 +2264,16 @@ def _openapi_document() -> dict[str, Any]:
                             "maxLength": MAX_INPUT_IMAGE_LENGTH,
                             "description": "Relative input filename for a face-centric IPAdapter reference; it is not a job-output reference.",
                         },
-                        "control_image": {
+                        "pose": {
                             "type": "string",
                             "maxLength": MAX_INPUT_IMAGE_LENGTH,
-                            "description": "Relative input filename for a pose/control reference consumed by the selected ControlNet workflow.",
+                            "description": "Body pose to follow: a pose id or view id from GET /project/poses, or the relative name of an uploaded image whose pose should be copied. Only routes with pose support accept it.",
                         },
-                        "control_strength": {
-                            "type": "number",
-                            "minimum": 0,
-                            "maximum": 10,
-                        },
-                        "control_start_percent": {
+                        "pose_strength": {
                             "type": "number",
                             "minimum": 0,
                             "maximum": 1,
-                        },
-                        "control_end_percent": {
-                            "type": "number",
-                            "minimum": 0,
-                            "maximum": 1,
+                            "description": "How strictly the pose is followed.",
                         },
                         "input_fit": {
                             "type": "string",
@@ -2598,8 +2751,8 @@ def _project_input_files() -> tuple[bool, list[dict[str, Any]]]:
             # input directory must not be exposed.
             continue
         name = relative.as_posix()
-        if not name or name.startswith("../"):
-            continue
+        if not name or name.startswith("../") or name.startswith(f"{pose_addon.CACHE_DIR}/"):
+            continue  # the pose cache (library sketches, skeletons) is the service's, not the requester's
         files.append(
             {
                 "name": name,
@@ -2689,6 +2842,22 @@ def _query_limit(value: Any, default: int = 1) -> int:
     if str(limit) != str(value) or not 1 <= limit <= 20:
         raise ApiError(400, "limit must be between 1 and 20")
     return limit
+
+
+async def list_poses(request: web.Request) -> web.Response:
+    try:
+        query = _as_text("q", request.query.get("q", ""), 256)
+        people = request.query.get("people")
+        if people not in (None, "", "1", "2"):
+            raise ApiError(400, "people must be 1 or 2", code="invalid_parameter")
+        angle = request.query.get("angle") or None
+        if angle is not None and angle not in pose_addon.ANGLES:
+            raise ApiError(400, "angle must be one of " + ", ".join(pose_addon.ANGLES), code="invalid_parameter")
+        result = pose_addon.search(query, int(people) if people else None, angle,
+                                   _query_limit(request.query.get("limit"), default=8))
+        return web.json_response({**result, "usage": "Pass a view id from views (or a pose id for its front view) as parameters.pose."})
+    except ApiError as error:
+        return _json_error(error)
 
 
 async def list_routes(request: web.Request) -> web.Response:
@@ -2854,7 +3023,8 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             raise ApiError(400, "workflow and workflow_id disagree")
         entry = _find_workflow(workflow_id)
         requested_granularity = _validate_prompt_granularity(entry, body)
-        graph = _prepare_graph(entry, body, fit_report)
+        pose_request = await asyncio.to_thread(_resolve_pose, entry, body)
+        graph = _prepare_graph(entry, body, fit_report, pose_request)
         public = _public_entry(entry, _read_catalog().get("model_registry", []))
         client_id = body.get("client_id", "project-workflow-api")
         client_id = _as_text("client_id", client_id, 256)
@@ -2875,6 +3045,9 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             applied["input_image"] = _request_parameters(body)["input_image"]
         if entry.get("lora_bindings"):
             applied["loras"] = {name: _binding_value(graph, entry, spec["strength_model"]) for name, spec in entry["lora_bindings"].items()}
+        if pose_request:
+            applied["pose"] = pose_request.get("id") or pose_request.get("file")
+            applied["pose_strength"] = pose_request["strength"]
         warnings = []
         for record in fit_report:
             original, used, name = record["original_size"], record["used_size"], record["parameter"]
@@ -2913,6 +3086,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
                     "resources": resources,
                     "warnings": warnings,
                     "prompt_granularity": requested_granularity,
+                    "pose": _pose_summary(pose_request),
                     "prompt": graph,
                 }
             )
@@ -2928,7 +3102,11 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         result["ignored_parameters"] = []
         result["resources"] = resources
         result["warnings"] = warnings
+        result["pose"] = _pose_summary(pose_request)
         return web.json_response(result)
+    except pose_addon.PoseError as exc:
+        return _json_error(ApiError(exc.status, exc.message, exc.details, code=exc.code,
+                                    route=workflow_id if isinstance(workflow_id, str) else None))
     except ApiError as error:
         if error.route is None:
             error.route = workflow_id if isinstance(workflow_id, str) else None
@@ -2969,6 +3147,7 @@ def _register_routes() -> None:
     routes.get("/project/resources")(get_project_resources)
     routes.get("/project/routes")(list_routes)
     routes.get("/project/inputs")(list_project_inputs)
+    routes.get("/project/poses")(list_poses)
     routes.delete("/project/inputs/{name:.*}")(delete_project_input)
     routes.post("/project/resolve")(resolve_route)
     routes.get("/project/models")(list_models)
@@ -2983,7 +3162,7 @@ def _register_routes() -> None:
     logging.info(
         "Project workflow API enabled at /.well-known/agent-manifest.json, "
         "/project/agent-manifest, /project/openapi.json, /project/resources, /project/routes, "
-        "/project/inputs, /project/inputs/{name}, /project/models, /project/workflows, /project/resolve, "
+        "/project/inputs, /project/inputs/{name}, /project/poses, /project/models, /project/workflows, /project/resolve, "
         "/project/generate, /upload/image and /project/jobs"
     )
 

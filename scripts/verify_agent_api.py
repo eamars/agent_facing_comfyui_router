@@ -81,7 +81,7 @@ def main() -> None:
             return Image.open(io.BytesIO(response.read())).convert("RGB")
 
     manifest = http("/.well-known/agent-manifest.json")
-    check("API 1.5 discovery", manifest.get("api_version") == "1.5.0")
+    check("API 1.6 discovery", manifest.get("api_version") == "1.6.0")
     report["initial_resources"] = http("/project/resources")
     entries = http("/project/workflows")["workflows"]
     source = Image.new("RGB", (320, 384), (40, 70, 110))
@@ -90,7 +90,7 @@ def main() -> None:
     pending = []
     try:
         source_name, mask_name = upload("source", source), upload("mask", mask)
-        references = {"input_image": source_name, "face_image": source_name, "control_image": source_name, "mask_image": mask_name}
+        references = {"input_image": source_name, "face_image": source_name, "mask_image": mask_name}
         routes = [
             ({"domain": "大肥鱼", "content_mode": "sfw"}, "deepseek-whale-girl-anima-turbo"),
             ({"domain": "bathroom"}, "anima-turbo-v1-1"),

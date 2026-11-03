@@ -10,7 +10,8 @@
 - **布局控制**：通过 MOSS-Image 的布局 JSON 指定文字和物体在画面中的位置与内容。
 - **参考图编辑**：通过 Qwen-Image-2.1 输入一张图片和自然语言指令，修改颜色、服装、场景等内容。
 - **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
-- **人物与姿态参考**：通过 IPAdapter 参考人物外观，通过 OpenPose ControlNet 控制身体姿态。
+- **人物参考**：通过 IPAdapter 参考人物外观。
+- **姿势**：同一个 `pose` 参数接受姿势库编号或上传的图片，服务提取骨架后按模型家族接入控制；目前 SDXL / Illustrious 路由已支持。
 - **自动选路**：根据题材、内容模式、风格和输入方式，从可用工作流中选择合适的模型组合。
 - **队列与热切换**：串行处理生成任务，同一工作流复用模型缓存，切换工作流时自动释放并加载所需模型。
 - **Agent 接入**：提供能力发现、参数说明、图片上传、任务状态和结果下载接口，也保留原生 ComfyUI 接口。
@@ -49,15 +50,27 @@
 | `moody-anima-inpaint` | Moody Anima Mix | 蒙版区域重绘 | `input_image`、`mask_image` |
 | `anima-turbo-face-reference-ipadapter` | Anima Turbo + Character Reference IPAdapter | 人物外观参考 | `face_image` |
 | `sdxl-face-reference-ipadapter` | Animagine XL 3.1 + IPAdapter Plus Face | 面部外观参考 | `face_image` |
-| `sdxl-openpose-controlnet` | Animagine XL 3.1 + Xinsir OpenPose | 身体姿态参考 | `control_image` |
 
-人物参考用于引导外观，不保证身份或五官完全一致。姿态控制主要约束身体姿势，人物、服装和背景仍由提示词描述。
+人物参考用于引导外观，不保证身份或五官完全一致。
+
+### 姿势
+
+姿势不是单独的工作流，而是各路由共用的可选参数 `pose`：
+
+- **姿势库编号**：`GET /project/poses?q=跪&people=1&angle=side` 按中英文名称搜索 288 个姿势，每个姿势有正面、斜侧、侧面、俯视、仰视五个视角，返回的视角编号（如 `full_single_P035_side`）直接作为 `pose` 传入。
+- **上传图片**：照片、插画或线稿均可，服务会复制其中人物的身体姿势。
+
+服务用 DWPose 把输入提取为 OpenPose 骨架（含手部），按内容哈希缓存；找不到人体时以 `pose_not_detected` 拒绝。骨架按输出尺寸等比绘制；未指定宽高时，输出采用姿势图的宽高比。`pose_strength`（0–1，默认 0.8）控制贴合程度。响应中的 `pose` 对象给出实际使用的姿势、检测到的人数和 `skeleton_url`（模型实际遵循的骨架图）。人物、服装和背景仍由提示词描述。
+
+每个模型家族有自己的接入方式：SDXL / Illustrious（JANKU、One Obsession、Animagine 及 SDXL 人物参考）使用 Xinsir OpenPose ControlNet。实测（[`scripts/verify_pose_fidelity.py`](scripts/verify_pose_fidelity.py)，结果记录在 catalog 的 `pose_adapters`）：站姿和手臂动作贴合较好；在 Illustrious 模型上，坐、跪等姿势需要在提示词中同时写出姿势，否则常被画成站姿。Anima、Flux.2 Klein、Qwen-Image 和 MOSS-Image 尚未接入，向这些路由传 `pose` 会返回 `pose_unsupported` 并列出可用路由；需要姿势时在 `/project/resolve` 中加 `input_mode: "openpose-control"`，只在支持姿势的路由中选择。原 `sdxl-openpose-controlnet` 工作流已并入 `animagine-xl-3.1-nsfw`，旧编号和旧参数 `control_image` 仍可用。
+
+姿势库来自 [ai-pose-gallery-zh](https://github.com/anhao/ai-pose-gallery-zh)（经 [gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) 整理），线稿著作权归ギア所有，不得商用。仓库只保存索引 [`workflows/poses.json`](workflows/poses.json)（英文名为机器翻译）；线稿在首次使用时下载并缓存到 `ComfyUI/input/_poses/`，输入列表不显示该目录。DWPose 认不出的视角已从索引中剔除，重建索引用 [`scripts/build_pose_library.py`](scripts/build_pose_library.py)。
 
 ### 如何选择
 
 通用 SFW 动漫请求优先使用 Anima Turbo，通用 NSFW 动漫请求优先使用 JANKU v7.77；指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。明确指定 NIKKE、AI 娘化角色或模型风格时，路由器优先匹配对应组合。AI 娘化角色的 domain 为 `deepseek`（大肥鱼）、`claude girl`（Claude娘）、`chatgpt`（ChatGPT龙娘）、`qwen girl`（千问娘）和 `gemini girl`（哈基米）；单独的 `qwen` 仍指 Qwen-Image，单独的 `claude`、`gemini` 也会撞上其他同名角色，不作为 domain；每个角色的 SFW 请求走 Anima Turbo，NSFW 请求走 JANKU，LoRA 强度统一用 `loras.character` 调整。角色一律按成年女性描写。
 
-使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘、人物参考和姿态控制分别使用 `inpaint`、`face-reference`、`openpose-control`。
+使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘和人物参考分别使用 `inpaint`、`face-reference`；需要姿势时加 `openpose-control`。
 
 全部工作流、默认参数和输入要求见 [工作流目录](workflows/catalog.json)；模型组件、来源与文件信息见 [模型表](workflows/models.json)。运行时可查询 `GET /project/workflows` 获取实际可用状态。
 
@@ -89,9 +102,10 @@
 | DeepSeek 鲸鱼娘 LoRA（两个，需 `CIVITAI_TOKEN`） | `deepseek-whale-girl` |
 | Claude / ChatGPT / 千问 / Gemini 娘 LoRA（八个，需 `CIVITAI_TOKEN`） | `ai-agent-girls` |
 | SDXL 人物参考附加组件 | `ipadapter-face-sdxl` |
-| SDXL 姿态控制附加组件 | `controlnet-openpose-sdxl` |
+| SDXL / Illustrious 姿势接入（Xinsir OpenPose ControlNet） | `controlnet-openpose-sdxl` |
+| 姿势骨架提取（DWPose，所有姿势请求都需要） | `pose` |
 
-SDXL 人物参考与姿态控制还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
+SDXL 人物参考还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
 
 Qwen-Image-2.1 使用 abenzerps 发布的 Uncensored Q4_K_M GGUF 扩散模型，叠加同一发布者的 uncensored LoRA（默认强度 1.0，可通过 `loras.uncensored` 调整或设为 0 关闭），并配套 Qwen3VL INT8 文本编码器与 BF16 VAE。`setup_comfyui.ps1` 会安装固定版本的 ComfyUI-GGUF 节点；目标模型及配套文件由 Qwen profile 下载并校验。原官方 INT8 扩散文件保留在本地作回滚，不再被命名工作流加载。部署细节见 [Qwen 2.1 替换记录](docs/qwen-image-2.1-uncensored-migration.md)。
 
@@ -181,9 +195,9 @@ Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取�
 
 参考图过大或为动图时不会被拒绝：默认 `input_fit` 为 `downscale`，服务会按工作流能处理的尺寸等比缩小（不修改原上传文件，缩小后的副本在任务结束时删除），动图取第一帧，并在响应 `warnings` 中以 `input_downscaled`、`input_resized` 或 `input_first_frame` 报告原始尺寸与实际尺寸。传 `input_fit: "none"` 则保持原图；工作流无法处理时以稳定的 `error.code` 拒绝（如 `input_too_large`、`input_animated`、`input_size_unsupported`、`mask_size_mismatch`），完整列表见 agent manifest 的 `error_codes`。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘。
 
-局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，姿态参考使用 `control_image`。Anima 人物参考会编码整张参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
+局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，姿势使用 `pose`。Anima 人物参考会编码整张参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
 
-参考图有五种用途：按指令修改（`input_mode` 为 `image-edit`，Qwen 编辑）、按模型画风重绘（`image-to-image`，保留构图与配色但不保证人物一致）、局部重绘（`inpaint`）、人物参考（`face-reference`）和姿态参考（`openpose-control`）。agent manifest 的 `input_files.reference_uses` 列出每种用途对应的工作流，`route_table[].image_inputs` 列出各工作流接受的图片参数。
+参考图有五种用途：按指令修改（`input_mode` 为 `image-edit`，Qwen 编辑）、按模型画风重绘（`image-to-image`，保留构图与配色但不保证人物一致）、局部重绘（`inpaint`）、人物参考（`face-reference`）和姿势（`openpose-control`，参数 `pose`）。agent manifest 的 `input_files.reference_uses` 列出每种用途对应的工作流，`route_table[].image_inputs` 列出各工作流接受的图片参数。
 
 生成的 PNG 保留 ComfyUI 的提示词元数据（提示词、种子、模型与参数）便于复现，但其中的输入图片文件名会在任务完成前替换为 `[input image]`，不会泄露上传文件名或路径。
 
