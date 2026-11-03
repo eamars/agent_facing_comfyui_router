@@ -223,7 +223,7 @@ $AssetSets = @{
         }
     )
     'ai-agent-girls' = @(
-        # Claude, ChatGPT, Qwen and Gemini girl LoRAs; Civitai-only, set CIVITAI_TOKEN before downloading.
+        # Claude, ChatGPT, Qwen, Gemini, GLM, Grok and Kimi girl LoRAs; Civitai-only, set CIVITAI_TOKEN before downloading.
         [pscustomobject]@{
             Name = 'Claude girl Anima 2B LoRA (siling40, Civitai model 2972520, version 3368645)'
             Url = 'https://civitai.com/api/download/models/3368645'
@@ -251,6 +251,13 @@ $AssetSets = @{
             Path = (Join-Path $ModelRoot 'loras\Gemini_Girl_Anima2B.safetensors')
             Bytes = [int64]91869432
             Sha256 = 'B2825DDB36FAA22168507D3CED7327E6FD81586D46FAD70E24048221C688CC08'
+        },
+        [pscustomobject]@{
+            Name = 'AI girls multi-character Anima 2B LoRA for GLM, Grok and Kimi (aiseaK, Civitai model 3031455, version 3443876)'
+            Url = 'https://civitai.com/api/download/models/3443876'
+            Path = (Join-Path $ModelRoot 'loras\AI_Girls_aiseaK_Anima2B.safetensors')
+            Bytes = [int64]138725688
+            Sha256 = 'F6495A514A7288DAD0151C5CB472D338C24D914B16679BB1520F8F36467D16B0'
         }
     )
     'ipadapter-face-sdxl' = @(

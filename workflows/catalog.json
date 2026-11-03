@@ -1142,7 +1142,10 @@
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
           "qwen-girl-anima-turbo",
-          "gemini-girl-anima-turbo"
+          "gemini-girl-anima-turbo",
+          "glm-girl-anima-turbo",
+          "grok-girl-anima-turbo",
+          "kimi-girl-anima-turbo"
         ]
       },
       "agent_hints": {
@@ -3140,7 +3143,10 @@
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
           "qwen-girl-anima-turbo",
-          "gemini-girl-anima-turbo"
+          "gemini-girl-anima-turbo",
+          "glm-girl-anima-turbo",
+          "grok-girl-anima-turbo",
+          "kimi-girl-anima-turbo"
         ]
       },
       "agent_hints": {
@@ -5332,6 +5338,1204 @@
       }
     },
     {
+      "id": "glm-girl-anima-turbo",
+      "name": "GLM girl — Anima Turbo v1.1 + aigirls character LoRA",
+      "description": "GLM girl (GLM 智谱娘) character route: official Anima Turbo v1.1 with aiseaK's multi-character aigirls Anima LoRA, trigger 'aigirls, aigirls（glm）'. Design: black-haired fox girl with a sleep-mask headdress and Z ornament, black-and-white gothic lolita dress, white lace-up boots. The only GLM girl route, for SFW and NSFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "glm",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "glm_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "ai-girls-aiseak-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/AI_Girls_aiseaK_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "glm girl",
+          "glm-chan"
+        ],
+        "aliases": [
+          "GLM娘",
+          "GLM 娘",
+          "智谱娘",
+          "智谱清言娘",
+          "GLM fox girl",
+          "Zhipu girl",
+          "GLM girl",
+          "aigirls（glm）"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the GLM fox girl; generic anime requests use anima-turbo-v1-1."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'aigirls, aigirls（glm）' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "GLM girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the aigirls LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-11-03",
+            "seeds": [
+              101,
+              202
+            ],
+            "scope": "Compared with the Lanpose public setting sheet; identity visually confirmed."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "GLM girl",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "GLM girl",
+          "GLM 智谱娘",
+          "GLM娘"
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, aigirls, aigirls（glm）, 1girl, solo, adult, black hair, very long hair, black eyes, fox ears, fox tail, sleep mask, Z hair ornament, hair bell, white lace headdress, tassel', then outfit (white blouse, frilled sleeves, frilled collar, black ribbon, black corset, white gem, chain, black long skirt, frills, white pleated skirt, white lace-up boots is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 1.0; at this strength the probe matched her public setting sheet."
+        }
+      },
+      "compatibility_notes": [
+        "aiseaK's aigirls LoRA (Anima Base v1.0) carries several AI-mascot girls; each is selected by its own trigger, here 'aigirls, aigirls（glm）'.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with the AI company it personifies."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, aigirls, aigirls（glm）, 1girl, solo, adult, black hair, very long hair, black eyes, fox ears, fox tail, sleep mask, Z hair ornament, hair bell, white lace headdress, tassel, white blouse, frilled sleeves, frilled collar, black ribbon, black corset, white gem, chain, black long skirt, frills, white pleated skirt, white lace-up boots, sitting, bookshelf, book, indoors, looking at viewer, light smile"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "aigirls, aigirls（glm）",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "aiseaK",
+        "civitai_model_id": 3031455,
+        "civitai_version_id": 3443876,
+        "local_file": "AI_Girls_aiseaK_Anima2B.safetensors",
+        "sha256": "F6495A514A7288DAD0151C5CB472D338C24D914B16679BB1520F8F36467D16B0"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "glm_girl_anima_turbo",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "AI_Girls_aiseaK_Anima2B.safetensors",
+          "trigger": "aigirls, aigirls（glm）",
+          "default": 1.0,
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
+      "id": "grok-girl-anima-turbo",
+      "name": "Grok girl — Anima Turbo v1.1 + aigirls character LoRA",
+      "description": "Grok girl (Grok 娘) character route: official Anima Turbo v1.1 with aiseaK's multi-character aigirls Anima LoRA, trigger 'aigirls, aigirls（grok）'. Design: blonde twin-tailed vampire with a black crown and bat-wing ornaments, black gothic dress with wine-red collar and lining. The only Grok girl route, for SFW and NSFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "grok",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "grok_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "ai-girls-aiseak-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/AI_Girls_aiseaK_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "grok girl",
+          "grok-chan"
+        ],
+        "aliases": [
+          "Grok娘",
+          "Grok 娘",
+          "Grok vampire girl",
+          "Grok girl",
+          "aigirls（grok）"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the community Grok girl (blonde vampire design). xAI's own companion Ani is a different character and has no route here."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'aigirls, aigirls（grok）' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "Grok girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the aigirls LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-11-03",
+            "seeds": [
+              101,
+              202
+            ],
+            "scope": "Compared with the Lanpose public setting sheet; identity visually confirmed."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Grok girl",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "Grok girl",
+          "Grok 娘",
+          "Grok娘"
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, aigirls, aigirls（grok）, 1girl, solo, adult, blonde hair, very long hair, twintails, ahoge, blue eyes, slit pupils, pointy ears, fang, vampire, black crown, gold crescent, bat wings, black hair bow', then outfit (black dress, wine red high collar, black lace choker, off shoulder, gold chain, frills, high-low skirt, red lining, black pantyhose is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 1.0; at this strength the probe matched her public setting sheet."
+        }
+      },
+      "compatibility_notes": [
+        "aiseaK's aigirls LoRA (Anima Base v1.0) carries several AI-mascot girls; each is selected by its own trigger, here 'aigirls, aigirls（grok）'.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with the AI company it personifies."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, aigirls, aigirls（grok）, 1girl, solo, adult, blonde hair, very long hair, twintails, ahoge, blue eyes, slit pupils, pointy ears, fang, vampire, black crown, gold crescent, bat wings, black hair bow, black dress, wine red high collar, black lace choker, off shoulder, gold chain, frills, high-low skirt, red lining, black pantyhose, standing, looking at viewer, open mouth, smile, gothic castle, moonlight"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "aigirls, aigirls（grok）",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "aiseaK",
+        "civitai_model_id": 3031455,
+        "civitai_version_id": 3443876,
+        "local_file": "AI_Girls_aiseaK_Anima2B.safetensors",
+        "sha256": "F6495A514A7288DAD0151C5CB472D338C24D914B16679BB1520F8F36467D16B0"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "grok_girl_anima_turbo",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "AI_Girls_aiseaK_Anima2B.safetensors",
+          "trigger": "aigirls, aigirls（grok）",
+          "default": 1.0,
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
+      "id": "kimi-girl-anima-turbo",
+      "name": "Kimi girl — Anima Turbo v1.1 + aigirls character LoRA",
+      "description": "Kimi girl (Kimi 娘) character route: official Anima Turbo v1.1 with aiseaK's multi-character aigirls Anima LoRA, trigger 'aigirls, aigirls（kimi）'. Design: silver-white wavy hair fading to blue, maid headdress with crescent ornament, navy starry cloak and corset over a white frilled dress, K pendant. The only Kimi girl route, for SFW and NSFW.",
+      "family": "anima-turbo",
+      "resident_group": "anima-turbo-v1-1",
+      "tags": [
+        "anime",
+        "anima",
+        "turbo",
+        "kimi",
+        "character-lora",
+        "nsfw-capable"
+      ],
+      "content_class": "anime-character-nsfw-capable",
+      "file": "kimi_girl_anima_turbo.json",
+      "model_ids": [
+        "anima-turbo-v1-1-checkpoint",
+        "qwen-3-0-6b-anima-text-encoder",
+        "qwen-image-vae-anima",
+        "ai-girls-aiseak-anima-lora"
+      ],
+      "required_files": [
+        "models/diffusion_models/anima-turbo-v1.1.safetensors",
+        "models/text_encoders/qwen_3_06b_base.safetensors",
+        "models/vae/qwen_image_vae.safetensors",
+        "models/loras/AI_Girls_aiseaK_Anima2B.safetensors"
+      ],
+      "routing": {
+        "selector_scope": "workflow-model",
+        "selector_fields": [
+          "domain",
+          "content_mode",
+          "style",
+          "input_type",
+          "input_mode",
+          "prompt_granularity"
+        ],
+        "domains": [
+          "kimi girl",
+          "kimi-chan"
+        ],
+        "aliases": [
+          "Kimi娘",
+          "Kimi 娘",
+          "月之暗面娘",
+          "Moonshot girl",
+          "Kimi girl",
+          "aigirls（kimi）"
+        ],
+        "styles": [
+          "anima",
+          "anime",
+          "anime illustration",
+          "illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ]
+        },
+        "priority": 100,
+        "fallback": false,
+        "exclusive": true,
+        "exclusion_rules": [
+          "Only for the Kimi (Moonshot AI) girl. The bare name is not a domain: it also names other characters (Kimi Finster). Use the girl/chan/娘 forms."
+        ]
+      },
+      "capabilities": {
+        "modalities": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "input_types": [
+          "text",
+          "image"
+        ],
+        "input_modes": [
+          "text-to-image",
+          "image-to-image"
+        ],
+        "output_types": [
+          "image"
+        ],
+        "architectures": [
+          "anima"
+        ],
+        "styles": [
+          "anime",
+          "illustration",
+          "stylized",
+          "anime portrait"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "content_levels": [
+          "sfw",
+          "nsfw-capable"
+        ],
+        "nsfw_capable": true,
+        "lora_support": true,
+        "prompt_dialect": "natural-language-and-danbooru-style-tags",
+        "prompt_granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed"
+        },
+        "natural_language": true,
+        "precision": "bf16 published weights",
+        "character_identity": "LoRA-assisted; trigger 'aigirls, aigirls（kimi）' plus her identity tags",
+        "style_control": "medium-to-strong",
+        "outfit_control": "medium through prompt",
+        "composition_control": "medium through prompt",
+        "recommended_resolutions": [
+          "896x1152",
+          "1024x1024",
+          "960x1472"
+        ],
+        "performance": "turbo-low-step",
+        "subjects": [
+          "Kimi girl"
+        ]
+      },
+      "input_contract": {
+        "text": {
+          "required": true,
+          "parameter": "prompt",
+          "format": "Structured natural-language description or ordered anime tags; keep subject count and identity near the beginning."
+        },
+        "image": {
+          "supported": true,
+          "required": false,
+          "parameter": "input_image",
+          "mode": "latent-img2img",
+          "accepted_sources": [
+            "comfyui-input",
+            "http-upload"
+          ],
+          "upload": {
+            "endpoint": "/upload/image",
+            "method": "POST",
+            "content_type": "multipart/form-data",
+            "file_field": "image",
+            "type_field": "type",
+            "type_value": "input",
+            "list_endpoint": "/project/inputs",
+            "response_to_parameter": "Join returned subfolder and name with '/' and pass the result as input_image."
+          },
+          "job_output_reference": false,
+          "processing": "LoadImage -> ImageScale -> VAEEncode -> RepeatLatentBatch -> sampler. Explicit width/height set output size (stretch); one dimension preserves aspect ratio; omitted dimensions use source size rounded down to multiples of 8. batch_size is honored.",
+          "default_denoise": 0.65,
+          "use_for": "Restyle or vary the source in this route's model style. Composition and colours carry over; character identity is not guaranteed. Lower denoise keeps more of the source. For instruction edits use qwen-image-2.1-edit; for the same face in a new scene use a face-reference route; to repaint one region use an inpaint route."
+        },
+        "parameter_aliases": {
+          "subject": "prompt"
+        },
+        "required_fields": [
+          "prompt"
+        ],
+        "required_fields_apply_after_aliases": true
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "native graph with the aigirls LoRA on Anima Turbo v1.1",
+        "probes": [
+          {
+            "mode": "text-to-image-native-graph",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-11-03",
+            "seeds": [
+              101,
+              202
+            ],
+            "scope": "Compared with the Lanpose public setting sheet; identity visually confirmed."
+          }
+        ]
+      },
+      "selection": {
+        "best_for": [
+          "Kimi girl",
+          "fast low-step drafts"
+        ],
+        "not_for": [
+          "other characters",
+          "SDXL or Illustrious LoRAs"
+        ],
+        "priority_signals": [
+          "Kimi girl",
+          "Kimi 娘",
+          "Kimi娘"
+        ]
+      },
+      "agent_hints": {
+        "recommended_prompt_granularity": "structured",
+        "prompt_scope": "Start with 'masterpiece, best quality, aigirls, aigirls（kimi）, 1girl, solo, adult, white hair, very long hair, wavy hair, gradient hair, light blue hair tips, blue eyes, maid headdress, navy hair bow, crescent hair ornament', then outfit (letter K pendant, white frilled blouse, long sleeves, navy corset, navy starry cloak, star print, white layered skirt, frilled skirt, white pantyhose, navy high heels is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
+        "optional_fields": [
+          "character",
+          "series",
+          "action",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting",
+          "content_mode"
+        ],
+        "quality_prefix": "masterpiece, best quality",
+        "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
+        "sampling": "Use the published Turbo range: CFG 1 and 8-12 steps. This route defaults to 12 steps for the comparison-quality setting.",
+        "input_image": "Optional latent image-to-image reference. Use input_image, not face_image; use the separate IPAdapter route for face-centric conditioning.",
+        "avoid": [
+          "age-lowering tags",
+          "SDXL-only prompt weighting tricks"
+        ],
+        "suggested_prompt_details": [
+          "subject"
+        ],
+        "prompt_details_are_advisory": true,
+        "recommended": {
+          "steps": [
+            8,
+            12
+          ],
+          "cfg": [
+            1,
+            1
+          ]
+        },
+        "recommendations_are_advisory": true,
+        "adapter_selection": {
+          "character": "Default 1.0; at this strength the probe matched her public setting sheet."
+        }
+      },
+      "compatibility_notes": [
+        "aiseaK's aigirls LoRA (Anima Base v1.0) carries several AI-mascot girls; each is selected by its own trigger, here 'aigirls, aigirls（kimi）'.",
+        "LoraLoaderModelOnly sits between UNETLoader and ModelSamplingAuraFlow; the LoRA has no text-encoder weights.",
+        "Fan-made design, not affiliated with the AI company it personifies."
+      ],
+      "prompting": {
+        "style": "ordered natural-language description with optional Danbooru-style tags",
+        "structure": [
+          "quality/meta",
+          "subject count",
+          "character/series",
+          "appearance",
+          "outfit",
+          "pose",
+          "composition",
+          "environment",
+          "lighting"
+        ],
+        "granularity": {
+          "minimum": "minimal",
+          "recommended": "structured",
+          "maximum": "detailed",
+          "accepted": [
+            "minimal",
+            "structured",
+            "detailed"
+          ],
+          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
+          "enforcement": "advisory; known levels are accepted even outside the recommended range"
+        },
+        "quality_prefix": "masterpiece, best quality",
+        "recommended": {
+          "width": 896,
+          "height": 1152,
+          "steps": 12,
+          "cfg": 1.0,
+          "sampler_name": "er_sde",
+          "scheduler": "simple"
+        },
+        "negative_prompt": "worst quality, low quality, score_1, score_2, score_3, blurry, jpeg artifacts, artist name, chromatic aberration",
+        "examples": [
+          {
+            "purpose": "SFW character portrait",
+            "prompt": "masterpiece, best quality, aigirls, aigirls（kimi）, 1girl, solo, adult, white hair, very long hair, wavy hair, gradient hair, light blue hair tips, blue eyes, maid headdress, navy hair bow, crescent hair ornament, letter K pendant, white frilled blouse, long sleeves, navy corset, navy starry cloak, star print, white layered skirt, frilled skirt, white pantyhose, navy high heels, standing, looking at viewer, light smile, night sky, starry sky"
+          }
+        ],
+        "negative_prompt_effective_at_default": false,
+        "notes": [
+          "CFG 1 skips negative conditioning. Negative text has no effect at the default setting; CFG changes can affect distilled-model quality."
+        ],
+        "lora_triggers": {
+          "character": {
+            "trigger": "aigirls, aigirls（kimi）",
+            "default_strength": 1.0
+          }
+        }
+      },
+      "source": {
+        "creator": "aiseaK",
+        "civitai_model_id": 3031455,
+        "civitai_version_id": 3443876,
+        "local_file": "AI_Girls_aiseaK_Anima2B.safetensors",
+        "sha256": "F6495A514A7288DAD0151C5CB472D338C24D914B16679BB1520F8F36467D16B0"
+      },
+      "bindings": {
+        "prompt": {
+          "node": "6",
+          "input": "text"
+        },
+        "negative_prompt": {
+          "node": "7",
+          "input": "text"
+        },
+        "width": {
+          "node": "8",
+          "input": "width"
+        },
+        "height": {
+          "node": "8",
+          "input": "height"
+        },
+        "batch_size": {
+          "node": "8",
+          "input": "batch_size"
+        },
+        "seed": {
+          "node": "9",
+          "input": "seed"
+        },
+        "steps": {
+          "node": "9",
+          "input": "steps"
+        },
+        "cfg": {
+          "node": "9",
+          "input": "cfg"
+        },
+        "denoise": {
+          "node": "9",
+          "input": "denoise"
+        },
+        "sampler_name": {
+          "node": "9",
+          "input": "sampler_name"
+        },
+        "scheduler": {
+          "node": "9",
+          "input": "scheduler"
+        },
+        "filename_prefix": {
+          "node": "11",
+          "input": "filename_prefix"
+        },
+        "character_strength_model": {
+          "node": "2",
+          "input": "strength_model"
+        }
+      },
+      "defaults": {
+        "width": 896,
+        "height": 1152,
+        "batch_size": 1,
+        "steps": 12,
+        "cfg": 1.0,
+        "denoise": 1.0,
+        "sampler_name": "er_sde",
+        "scheduler": "simple",
+        "filename_prefix": "kimi_girl_anima_turbo",
+        "loras": {
+          "character": 1.0
+        }
+      },
+      "resource_limits": {
+        "max_total_pixels": 2359296,
+        "basis": "Deployment admission budget for total width * height * batch, not a guarantee of model fit. Adjust here after measuring the selected hardware."
+      },
+      "control_ports": {
+        "inpaint": false,
+        "face_reference": false,
+        "controlnet": false,
+        "image_to_image": true
+      },
+      "lora_bindings": {
+        "character": {
+          "file": "AI_Girls_aiseaK_Anima2B.safetensors",
+          "trigger": "aigirls, aigirls（kimi）",
+          "default": 1.0,
+          "strength_model": "character_strength_model"
+        }
+      }
+    },
+    {
       "id": "anima-turbo-face-reference-ipadapter",
       "name": "Anima Turbo v1.1 — IPAdapter Face/Character Reference",
       "description": "Anima-specific IPAdapter route using the official Turbo checkpoint plus a SigLIP2 reference encoder. It accepts a clear single-face portrait as face_image, while the caller keeps outfit, pose, scene and content details in the prompt.",
@@ -6432,7 +7636,10 @@
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
           "qwen-girl-anima-turbo",
-          "gemini-girl-anima-turbo"
+          "gemini-girl-anima-turbo",
+          "glm-girl-anima-turbo",
+          "grok-girl-anima-turbo",
+          "kimi-girl-anima-turbo"
         ],
         "prefer_instead": [
           {
@@ -6891,7 +8098,10 @@
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
           "qwen-girl-anima-turbo",
-          "gemini-girl-anima-turbo"
+          "gemini-girl-anima-turbo",
+          "glm-girl-anima-turbo",
+          "grok-girl-anima-turbo",
+          "kimi-girl-anima-turbo"
         ],
         "prefer_instead": [
           {
@@ -7317,7 +8527,10 @@
           "claude-girl-anima-turbo",
           "chatgpt-girl-anima-turbo",
           "qwen-girl-anima-turbo",
-          "gemini-girl-anima-turbo"
+          "gemini-girl-anima-turbo",
+          "glm-girl-anima-turbo",
+          "grok-girl-anima-turbo",
+          "kimi-girl-anima-turbo"
         ]
       },
       "agent_hints": {

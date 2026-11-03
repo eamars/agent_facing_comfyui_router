@@ -349,6 +349,9 @@ class AgentContractTests(unittest.TestCase):
             "chatgpt-girl": ("chatgpt", "ChatGPT龙娘", "GPT娘"),
             "qwen-girl": ("qwen girl", "千问娘", "Qwen-chan"),
             "gemini-girl": ("gemini girl", "Gemini娘", "哈基米"),
+            "glm-girl": ("glm girl", "智谱娘", "GLM娘"),
+            "grok-girl": ("grok girl", "Grok娘", "grok-chan"),
+            "kimi-girl": ("kimi girl", "Kimi娘", "月之暗面娘"),
         }
         # Every character has one Anima route for SFW and NSFW. The JANKU character routes were removed: their LoRAs
         # drew a different design (Claude, DeepSeek) or a less faithful one, and granularity alone could select them.
@@ -368,7 +371,7 @@ class AgentContractTests(unittest.TestCase):
                     if other != slug:
                         self.assertIsNone(api._route_score(entries[f"{other}-anima-turbo"], sfw), (alias, other))
             for entry, loader in ((janku, "LoraLoader"), (anima, "LoraLoaderModelOnly")) if janku else ((anima, "LoraLoaderModelOnly"),):
-                (lora_id,) = [m for m in entry["model_ids"] if m.startswith(slug)]
+                (lora_id,) = [m for m in entry["model_ids"] if models.get(m, {}).get("kind") == "lora"]
                 model = models[lora_id]
                 (lora_name,) = entry["lora_bindings"]
                 self.assertIn(model["required_file"], entry["required_files"])
@@ -385,7 +388,8 @@ class AgentContractTests(unittest.TestCase):
             self.assertIsNone(api._route_score(entries["qwen-girl-anima-turbo"], query))
         # Bare names that also belong to other characters must not select a character route.
         for slug, domain in (("qwen-girl", "qwen"), ("claude-girl", "Claude Monet style"), ("claude-girl", "Claude von Riegan"),
-                             ("gemini-girl", "Gemini Saga"), ("gemini-girl", "Saint Seiya Gemini")):
+                             ("gemini-girl", "Gemini Saga"), ("gemini-girl", "Saint Seiya Gemini"), ("kimi-girl", "Kimi Finster"),
+                             ("grok-girl", "Ani from Grok")):
             for side in ("anima-turbo", "janku"):
                 if f"{slug}-{side}" in entries:
                     self.assertIsNone(api._route_score(entries[f"{slug}-{side}"], {"domain": domain}), domain)

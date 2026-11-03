@@ -2848,6 +2848,117 @@
       "file_sizes": {
         "models/loras/Gemini_Girl_Anima2B.safetensors": 91869432
       }
+    },
+    {
+      "id": "ai-girls-aiseak-anima-lora",
+      "name": "AI girls — multi-character Anima 2B LoRA (aiseaK)",
+      "kind": "lora",
+      "status": "installed",
+      "routeable": true,
+      "family": "ai-girls-character",
+      "architecture": "anima",
+      "base_model": "Anima Base v1.0 (2B)",
+      "precision": "fp16",
+      "tensor_dtypes": [
+        "F16"
+      ],
+      "description": "Multi-character LoRA of AI-mascot girls (DeepSeek, Grok, GPT, Claude, Gemini, Kimi, GLM, Qwen), each behind its own trigger 'aigirls（name）'. Routed here for GLM, Grok and Kimi, whose designs it matches against the public setting sheets; the other girls keep their dedicated LoRAs.",
+      "capabilities": {
+        "domains": [
+          "glm girl anima",
+          "grok girl anima",
+          "kimi girl anima"
+        ],
+        "input_types": [
+          "conditioning"
+        ],
+        "input_modes": [
+          "adapter-conditioning"
+        ],
+        "output_types": [
+          "adapted-conditioning"
+        ],
+        "characters": [
+          "GLM girl",
+          "GLM娘",
+          "Grok girl",
+          "Grok娘",
+          "Kimi girl",
+          "Kimi娘"
+        ],
+        "outfits": [
+          "white blouse, frilled sleeves, frilled collar, black ribbon, black corset, white gem, chain, black long skirt, frills, white pleated skirt, white lace-up boots",
+          "black dress, wine red high collar, black lace choker, off shoulder, gold chain, frills, high-low skirt, red lining, black pantyhose",
+          "letter K pendant, white frilled blouse, long sleeves, navy corset, navy starry cloak, star print, white layered skirt, frilled skirt, white pantyhose, navy high heels"
+        ],
+        "styles": [
+          "anime",
+          "character illustration"
+        ],
+        "content_modes": [
+          "sfw",
+          "nsfw",
+          "general"
+        ],
+        "nsfw_capable": true,
+        "identity_strength": "character-specific when the character's own trigger is included"
+      },
+      "prompting": {
+        "trigger_words": [
+          "aigirls",
+          "aigirls（glm）",
+          "aigirls（grok）",
+          "aigirls（kimi）"
+        ],
+        "recommended_strength": 1.0,
+        "notes": [
+          "Write both 'aigirls' and the character trigger with full-width parentheses, e.g. 'aigirls, aigirls（glm）'.",
+          "The author notes one LoRA cannot train every character perfectly; some features can slip."
+        ]
+      },
+      "compatibility": {
+        "workflow_families": [
+          "anima"
+        ],
+        "base_models": [
+          "Anima"
+        ],
+        "known_limits": [
+          "Anima 2B only."
+        ]
+      },
+      "source": {
+        "url": "https://civitai.com/models/3031455?modelVersionId=3443876",
+        "type": "Civitai",
+        "creator": "aiseaK",
+        "model_version_id": 3443876,
+        "file_name": "aigrilsV1.0.safetensors",
+        "bytes": 138725688,
+        "sha256": "F6495A514A7288DAD0151C5CB472D338C24D914B16679BB1520F8F36467D16B0",
+        "license_note": "Civitai license allows use without credit and commercial image use; fan-made designs, not affiliated with the AI companies."
+      },
+      "validation": {
+        "status": "verified-by-runtime-probe",
+        "scope": "adapter load and SFW identity generation for GLM, Grok and Kimi",
+        "probes": [
+          {
+            "mode": "adapter-load-and-identity-generation",
+            "status": "success",
+            "prompt_class": "sfw",
+            "date": "2026-11-03",
+            "adapter_strength": 1.0
+          }
+        ]
+      },
+      "required_file": "models/loras/AI_Girls_aiseaK_Anima2B.safetensors",
+      "route_roles": [
+        "glm-girl-character",
+        "grok-girl-character",
+        "kimi-girl-character"
+      ],
+      "file_sizes": {
+        "models/loras/AI_Girls_aiseaK_Anima2B.safetensors": 138725688
+      }
     }
   ]
 }
