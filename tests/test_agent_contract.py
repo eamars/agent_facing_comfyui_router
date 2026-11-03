@@ -411,7 +411,8 @@ class AgentContractTests(unittest.TestCase):
         uses = {use["input_mode"]: use["routes"] for use in api._reference_uses(workflows)}
         self.assertEqual(uses["image-edit"], ["qwen-image-2.1-edit"])
         self.assertEqual(set(uses["face-reference"]), {"sdxl-face-reference-ipadapter", "anima-turbo-face-reference-ipadapter"})
-        pose_families = {"sdxl", "sdxl-illustrious", "sdxl-ipadapter", "anima-turbo", "anima", "anima-ipadapter", "qwen-image-2.1"}
+        pose_families = {"sdxl", "sdxl-illustrious", "sdxl-ipadapter", "anima-turbo", "anima", "anima-ipadapter", "qwen-image-2.1",
+                         "flux2-klein"}
         self.assertEqual(set(uses["openpose-control"]), {e["id"] for e in workflows if e["family"] in pose_families
                                                          and {"text-to-image", "face-reference"} & set(e["capabilities"]["input_modes"])})
         self.assertEqual(set(uses["inpaint"]), {"moody-anima-inpaint", "anima-turbo-inpaint"})
@@ -483,6 +484,17 @@ class AgentContractTests(unittest.TestCase):
             self.assertTrue(encoder["prompt"].startswith(f"Use image {slot} only as a pose reference"), route_id)
             self.assertIn("vae", encoder)
             self.assertNotIn("pose_strength", api._parameter_schema(qwen, api._read_workflow(qwen))["properties"])
+        # Klein: the encoded skeleton is a reference latent on the sampler's positive, and the prompt names it.
+        klein = next(e for e in annotated["workflows"] if e["id"] == "moody-desire-v30")
+        graph = api._read_workflow(klein)
+        sampler = next(node for node in graph.values() if node["class_type"] == "KSampler")["inputs"]
+        prompt_id = sampler["positive"][0]
+        api.pose_addon.attach(graph, api.pose_addon.adapter_for(annotated, klein), "_poses/rendered/test.png", None)
+        reference = graph[sampler["positive"][0]]
+        self.assertEqual((reference["class_type"], reference["inputs"]["conditioning"]), ("ReferenceLatent", [prompt_id, 0]))
+        encode = graph[reference["inputs"]["latent"][0]]
+        self.assertEqual(graph[encode["inputs"]["pixels"][0]]["inputs"]["image"], "_poses/rendered/test.png")
+        self.assertTrue(graph[prompt_id]["inputs"]["text"].startswith("Use the reference image only as a pose reference"))
         # Edit and inpaint routes take no pose, and a pose never rides along with input_image.
         for route_id in ("qwen-image-2.1-edit", "anima-turbo-inpaint", "moody-anima-inpaint"):
             self.assertFalse(next(e for e in annotated["workflows"] if e["id"] == route_id)["pose"]["supported"], route_id)

@@ -505,8 +505,29 @@ def _attach_qwen_reference(graph: dict[str, Any], adapter: dict[str, Any], skele
     encoder["prompt"] = adapter["instruction"].format(image=slot) + encoder["prompt"]
 
 
+def _attach_reference_latent(graph: dict[str, Any], adapter: dict[str, Any], skeleton_image: str, strength: float | None) -> None:
+    """Flux.2 Klein: the VAE-encoded skeleton becomes a reference latent on the sampler's positive conditioning, and
+    the prompt says to take only the pose from it."""
+    samplers = [node for node in graph.values() if isinstance(node, dict) and node.get("class_type") == "KSampler"]
+    decoders = [node for node in graph.values() if isinstance(node, dict) and node.get("class_type") == "VAEDecode"]
+    prompt_node = graph.get(samplers[0]["inputs"]["positive"][0]) if len(samplers) == 1 else None
+    if not decoders or not prompt_node or prompt_node.get("class_type") != "CLIPTextEncode":
+        raise PoseError(500, "Route graph does not have the single KSampler and text prompt the reference pose adapter expects",
+                        "pose_adapter_failed")
+    sampler = samplers[0]["inputs"]
+    next_id = max((int(node_id) for node_id in graph if str(node_id).isdigit()), default=0) + 1
+    load_id, encode_id, reference_id = (str(next_id + offset) for offset in range(3))
+    graph[load_id] = {"class_type": "LoadImage", "inputs": {"image": skeleton_image}}
+    graph[encode_id] = {"class_type": "VAEEncode", "inputs": {
+        "pixels": [load_id, 0], "vae": copy.deepcopy(decoders[0]["inputs"]["vae"])}}
+    graph[reference_id] = {"class_type": "ReferenceLatent", "inputs": {
+        "conditioning": copy.deepcopy(sampler["positive"]), "latent": [encode_id, 0]}}
+    sampler["positive"] = [reference_id, 0]
+    prompt_node["inputs"]["text"] = adapter["instruction"] + prompt_node["inputs"]["text"]
+
+
 _MECHANISMS = {"controlnet-openpose": _attach_controlnet, "anima-control-lora": _attach_anima_control,
-               "qwen-reference-image": _attach_qwen_reference}
+               "qwen-reference-image": _attach_qwen_reference, "reference-latent": _attach_reference_latent}
 
 
 def attach(graph: dict[str, Any], adapter: dict[str, Any], skeleton_image: str, strength: float) -> None:

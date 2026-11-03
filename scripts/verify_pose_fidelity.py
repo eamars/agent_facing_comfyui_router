@@ -1,7 +1,7 @@
 """Measure how closely live renders follow a requested pose.
 
 Run with the ComfyUI interpreter against a running server:
-    ComfyUI\\.venv\\Scripts\\python.exe scripts\\verify_pose_fidelity.py [--set sdxl|anima|qwen] [--base http://127.0.0.1:8191] [--out DIR]
+    ComfyUI\\.venv\\Scripts\\python.exe scripts\\verify_pose_fidelity.py [--set sdxl|anima|qwen|klein] [--base http://127.0.0.1:8191] [--out DIR]
 
 Each case renders once with the pose and once without (same seed). DWPose reads the output and the score is
 PCK@0.1: the share of requested body points whose detected point lies within 10% of the requested figure's
@@ -31,6 +31,11 @@ PROMPT = "1girl, solo, {outfit}, simple background, full body, masterpiece, best
 XIAOMAN = ("masterpiece, best quality, 1girl, solo, adult, original character, chinese young woman, black hair, bob cut, "
            "chin-length hair, grey eyes, calm face, subtle smirk, slim, white t-shirt, light beige overshirt, open shirt, "
            "dark straight-leg trousers, white canvas sneakers, full body, plain light grey background, simple background")
+# The same character as a real person, for photo-oriented checkpoints such as Moody Desire (Klein).
+XIAOMAN_PHOTO = ("A realistic full-body photograph of a 24-year-old Chinese woman with a chin-length black bob haircut and grey "
+                 "eyes, a calm face with a subtle playful smirk and a slim build. She wears a plain white t-shirt under a loose "
+                 "light beige overshirt worn open, dark straight-leg trousers and white canvas sneakers. Plain light grey studio "
+                 "background, soft even studio lighting.")
 CASE_SETS = {  # set -> [(workflow, pose, prompt)]
     "sdxl": [(workflow, pose_value, PROMPT.format(outfit=outfit)) for workflow, pose_value, outfit in (
         ("janku-illustrious", "full_single_P035_side", "kimono"),
@@ -46,6 +51,9 @@ CASE_SETS = {  # set -> [(workflow, pose, prompt)]
         ("janku-illustrious", "tests/fixtures/reference_character.webp", "gothic dress"),
     )],
     "anima": [("anima-turbo-v1-1", pose_value, XIAOMAN) for pose_value in (
+        "full_single_P035_side", "full_single_P012_front", "full_single_P015_low", "full_single_P049_high",
+        "full_single_P066_diag", "full_single_P030_front", "tests/fixtures/reference_character.webp")],
+    "klein": [("moody-desire-v30", pose_value, XIAOMAN_PHOTO) for pose_value in (
         "full_single_P035_side", "full_single_P012_front", "full_single_P015_low", "full_single_P049_high",
         "full_single_P066_diag", "full_single_P030_front", "tests/fixtures/reference_character.webp")],
     "qwen": [("qwen-image-2.1-t2i", pose_value, XIAOMAN) for pose_value in (

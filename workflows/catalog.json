@@ -123,6 +123,40 @@
         "observed": "Every tested pose followed, including the kneeling side view, and the character's look stays as prompted. Line art and the skeleton scored the same (0.96) as the reference; the skeleton is used because it also suits uploaded photos. Skeleton marks occasionally show on the hands. The edit route pasted the pose image in instead of re-posing, so edit routes take no pose. Adds about 10 s per image.",
         "tool": "scripts/verify_pose_fidelity.py --set qwen"
       }
+    },
+    "flux2-reference-latent": {
+      "description": "Gives Flux.2 Klein the thin whole-body skeleton as a reference latent (core ReferenceLatent on the sampler's positive conditioning), with an instruction to take only the body pose from it. No ControlNet.",
+      "families": [
+        "flux2-klein"
+      ],
+      "mechanism": "reference-latent",
+      "render": "wholebody-thin",
+      "instruction": "Use the reference image only as a pose reference: it is a pose skeleton (coloured lines for the limbs, dots for joints, face and hands). Draw the person described below in exactly that body pose. Do not draw the skeleton. ",
+      "model_ids": [
+        "dwpose-pose-extractor"
+      ],
+      "download_profile": "pose",
+      "default_strength": null,
+      "measured_fidelity": {
+        "metric": "PCK@0.1: share of requested body points DWPose finds within 10% of figure size in the output",
+        "date": "2026-11-03",
+        "pose_without_pose_words": {
+          "with_pose": 0.83,
+          "no_pose_baseline": 0.44,
+          "cases": 7,
+          "routes": [
+            "moody-desire-v30"
+          ],
+          "subject": "Xiaoman as a real person (natural-language photo prompt)"
+        },
+        "anime_tag_prompt": {
+          "with_pose": 0.82,
+          "no_pose_baseline": 0.44,
+          "cases": 7
+        },
+        "observed": "Standing, arm, hand-on-hip and crouching poses follow and photos stay photographic; the kneeling side view did not follow and a seated pose came out as a deep lunge. With anime tags instead of a photo prompt the pose still follows but the reference pulls the render toward illustration. Line art and the skeleton scored the same (0.80 / 0.79). Adds about 1 s per image.",
+        "tool": "scripts/verify_pose_fidelity.py --set klein"
+      }
     }
   },
   "workflows": [
