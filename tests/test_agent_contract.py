@@ -501,6 +501,21 @@ class AgentContractTests(unittest.TestCase):
             api._prepare_graph(claude, {"parameters": {"prompt": "x", "width": 1000, "height": 1208}}, None, request)
         self.assertEqual(render.call_args.args[1:3], (992, 1200))
 
+    def test_moody_desire_ranks_behind_qwen_and_anima_and_is_picked_by_style(self):
+        # Realism first but behind Qwen-Image (photos) and Anima Turbo (anime); its explicit-realism specialty is the
+        # agent's call through the style or workflow id, never a content route.
+        ready = {"workflows": catalog["workflows"]}
+        with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):
+            def selected(query):
+                return api._resolve_routes(ready, query)["selected_workflow"]
+            for query in ({"domain": "photo"}, {"domain": "realistic person"}, {"domain": "photo", "style": "realistic"}):
+                self.assertEqual(selected(query), "qwen-image-2.1-t2i", query)
+            self.assertEqual(selected({"domain": "anime"}), "anima-turbo-v1-1")
+            self.assertEqual(selected({"domain": "layout"}), "moss-image-sft-t2i")
+            for query in ({"domain": "photo", "style": "moody desire"}, {"style": "moody desire"},
+                          {"domain": "realistic person", "style": "klein"}, {"domain": "写实人像"}):
+                self.assertEqual(selected(query), "moody-desire-v30", query)
+
     def test_janku_versions_split_by_style_and_point_at_each_other(self):
         ready = {"workflows": catalog["workflows"]}
         with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):

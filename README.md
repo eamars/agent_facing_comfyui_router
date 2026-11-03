@@ -28,7 +28,7 @@
 | MOSS-Image-SFT · 官方 BF16 | 布局 JSON 精确排版、长提示词、图中中英文文字 | 文生图（自然语言 / 标签 / 布局 JSON），SFW | `moss-image-sft-t2i` |
 | Anima Turbo v1.1 · 官方 BF16 | 通用动漫、人物与插画 | 文生图、图生图 | `anima-turbo-v1-1` |
 | Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
-| Moody Desire Mix v3.0 · Flux.2/Klein | 动漫、人物肖像 | 文生图、图生图 | `moody-desire-v30` |
+| Moody Desire Mix v3.0 · Flux.2/Klein | 写实人像为主（擅长成人写实图），也能画动漫 | 文生图、图生图 | `moody-desire-v30` |
 | Animagine XL 3.1 + NIKKE LoRA | NIKKE 风格；可选 Rapi 角色适配 | 文生图、图生图 | `animagine-xl-3.1-nsfw` |
 | JANKU v7.77 · Illustrious/NoobAI + Chenkin 系 | 主流动画风：线条较粗、背景细致、电影感光影，默认脸型偏成熟 | 文生图、图生图 | `janku-illustrious` |
 | JANKU v5.0 · Illustrious/NoobAI + RouWei 系 | 视觉小说（Galgame）风：脸型柔和精致、线条细、浅色光泽与腮红，画师标签最强 | 文生图、图生图 | `janku-v5-illustrious` |
@@ -75,7 +75,7 @@ MOSS-Image 不接受任何图片输入，无法接入姿势。向不支持姿势
 
 ### 如何选择
 
-通用动漫请求使用 Anima Turbo；指定主流动漫画风（`mainstream anime`）时使用 JANKU v7.77，指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。两者都能生成成人内容，区别在画风：JANKU 偏光泽柔和的同人风，Anima Turbo 偏平涂赛璐珞。明确指定 NIKKE、AI 娘化角色或模型风格时，路由器优先匹配对应组合。AI 娘化角色的 domain 为 `deepseek`（大肥鱼）、`claude girl`（Claude娘）、`chatgpt`（ChatGPT龙娘）、`qwen girl`（千问娘）、`gemini girl`（哈基米）、`glm girl`（智谱娘）、`grok girl`（Grok娘）和 `kimi girl`（Kimi娘）；单独的 `qwen` 仍指 Qwen-Image，单独的 `claude`、`gemini`、`kimi` 也会撞上其他同名角色，不作为 domain；每个角色只有一条 Anima Turbo 路由，SFW 与 NSFW 都走它（JANKU 版角色路由的形象与公开设定不符或不如 Anima 贴近，已移除），LoRA 强度统一用 `loras.character` 调整。角色一律按成年女性描写。
+通用动漫请求使用 Anima Turbo；指定主流动漫画风（`mainstream anime`）时使用 JANKU v7.77，指定视觉小说、Galgame 或柔和精致的角色风格时使用 JANKU v5.0。两者都能生成成人内容，区别在画风：JANKU 偏光泽柔和的同人风，Anima Turbo 偏平涂赛璐珞。写实人像的成人图可选 Moody Desire（`style: "moody desire"` 或直接用工作流编号），它偏写真风格、只需 4 步；通用照片仍由 Qwen-Image 负责。明确指定 NIKKE、AI 娘化角色或模型风格时，路由器优先匹配对应组合。AI 娘化角色的 domain 为 `deepseek`（大肥鱼）、`claude girl`（Claude娘）、`chatgpt`（ChatGPT龙娘）、`qwen girl`（千问娘）、`gemini girl`（哈基米）、`glm girl`（智谱娘）、`grok girl`（Grok娘）和 `kimi girl`（Kimi娘）；单独的 `qwen` 仍指 Qwen-Image，单独的 `claude`、`gemini`、`kimi` 也会撞上其他同名角色，不作为 domain；每个角色只有一条 Anima Turbo 路由，SFW 与 NSFW 都走它（JANKU 版角色路由的形象与公开设定不符或不如 Anima 贴近，已移除），LoRA 强度统一用 `loras.character` 调整。角色一律按成年女性描写。
 
 使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘和人物参考分别使用 `inpaint`、`face-reference`；需要姿势时加 `openpose-control`。
 

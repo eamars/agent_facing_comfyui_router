@@ -2042,12 +2042,14 @@
     {
       "id": "moody-desire-v30",
       "name": "Moody Desire Mix v3.0",
-      "description": "Flux.2/Klein-style low-step workflow for the installed Moody Desire checkpoint; accepts concise natural-language prompts.",
+      "description": "Moody Desire Mix v3.0 on Flux.2 Klein, 4 steps: realistic people and portraits first, anime and stylized images too. Its specialty is explicit realistic images. Natural-language prompts.",
       "family": "flux2-klein",
       "resident_group": "flux2-klein-moody-desire",
       "tags": [
-        "anime",
+        "realistic",
+        "photo",
         "portrait",
+        "anime",
         "moody"
       ],
       "file": "moody_desire_v30_minimal.json",
@@ -2064,23 +2066,35 @@
           "input_mode"
         ],
         "domains": [
+          "realistic person",
+          "realistic portrait",
+          "portrait photo",
+          "photo",
+          "realistic",
           "general",
           "anime",
           "anime-portrait"
         ],
         "aliases": [
-          "general anime",
+          "moody desire",
           "flux klein",
+          "general anime",
           "通用动漫",
-          "动漫头像"
+          "动漫头像",
+          "写实人像"
         ],
         "styles": [
-          "anime",
+          "moody",
+          "moody desire",
+          "klein",
+          "flux klein",
+          "photorealistic",
+          "realistic",
           "portrait",
-          "stylized",
-          "moody"
+          "anime",
+          "stylized"
         ],
-        "priority": 10,
+        "priority": 15,
         "fallback": true,
         "exclusive": false
       },
@@ -2101,8 +2115,10 @@
           "flux2-klein"
         ],
         "styles": [
-          "anime",
+          "photorealistic",
+          "realistic",
           "portrait",
+          "anime",
           "stylized"
         ],
         "lora_support": false,
@@ -2193,22 +2209,27 @@
       },
       "selection": {
         "best_for": [
-          "fast general anime portraits",
-          "low-step Flux.2/Klein generation"
+          "explicit (NSFW) realistic people and boudoir-style photos: its specialty; choose it by workflow id or style 'moody desire'",
+          "realistic people and portraits (Qwen-Image stays the default photo route)",
+          "anime and stylized portraits",
+          "fast 4-step Flux.2 Klein generation"
         ],
         "not_for": [
           "SDXL-specific LoRAs",
-          "tag-heavy SDXL character workflows"
+          "tag-heavy SDXL character workflows",
+          "products, landscapes, posters and text inside the image (Qwen-Image)",
+          "exact layouts (MOSS-Image)"
         ],
         "priority_signals": [
           "fast",
+          "realistic",
           "portrait",
           "Flux.2",
           "Klein"
         ]
       },
       "agent_hints": {
-        "prompt_scope": "Describe the main subject, action, composition, environment and lighting in short natural language.",
+        "prompt_scope": "Describe the subject, action, composition, environment and lighting in natural language. For a realistic image say 'a realistic photograph of ...' and describe the person as a photo caption would; for anime, say anime.",
         "optional_fields": [
           "action",
           "composition",

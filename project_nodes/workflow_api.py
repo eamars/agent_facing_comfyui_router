@@ -1368,10 +1368,11 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "deprecated": "content_mode, input_type and prompt_granularity are accepted but ignored, with a "
                           "deprecated_selector warning.",
         },
-        "content": "Routes are not split by SFW or explicit: the prompt decides what an image shows, and every route except "
-                   "MOSS-Image (untested) has made explicit images. Choose routes by subject and look, never by content. "
-                   "When the selected route has prompting.content_lines, add its 'explicit' or 'safe' line to the prompt. "
-                   "Explicit images must show adults.",
+        "content": "Resolve never routes by content: the prompt decides what an image shows, and every route except "
+                   "MOSS-Image (untested) has made explicit images. Choose routes by subject and look. A route's best_for may "
+                   "name a specialty (Moody Desire: explicit realistic people); picking it by workflow id or style is your "
+                   "call. When the selected route has prompting.content_lines, add its 'explicit' or 'safe' line to the "
+                   "prompt. Explicit images must show adults.",
         "characters": "The AI-mascot character routes (domains 'deepseek', 'claude girl', 'chatgpt', 'qwen girl', "
                       "'gemini girl', 'glm girl', 'grok girl', 'kimi girl' and aliases such as 大肥鱼, Claude娘, 千问娘, "
                       "哈基米, 智谱娘, Grok娘, Kimi娘) carry a character LoRA whose trigger draws her canonical design. Use them "
