@@ -103,7 +103,7 @@ class AgentContractTests(unittest.TestCase):
             self.assertIsNone(api._route_score(moss, query), query)
         for query in ({"domain": "moss"}, {"domain": "layout", "input_mode": "text-to-image"}, {"style": "MOSS-Image"}):
             self.assertIsNotNone(api._route_score(moss, query), query)
-        # Benchmark-driven split of the heavy general-purpose bucket (docs/moss-image-integration.md).
+        # Benchmark-driven split of the heavy general-purpose bucket (docs/decisions.md).
         workflows = catalog["workflows"]
 
         def selected(query):

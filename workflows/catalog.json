@@ -397,7 +397,7 @@
             "date": "2026-10-16",
             "seed": 4242,
             "scope": "12 shared prompts vs moss-image-sft-t2i plus one layout-JSON prompt, all 25 jobs succeeded. MOSS won UI mock-up, long 12-detail scene and layout JSON; Qwen won short prompt, real-place landscape, Chinese poster (MOSS invented a garbled subtitle) and 2 MP macro realism; portrait, product label, menu text, composition, anime and natural-language layout tied. Mean 1 MP time: MOSS 50.0 s, Qwen 47.5 s; 1456 square: MOSS 109.8 s, Qwen 87.3 s.",
-            "report": "docs/moss-image-integration.md"
+            "report": "docs/decisions.md"
           }
         ]
       },
@@ -941,7 +941,7 @@
             "date": "2026-10-16",
             "seed": 4242,
             "scope": "12 shared prompts vs qwen-image-2.1-t2i plus one layout-JSON prompt, all 25 jobs succeeded. MOSS won UI mock-up, long 12-detail scene and layout JSON; Qwen won short prompt, real-place landscape, Chinese poster (MOSS invented a garbled subtitle) and 2 MP macro realism; portrait, product label, menu text, composition, anime and natural-language layout tied. Mean 1 MP time: MOSS 50.0 s, Qwen 47.5 s; 1456 square: MOSS 109.8 s, Qwen 87.3 s.",
-            "report": "docs/moss-image-integration.md"
+            "report": "docs/decisions.md"
           }
         ]
       },

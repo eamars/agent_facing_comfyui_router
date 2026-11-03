@@ -3,7 +3,13 @@
   "purpose": "Twelve prompt inputs for agent route-selection simulation. This fixture is never submitted to /project/generate.",
   "generation_requested": false,
   "routing_boundary": "Only workflow/model selectors are sent to /project/resolve; character and outfit remain inside the agent-authored prompt.",
-  "agent_flow": ["user_request", "agent_route_query", "project_resolve", "agent_prompt", "no_generation"],
+  "agent_flow": [
+    "user_request",
+    "agent_route_query",
+    "project_resolve",
+    "agent_prompt",
+    "no_generation"
+  ],
   "prompts": [
     {
       "id": "deepseek-sfw-maid-cafe",
@@ -11,9 +17,7 @@
       "user_request": "请画一张大肥鱼（DeepSeek 鲸鱼娘）穿女仆装在咖啡店端茶的插画，成年女性，温暖午后光线，内容保持 SFW。",
       "agent_route_query": {
         "domain": "大肥鱼",
-        "content_mode": "sfw",
-        "style": "anime",
-        "prompt_granularity": "structured"
+        "style": "anime"
       },
       "prompt": "masterpiece, best quality, deepseek_whale_girl_zipzippipe, 1girl, solo, adult, blue hair, very long hair, gradient blue hair, whale fin ears, blue hair bows, cetacean tail, blue eyes, deepseek_maid_outfit_zipzippipe, maid, maid headdress, long skirt, smile, holding a teacup, cozy cafe interior, warm afternoon light, upper body",
       "negative_prompt": "worst quality, low quality, bad hands, bad anatomy, text, watermark, nsfw",
@@ -25,9 +29,7 @@
       "user_request": "Draw the DeepSeek whale girl as an adult standing on a beach at sunset, original white dress, looking at the viewer. Keep it SFW.",
       "agent_route_query": {
         "domain": "DeepSeek whale girl",
-        "content_mode": "sfw",
-        "style": "anime illustration",
-        "prompt_granularity": "structured"
+        "style": "anime illustration"
       },
       "prompt": "masterpiece, best quality, deepseek_whale_girl_zipzippipe, 1girl, solo, adult, blue hair, very long hair, gradient blue hair, whale fin ears, cetacean tail, blue eyes, white dress, off shoulder, barefoot, beach at sunset, waves, looking at viewer, full body",
       "negative_prompt": "worst quality, low quality, bad hands, bad anatomy, text, watermark, nsfw",
@@ -39,9 +41,7 @@
       "user_request": "请为成年版 DeepSeek 娘制作一张成人向写真：海边别墅、丝质睡袍、柔和灯光，非露骨但具有明显 NSFW 氛围。",
       "agent_route_query": {
         "domain": "DeepSeek娘",
-        "content_mode": "nsfw",
-        "style": "anime",
-        "prompt_granularity": "detailed"
+        "style": "anime"
       },
       "prompt": "masterpiece, best quality, nsfw, deepseek_whale_girl_zipzippipe, 1girl, solo, adult, blue hair, very long hair, gradient blue hair, whale fin ears, blue hair bows, cetacean tail, blue eyes, mature adult woman, sheer silk robe, seated by a seaside villa window, tasteful implied nudity, glamour editorial, soft evening light",
       "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, blurry, text, watermark, logo, signature",
@@ -53,9 +53,7 @@
       "user_request": "请生成《胜利女神：NIKKE》拉毗的战斗肖像，保留她的默认军装、贝雷帽和步枪，工业基地背景，动漫风格，SFW。",
       "agent_route_query": {
         "domain": "NIKKE",
-        "content_mode": "sfw",
-        "style": "anime",
-        "prompt_granularity": "detailed"
+        "style": "anime"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapidef, red eyes, brown hair, black beret, military uniform, holding a rifle, industrial hangar, dramatic rim light",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature",
@@ -67,9 +65,7 @@
       "user_request": "我想要一个 NIKKE 世界观的成年女性原创作战人员，她在指挥室查看全息地图，战术夹克和耳机，电影感蓝色灯光，SFW。",
       "agent_route_query": {
         "domain": "goddess of victory nikke",
-        "content_mode": "sfw",
-        "style": "character illustration",
-        "prompt_granularity": "detailed"
+        "style": "character illustration"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult woman, NIKKE universe original operative, short silver hair, tactical jacket, headset, standing in a command room, holographic map, cinematic blue lighting, detailed anime character illustration",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature",
@@ -81,9 +77,7 @@
       "user_request": "请用自然的描述生成一张雨天咖啡馆窗边的成年女性动漫肖像，她正在读书，蓝色和琥珀色的忧郁灯光，画面柔和。",
       "agent_route_query": {
         "domain": "general",
-        "content_mode": "sfw",
-        "style": "portrait",
-        "prompt_granularity": "minimal"
+        "style": "portrait"
       },
       "prompt": "A thoughtful young adult anime woman reading beside a rainy cafe window, muted blue and amber lighting, intimate portrait composition, soft painterly atmosphere",
       "expected_workflow": "anima-turbo-v1-1"
@@ -94,9 +88,7 @@
       "user_request": "请为成年版拉毗制作一张 NIKKE 成人向成熟时尚写真：黑色蕾丝内衣、薄纱睡袍、丝绒贵妃椅和摄影棚灯光，要求非露骨但具有明显 NSFW 氛围。",
       "agent_route_query": {
         "domain": "NIKKE",
-        "content_mode": "nsfw",
-        "style": "anime",
-        "prompt_granularity": "expert"
+        "style": "anime"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, adult rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapidef, mature adult woman, black lace lingerie, sheer silk robe, seated on a velvet chaise, tasteful implied nudity, mature glamour editorial, soft studio lighting",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
@@ -108,9 +100,7 @@
       "user_request": "我需要一张 NIKKE 风格成年原创女性作战人员的成人向 boudoir 艺术研究图，敞开的缎面睡袍、裸背、含蓄的非露骨裸体表现，暖色电影灯光。",
       "agent_route_query": {
         "domain": "goddess of victory nikke",
-        "content_mode": "nsfw",
-        "style": "character illustration",
-        "prompt_granularity": "detailed"
+        "style": "character illustration"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult woman, NIKKE-inspired original operative, long black hair, white stockings, open satin robe, bare back, tasteful implied nudity, non-graphic artistic boudoir portrait, warm cinematic lighting",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
@@ -122,9 +112,7 @@
       "user_request": "请生成一张 NIKKE 世界观成年女性作战人员的 NSFW 霓虹 pin-up 插画，黑色无肩带内衣、过膝靴、夜店背景、紫青色灯光，成熟时尚而非露骨。",
       "agent_route_query": {
         "domain": "NIKKE",
-        "content_mode": "nsfw",
-        "style": "danbooru",
-        "prompt_granularity": "expert"
+        "style": "danbooru"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult woman, NIKKE universe operative, mature pin-up, strapless black lingerie, thigh-high boots, confident suggestive pose, neon nightclub, magenta and cyan lighting, polished anime illustration",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
@@ -136,9 +124,7 @@
       "user_request": "请制作一张成年拉毗的 NIKKE NSFW 泳装写真，黑色比基尼、湿发、黄昏泳池、优雅的成人 glamour 姿势和电影感动漫灯光。",
       "agent_route_query": {
         "domain": "NIKKE",
-        "content_mode": "nsfw",
-        "style": "anime",
-        "prompt_granularity": "expert"
+        "style": "anime"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, adult rapi (nikke), goddess of victory: nikke, IncrsNikkeProfile, rapiswim, mature adult woman, black bikini, wet hair, poolside at twilight, elegant glamour pose, reflective water, cinematic anime lighting",
       "negative_prompt": "worst quality, lowres, bad anatomy, bad hands, extra fingers, blurry, text, watermark, logo, signature, censored, mosaic censorship",
@@ -149,26 +135,22 @@
       "label": "JANKU v5 — glossy high-contrast anime portrait",
       "user_request": "Use JANKU v5 for a glossy high-contrast anime portrait.",
       "agent_route_query": {
-        "style": "JANKU v5",
-        "content_mode": "sfw",
-        "prompt_granularity": "detailed"
+        "style": "JANKU v5"
       },
       "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, polished anime portrait, glossy hair, vibrant colors, sharp linework, soft studio light",
       "negative_prompt": "worst quality, low quality, bad anatomy, bad hands, text, watermark, logo, signature",
       "expected_workflow": "janku-v5-illustrious"
     },
     {
-      "id": "one-obsession-v20-bold-portrait",
+      "id": "one-obsession-v24-portrait",
       "label": "One Obsession v20 BOLD — polished stylized 2.5D portrait",
-      "user_request": "Use One Obsession v20 BOLD for a polished stylized 2.5D anime portrait.",
+      "user_request": "Use One Obsession v24 for a polished stylized 2.5D anime portrait.",
       "agent_route_query": {
-        "style": "One Obsession v20 BOLD",
-        "content_mode": "sfw",
-        "prompt_granularity": "detailed"
+        "style": "One Obsession v24"
       },
       "prompt": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, 1girl, solo, stylized anime portrait, rich texture, polished 2.5D rendering, dramatic light and shadow",
       "negative_prompt": "worst quality, low quality, bad anatomy, bad hands, text, watermark, logo, signature",
-      "expected_workflow": "one-obsession-v20-bold"
+      "expected_workflow": "one-obsession"
     }
   ]
 }

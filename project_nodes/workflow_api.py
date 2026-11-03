@@ -1368,8 +1368,8 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "deprecated": "content_mode, input_type and prompt_granularity are accepted but ignored, with a "
                           "deprecated_selector warning.",
         },
-        "content": "Resolve never routes by content: the prompt decides what an image shows, and every route except "
-                   "MOSS-Image (untested) has made explicit images. Choose routes by subject and look. A route's best_for may "
+        "content": "Resolve never routes by content: the prompt decides what an image shows, and every model family "
+                   "here makes explicit images (MOSS-Image untested). Choose routes by subject and look. A route's best_for may "
                    "name a specialty (Moody Desire: explicit realistic people); picking it by workflow id or style is your "
                    "call. When the selected route has prompting.content_lines, add its 'explicit' or 'safe' line to the "
                    "prompt. Explicit images must show adults.",
@@ -1510,7 +1510,7 @@ def _openapi_document() -> dict[str, Any]:
         "openapi": "3.1.0",
         "info": {
             "title": "Project ComfyUI Agent API",
-            "version": "1.5.0",
+            "version": "2.0.0",
             "description": "Self-describing named-workflow API layered on ComfyUI.",
         },
         "paths": {

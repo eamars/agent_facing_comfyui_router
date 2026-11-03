@@ -40,7 +40,7 @@
 | Anima Turbo + Gemini 娘 LoRA | Gemini 娘 / 哈基米（渐变发双丸子、猫耳异色瞳） | 文生图、图生图 | `gemini-girl-anima-turbo` |
 | Anima Turbo + aigirls 多角色 LoRA | GLM 智谱娘（黑发狐狸娘、黑白哥特洛丽塔）、Grok 娘（金发双马尾吸血鬼）、Kimi 娘（银蓝卷发、星空斗篷） | 文生图、图生图 | `glm-girl-anima-turbo`、`grok-girl-anima-turbo`、`kimi-girl-anima-turbo` |
 
-路由不区分 SFW 与 NSFW：画面内容由提示词决定，除 MOSS-Image（未测试）外各路由都能生成成人内容，路由按题材和画风选择。旧的选路参数 `content_mode`、`input_type` 和 `prompt_granularity` 仍被接受但不起作用，响应中会返回 `deprecated_selector` 警告。
+路由不区分 SFW 与 NSFW：画面内容由提示词决定，各模型家族都能生成成人内容（MOSS-Image 未测试），路由按题材和画风选择。旧的选路参数 `content_mode`、`input_type` 和 `prompt_granularity` 仍被接受但不起作用，响应中会返回 `deprecated_selector` 警告。
 
 ### 局部重绘与人物参考
 
@@ -79,7 +79,7 @@ MOSS-Image 不接受任何图片输入，无法接入姿势。向不支持姿势
 
 使用 Qwen 时，可指定 `domain: "qwen"`，并选择 `text-to-image` 或 `image-to-image`。写实照片、产品、风景、海报等非动漫请求用 `domain: "photo"`、`"product"`、`"landscape"` 或 `"poster"`，选择 Qwen-Image；需要按坐标控制文字和物体的位置与大小，或生成界面原型时，用 `domain: "layout"` 或 `"ui mockup"`，选择 MOSS-Image（提示词需写完整描述，过短会导致主体变形）。每条路由可匹配的词见 agent manifest 的 `route_table[].selectors`。局部重绘和人物参考分别使用 `inpaint`、`face-reference`；需要姿势时加 `openpose-control`。
 
-全部工作流、默认参数和输入要求见 [工作流目录](workflows/catalog.json)；模型组件、来源与文件信息见 [模型表](workflows/models.json)。运行时可查询 `GET /project/workflows` 获取实际可用状态。
+全部工作流、默认参数和输入要求见 [工作流目录](workflows/catalog.json)；模型组件、来源与文件信息见 [模型表](workflows/models.json)。运行时可查询 `GET /project/workflows` 获取实际可用状态。各项取舍的原因与实测依据见 [设计决定](docs/decisions.md)。
 
 ## 快速开始
 
@@ -115,7 +115,7 @@ MOSS-Image 不接受任何图片输入，无法接入姿势。向不支持姿势
 
 SDXL 人物参考还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
 
-Qwen-Image-2.1 使用 abenzerps 发布的 Uncensored Q4_K_M GGUF 扩散模型，叠加同一发布者的 uncensored LoRA（默认强度 1.0，可通过 `loras.uncensored` 调整或设为 0 关闭），并配套 Qwen3VL INT8 文本编码器与 BF16 VAE。`setup_comfyui.ps1` 会安装固定版本的 ComfyUI-GGUF 节点；目标模型及配套文件由 Qwen profile 下载并校验。原官方 INT8 扩散文件保留在本地作回滚，不再被命名工作流加载。部署细节见 [Qwen 2.1 替换记录](docs/qwen-image-2.1-uncensored-migration.md)。
+Qwen-Image-2.1 使用 abenzerps 发布的 Uncensored Q4_K_M GGUF 扩散模型，叠加同一发布者的 uncensored LoRA（默认强度 1.0，可通过 `loras.uncensored` 调整或设为 0 关闭），并配套 Qwen3VL INT8 文本编码器与 BF16 VAE。`setup_comfyui.ps1` 会安装固定版本的 ComfyUI-GGUF 节点；目标模型及配套文件由 Qwen profile 下载并校验。原官方 INT8 扩散文件保留在本地作回滚，不再被命名工作流加载。替换的原因与依据见 [设计决定](docs/decisions.md)。
 
 MOSS-Image-SFT 使用 OpenMOSS 发布的 5B DiT、Qwen3.5 9B 文本编码器和 FLUX.2 小解码器 VAE，按 Hugging Face 目录原样存放在 `ComfyUI/models/moss-image/MOSS-Image-SFT/`，由 `setup_comfyui.ps1` 固定版本安装的官方 MOSS-Image 节点直接读取。默认 1024×1024、50 步、Euler/sgm_uniform、CFG 3、shift 5，并在负向分支跳过第 22 层；每步计算两次；4090 上 1024×1024 约 55 秒，与 Qwen 文生图相当。
 
