@@ -46,15 +46,10 @@ MAX_PROJECT_QUEUE = 32
 MAX_PROJECT_JOB_STATES = 1000
 PROJECT_QUEUE_POLL_SECONDS = 0.2
 PROJECT_JOB_TIMEOUT_SECONDS = 24 * 60 * 60
-PROMPT_GRANULARITY_LEVELS = ("minimal", "structured", "detailed", "expert")
-PROMPT_GRANULARITY_ALIASES = {
-    "short": "minimal",
-    "basic": "minimal",
-    "normal": "structured",
-    "tagged": "structured",
-    "full": "detailed",
-    "advanced": "expert",
-}
+# API 1.x fields that no longer steer anything; accepted with a deprecated_selector warning.
+DEPRECATED_SELECTORS = ("content_mode", "content", "safety_mode", "input_type", "input", "prompt_granularity", "granularity")
+RESOLVE_SELECTORS = ["domain", "style", "input_mode", "family", "workflow"]
+INPUT_MODES = ["text-to-image", "image-edit", "image-to-image", "inpaint", "face-reference", "openpose-control"]
 
 
 class ApiError(Exception):
@@ -280,7 +275,6 @@ def _public_entry(
         "family",
         "resident_group",
         "tags",
-        "content_class",
         "model_ids",
         "required_files",
         "compatibility_notes",
@@ -1027,16 +1021,6 @@ def _normalise_match_text(value: Any) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
-def _normalise_granularity(value: Any) -> str:
-    if not isinstance(value, str):
-        raise ApiError(400, "prompt_granularity must be one of minimal, structured, detailed or expert")
-    normalised = _normalise_match_text(value)
-    normalised = PROMPT_GRANULARITY_ALIASES.get(normalised, normalised)
-    if normalised not in PROMPT_GRANULARITY_LEVELS:
-        raise ApiError(400, "prompt_granularity must be one of minimal, structured, detailed or expert")
-    return normalised
-
-
 def _query_value(payload: dict[str, Any], *names: str) -> Any:
     for name in names:
         if name in payload and payload[name] is not None:
@@ -1044,13 +1028,12 @@ def _query_value(payload: dict[str, Any], *names: str) -> Any:
     return None
 
 
-def _route_query(payload: dict[str, Any]) -> dict[str, Any]:
+def _route_query(payload: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+    """Selectors resolve scores, and the deprecated ones the caller sent (ignored)."""
     query: dict[str, Any] = {}
     aliases = {
         "domain": ("domain", "subject_domain", "franchise", "series"),
         "style": ("style", "aesthetic"),
-        "content_mode": ("content_mode", "content", "safety_mode"),
-        "input_type": ("input_type", "input"),
         "input_mode": ("input_mode", "generation_mode", "mode"),
         "family": ("family",),
     }
@@ -1072,25 +1055,28 @@ def _route_query(payload: dict[str, Any]) -> dict[str, Any]:
             400,
             "character and outfit are prompt inputs, not route selectors",
             {
-                "route_selectors": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
+                "route_selectors": RESOLVE_SELECTORS,
                 "next_step": "resolve the workflow first, then include character and outfit in parameters.prompt",
             },
         )
-    allowed = {name for names in aliases.values() for name in names} | {
-        "prompt_granularity", "granularity", "workflow", "workflow_id", "include_unready", "limit"
+    allowed = {name for names in aliases.values() for name in names} | set(DEPRECATED_SELECTORS) | {
+        "workflow", "workflow_id", "include_unready", "limit"
     }
     unknown = set(payload) - allowed
     if unknown:
         raise ApiError(400, "Unknown route selectors", sorted(unknown))
-    granularity = _query_value(payload, "prompt_granularity", "granularity")
-    if granularity is not None:
-        query["prompt_granularity"] = _normalise_granularity(granularity)
     workflow = _query_value(payload, "workflow", "workflow_id")
     if workflow is not None:
         if not isinstance(workflow, str) or not workflow:
             raise ApiError(400, "workflow must be a non-empty workflow id")
         query["workflow"] = workflow
-    return query
+    return query, sorted(name for name in DEPRECATED_SELECTORS if name in payload)
+
+
+def _deprecation_warnings(names: list[str]) -> list[dict[str, Any]]:
+    return [{"code": "deprecated_selector", "parameter": name,
+             "message": f"{name} is deprecated and ignored: every route makes SFW and explicit images (the prompt decides) and "
+                        f"routes are chosen by {', '.join(RESOLVE_SELECTORS)}."} for name in names]
 
 
 def _normalised_values(value: Any) -> list[str]:
@@ -1115,8 +1101,6 @@ def _route_values(entry: dict[str, Any], key: str) -> list[str]:
             "character": "characters",
             "outfit": "outfits",
             "style": "styles",
-            "content_mode": "content_modes",
-            "input_type": "input_types",
             "input_mode": "input_modes",
         }.get(key, key)
         routing_values.extend(_normalised_values(routing.get(routing_key)))
@@ -1132,74 +1116,15 @@ def _route_values(entry: dict[str, Any], key: str) -> list[str]:
             "domain": "domains",
             "character": "subjects",
             "style": "styles",
-            "content_mode": "content_modes",
-            "input_type": "input_types",
             "input_mode": "input_modes",
         }.get(key)
         if capability_key:
             values.extend(_normalised_values(capabilities.get(capability_key)))
-        if key == "content_mode":
-            values.extend(_normalised_values(capabilities.get("content_levels")))
     if key == "style" and not routing_values:
         values.extend(_normalised_values(entry.get("tags")))
         if isinstance(selection, dict):
             values.extend(_normalised_values(selection.get("priority_signals")))
-    if key == "content_mode":
-        values.extend(_normalised_values(entry.get("content_class")))
     return list(dict.fromkeys(values))
-
-
-def _canonical_content_mode(value: str) -> str:
-    normalised = _normalise_match_text(value)
-    if normalised in {"nsfw", "explicit", "mature", "adult", "nsfw capable"}:
-        return "nsfw"
-    if normalised in {"sfw", "general", "non explicit", "non explicit content", "safe"}:
-        return "sfw"
-    return normalised
-
-
-def _route_content_modes(entry: dict[str, Any]) -> set[str]:
-    return {
-        _canonical_content_mode(value)
-        for value in _route_values(entry, "content_mode")
-        if value
-    }
-
-
-def _route_prompt_granularity(entry: dict[str, Any]) -> dict[str, Any]:
-    routing = entry.get("routing", {})
-    capabilities = entry.get("capabilities", {})
-    hint: Any = routing.get("prompt_granularity") if isinstance(routing, dict) else None
-    if not isinstance(hint, dict):
-        hint = capabilities.get("prompt_granularity") if isinstance(capabilities, dict) else None
-    if not isinstance(hint, dict):
-        return {
-            "minimum": "minimal",
-            "recommended": "structured",
-            "maximum": "expert",
-            "accepted": list(PROMPT_GRANULARITY_LEVELS),
-        }
-    minimum = _normalise_granularity(hint.get("minimum", "minimal"))
-    recommended = _normalise_granularity(hint.get("recommended", minimum))
-    maximum = _normalise_granularity(hint.get("maximum", "expert"))
-    minimum_index = PROMPT_GRANULARITY_LEVELS.index(minimum)
-    maximum_index = PROMPT_GRANULARITY_LEVELS.index(maximum)
-    if minimum_index > maximum_index:
-        raise ApiError(500, f"Workflow {entry.get('id', '<unknown>')} has invalid prompt granularity")
-    accepted = hint.get("accepted")
-    if isinstance(accepted, list):
-        accepted_values = [
-            _normalise_granularity(value) for value in accepted if isinstance(value, str)
-        ]
-    else:
-        accepted_values = list(PROMPT_GRANULARITY_LEVELS[minimum_index : maximum_index + 1])
-    return {
-        **hint,
-        "minimum": minimum,
-        "recommended": recommended,
-        "maximum": maximum,
-        "accepted": list(dict.fromkeys(accepted_values)),
-    }
 
 
 def _route_value_matches(query: str, values: list[str]) -> bool:
@@ -1234,38 +1159,12 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
         return None
     reasons: list[str] = []
 
-    requested_content = query.get("content_mode")
-    if isinstance(requested_content, str) and requested_content:
-        requested_content = _canonical_content_mode(requested_content)
-        route_modes = _route_content_modes(entry)
-        nsfw_capable = bool(entry.get("capabilities", {}).get("nsfw_capable"))
-        if requested_content == "nsfw" and not nsfw_capable:
-            return None
-        if requested_content not in route_modes:
-            if routing.get("exclusive", False) or route_modes:
-                return None
-        else:
-            score += 60
-            reasons.append(f"content_mode matched: {requested_content}")
-            preferences = routing.get("content_mode_preferences", {})
-            if isinstance(preferences, dict):
-                preference = preferences.get(requested_content)
-                if isinstance(preference, (int, float)) and not isinstance(preference, bool):
-                    score += int(preference)
-                    if preference:
-                        reasons.append(f"content_mode preference: {requested_content}")
-
-    for selector, score_bonus, label in (
-        ("input_type", 35, "input type"),
-        ("input_mode", 40, "input mode"),
-    ):
-        requested_input = query.get(selector)
-        if not isinstance(requested_input, str) or not requested_input:
-            continue
-        input_values = _route_values(entry, selector)
+    requested_input = query.get("input_mode")
+    if isinstance(requested_input, str) and requested_input:
+        input_values = _route_values(entry, "input_mode")
         if _normalise_match_text(requested_input) in input_values:
-            score += score_bonus
-            reasons.append(f"{label} matched")
+            score += 40
+            reasons.append("input mode matched")
         elif input_values:
             return None
 
@@ -1278,7 +1177,7 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
         elif routing.get("exclusive", False) and not explicit_workflow:
             return None
         else:
-            # A domain-specific route should outrank a generic fallback's content preference.
+            # A domain-specific route must outrank a generic fallback.
             score -= 100
             reasons.append("generic fallback route")
 
@@ -1299,19 +1198,6 @@ def _route_score(entry: dict[str, Any], query: dict[str, Any]) -> tuple[int, lis
             # but it should not outrank an explicit style match elsewhere.
             score -= 5
 
-    requested_granularity = query.get("prompt_granularity")
-    if isinstance(requested_granularity, str):
-        hint = _route_prompt_granularity(entry)
-        accepted = hint["accepted"]
-        if requested_granularity not in accepted:
-            reasons.append("prompt granularity is outside this route's recommended range")
-        elif requested_granularity == hint["recommended"]:
-            score += 25
-            reasons.append(f"prompt granularity preferred: {requested_granularity}")
-        else:
-            score += 10
-            reasons.append(f"prompt granularity supported: {requested_granularity}")
-
     if not reasons:
         reasons.append("catalog priority fallback")
     return score, reasons
@@ -1323,6 +1209,7 @@ def _resolve_routes(
     *,
     include_unready: bool = False,
     limit: int = 1,
+    deprecated: list[str] | tuple[str, ...] = (),
 ) -> dict[str, Any]:
     model_registry = catalog.get("model_registry", [])
     matches: list[dict[str, Any]] = []
@@ -1352,14 +1239,14 @@ def _resolve_routes(
     selected = top_match
     has_specific_selector = any(
         query.get(key)
-        for key in ("workflow", "family", "domain", "content_mode", "style", "input_type", "input_mode")
+        for key in RESOLVE_SELECTORS
     )
     selection_status = "selected" if selected else "no_match"
     guidance = "Use the selected workflow's prompting and model hints."
     if not has_specific_selector:
         selected = None
         selection_status = "needs_route_selector"
-        guidance = "Provide domain, content_mode, style, input_type, input_mode or workflow before generating."
+        guidance = "Provide domain, style, input_mode, family or workflow before generating."
     elif (
         selected
         and not query.get("workflow")
@@ -1388,6 +1275,7 @@ def _resolve_routes(
             "guidance": guidance,
             "prefer_instead": prefer_instead,
         },
+        "warnings": _deprecation_warnings(list(deprecated)),
     }
 
 
@@ -1440,18 +1328,55 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         for entry in catalog["workflows"]
         if isinstance(entry, dict) and _public_entry(entry, model_registry)["ready"]
     ]
-    ready_model_ids = {
-        model_id
-        for entry in ready_workflows
-        for model_id in entry.get("model_ids", [])
-        if isinstance(model_id, str)
-    }
     return {
         "schema_version": 1,
         "protocol": "project-comfyui-agent/v1",
-        "api_version": "1.6.0",
-        "route_table": [{"id": entry["id"], "family": entry["family"],
-                         "control_ports": entry.get("control_ports", {}),
+        "api_version": "2.0.0",
+        "service": {
+            "description": "Image generation for this ComfyUI server: pick a named route, then generate from text, edit an image "
+                           "by instruction, restyle, inpaint, reuse a face or copy a body pose.",
+            "api_base": "/project",
+            "authentication": "none",
+            "openapi": "/project/openapi.json",
+            "root_path": "/ is the native ComfyUI UI, not this API.",
+        },
+        "quick_start": [
+            "1. Pick a route. Match the request to route_table[].best_for and take domain and style words from "
+            "route_table[].selectors. If the requester supplies an image, choose its use in input_files.reference_uses. "
+            "Then POST /project/resolve with what you know, e.g. {\"domain\": \"anime\", \"style\": \"visual novel\"} or "
+            "{\"input_mode\": \"image-edit\"}; every field is optional. Character, outfit, pose and scene are prompt content, "
+            "not resolve fields.",
+            "2. Use selected_workflow. If selection.prefer_instead has an entry whose 'when' fits the request, use that "
+            "workflow instead. selection.fallback true means no route matched your domain; the closest route by the other "
+            "fields was chosen.",
+            "3. Write the prompt from the selected route's agent_hints and prompting (matches[0].workflow in the resolve "
+            "response, or GET /project/workflows/{id}). Use that route's dialect and trigger words, not another family's.",
+            "4. POST /project/generate {\"workflow\": id, \"parameters\": {\"prompt\": ...}}, optionally with a "
+            "\"client_id\" label. Send only fields in the route's parameter_schema; omitted fields take the route's defaults. "
+            "Add \"dry_run\": true to validate without running.",
+            "5. Poll GET /project/jobs/{prompt_id} until state is succeeded or failed, then download outputs[].url.",
+        ],
+        "resolve": {
+            "path": "POST /project/resolve",
+            "fields": {
+                "domain": "subject or genre word from route_table[].selectors.domains or .aliases",
+                "style": "look word from route_table[].selectors.styles (e.g. 'visual novel', 'mainstream anime', 'photo')",
+                "input_mode": INPUT_MODES,
+                "family": "exact route family, to stay within one model family",
+                "workflow": "a route id, to inspect that one route",
+            },
+            "deprecated": "content_mode, input_type and prompt_granularity are accepted but ignored, with a "
+                          "deprecated_selector warning.",
+        },
+        "content": "Routes are not split by SFW or explicit: the prompt decides what an image shows, and every route except "
+                   "MOSS-Image (untested) has made explicit images. Choose routes by subject and look, never by content. "
+                   "When the selected route has prompting.content_lines, add its 'explicit' or 'safe' line to the prompt. "
+                   "Explicit images must show adults.",
+        "characters": "The AI-mascot character routes (domains 'deepseek', 'claude girl', 'chatgpt', 'qwen girl', "
+                      "'gemini girl', 'glm girl', 'grok girl', 'kimi girl' and aliases such as 大肥鱼, Claude娘, 千问娘, "
+                      "哈基米, 智谱娘, Grok娘, Kimi娘) carry a character LoRA whose trigger draws her canonical design. Use them "
+                      "only for that character, write her as an adult, and adjust loras.character to weaken the LoRA.",
+        "route_table": [{"id": entry["id"], "family": entry["family"], "ready": True,
                          "required_fields": entry.get("input_contract", {}).get("required_fields", []),
                          "image_inputs": _image_inputs(entry),
                          "pose": entry.get("pose", {}).get("supported", False),
@@ -1459,79 +1384,44 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                          "explicit_only": entry.get("routing", {}).get("explicit_only", False),
                          # The words /project/resolve matches, so agents choose from a menu instead of guessing.
                          "selectors": {"domains": entry.get("routing", {}).get("domains", []),
+                                       "aliases": entry.get("routing", {}).get("aliases", []),
                                        "styles": entry.get("routing", {}).get("styles", [])},
                          "best_for": entry.get("selection", {}).get("best_for", [])} for entry in ready_workflows],
-        "discovery": {
-            "preferred_entrypoint": "/.well-known/agent-manifest.json",
-            "alternate_entrypoints": ["/project/agent-manifest", "/project/openapi.json"],
-            "native_comfyui_ui": "/",
-            "agent_startup_rule": "Read the preferred entrypoint before treating the root path as a ComfyUI client surface.",
-        },
-        "service": {
-            "description": "Named workflow selection, reference-image upload, pose library, and text-to-image, image edit, image-to-image, inpaint, face-reference and pose job API for this ComfyUI server.",
-            "authentication": "none",
-            "api_base": "/project",
-            "native_comfyui_api": "available",
-        },
-        "resources": {"endpoint": "/project/resources", "max_pending_jobs": MAX_PROJECT_QUEUE,
-                      "admission": "Each workflow exposes resource_limits. max_total_pixels (width * height * batch, or the reference size for edits) is advisory: exceeding it adds an over_pixel_budget warning but the job still runs. There is no free-memory pre-check: a job that actually runs out of RAM/VRAM fails with error.code out_of_memory."},
         "input_files": {
-            "directory": "ComfyUI/input",
-            "lifecycle": "Persistent across restarts. No project TTL or automatic cleanup; only explicit DELETE or external/manual cleanup removes inputs. Keep referenced files unchanged until jobs finish.",
-            "list": {
-                "method": "GET",
-                "path": "/project/inputs",
-                "returns": "Relative filenames, byte sizes, modification times and extensions.",
-            },
-            "delete": {
-                "method": "DELETE",
-                "path": "/project/inputs/{name}",
-                "returns": "Deletes one regular file and returns its relative name and byte size.",
-            },
-            "upload": {
-                "method": "POST",
-                "path": "/upload/image",
-                "content_type": "multipart/form-data",
-                "file_field": "image",
-                "form_fields": {
-                    "type": "input (required for a reference image)",
-                    "overwrite": "optional true/false; default is to avoid replacing an existing file; use a unique basename for a new upload",
-                    "subfolder": "optional relative input subfolder",
-                },
-                "response_fields": ["name", "subfolder", "type"],
-                "use_as": "Combine response subfolder and name with '/' and pass it as the selected route's image parameter (route_table[].image_inputs): input_image, mask_image, face_image or pose.",
-            },
             "reference_uses": _reference_uses(ready_workflows),
-            "input_fit": {
-                "parameter": "parameters.input_fit",
-                "values": list(INPUT_FIT_MODES),
-                "default": "downscale",
-                "downscale": "Oversized inputs are shrunk to what the route can run (aspect kept) and animated inputs use their first frame. Each change comes back as a warning with original_size and used_size: input_downscaled, input_resized or input_first_frame. The uploaded file is never modified; the adjusted copy is deleted when the job ends.",
-                "none": "The upload is used unchanged. Inputs the route cannot run are refused with a stable error.code; larger inputs that can run may add an over_pixel_budget warning.",
-            },
             "text_only_routes": [entry["id"] for entry in ready_workflows if not _image_inputs(entry)],
-            "reference_rule": "Upload or discover the reference before submitting /project/prompt; the named API accepts only a relative input-directory filename, never a host path or URL.",
+            "find_or_upload": "GET /project/inputs lists existing files. To add one, POST multipart/form-data to /upload/image "
+                              "with fields image (the file) and type=input; join the response's subfolder and name with '/' "
+                              "and pass that as the image parameter. Only names inside the input directory work, never a "
+                              "host path or URL. Use a unique basename per upload.",
+            "input_fit": "Inputs are fitted automatically (parameters.input_fit=downscale): oversized images shrink and "
+                         "animated ones use their first frame, reported as input_downscaled, input_resized or "
+                         "input_first_frame warnings with original_size and used_size; tell the requester. input_fit=none "
+                         "keeps the upload unchanged and refuses what the route cannot run.",
+            "lifecycle": "Inputs persist until DELETE /project/inputs/{name}; delete only files you uploaded and no job "
+                         "still uses.",
         },
         "poses": {
             "parameter": "parameters.pose",
-            "when": "Send pose when the requester asks for a specific body pose or hand gesture, or gives a pose image. Otherwise leave it out.",
-            "value": "A pose id from the pose library, or the name of an uploaded image (from /project/inputs) whose pose should be copied.",
+            "when": "Send pose when the requester asks for a specific body pose or hand gesture, or gives a pose image. "
+                    "Otherwise leave it out.",
+            "value": "A pose id from the pose library, or the name of an uploaded image whose pose should be copied.",
             "search": {
                 "method": "GET", "path": "/project/poses",
                 "query": {"q": "words; matches English or Chinese pose names", "people": "1 or 2",
                           "angle": "front, diag, side, high or low", "limit": "1-20, default 8"},
                 "returns": "Each result has views: one view id per camera angle: front, diag (three-quarter), side, "
                            "high (camera above, looking down), low (camera below, looking up). Pass the view id for the angle "
-                           "you want, or the pose id for the front view.",
+                           "you want; a bare pose id means its front view, or its first view when it has no front.",
             },
             "no_match": "If no library pose fits the request, leave pose out and describe the pose in the prompt.",
+            "applies_to": "Generation from text, with or without face_image. A request that also sends input_image (edit, "
+                          "image-to-image, inpaint) is refused with pose_unsupported: a pose cannot re-pose an existing image.",
             "prompt": "Also name the pose in the prompt (e.g. sitting, knee up, hand on chin): on Illustrious and character-LoRA "
                       "routes seated and kneeling poses often stay standing when only the skeleton asks for them.",
-            "pose_strength": "Optional parameters.pose_strength 0-1 (default per route in its parameter schema): how strictly the pose "
-                             "is followed. Routes whose schema has no pose_strength follow the pose without one.",
-            "applies_to": "Generation from text, with or without face_image. A pose cannot re-pose an input_image "
-                          "(edit, image-to-image, inpaint).",
-            "routing": "Not every route takes a pose yet (route_table[].pose). When sending pose, add input_mode "
+            "pose_strength": "Optional parameters.pose_strength 0-1 where the route's parameter_schema lists it: how strictly "
+                             "the pose is followed. Routes without it follow the pose without a strength setting.",
+            "routing": "Not every route takes a pose (route_table[].pose). When sending pose, add input_mode "
                        "'openpose-control' to /project/resolve so only routes that take one are chosen. If that drops the "
                        "route the requester asked for (selection.fallback is true), resolve without input_mode, keep that "
                        "route and describe the pose in the prompt.",
@@ -1539,6 +1429,31 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "response": "The queued or dry-run response has a pose object: the pose used, people_detected and skeleton_url, "
                         "the skeleton the model follows.",
             "library_size": sum(1 for item in pose_addon.library().get("poses", {}).values() if item["views"]),
+        },
+        "instructions": [
+            "parameters.prompt is required (an empty string is allowed). Seed is random when omitted.",
+            "Width and height are multiples of 8, 64-2048. MOSS-Image floors them to multiples of 16, and Anima routes do "
+            "the same when a pose is sent.",
+            "For inpaint, send a source image and a mask with the same aspect ratio (normally the same size). White or red "
+            "mask pixels are redrawn, or transparent ones with mask_channel=alpha. denoise 1.0 (default) replaces the "
+            "masked region; lower keeps more of the original. Unmasked pixels are composited back unchanged.",
+            "For face-reference, send a head-and-shoulders crop as face_image; it is IPAdapter conditioning, not FaceID. "
+            "The Anima route encodes the whole reference: keep ipadapter_weight at its 0.6 default unless likeness matters "
+            "more than the prompted outfit and scene, since 0.8-1.0 copies the reference's outfit and background.",
+            "Warnings never block a job; see warning_codes. If a job fails with error.code out_of_memory, report it with "
+            "the GET /project/resources snapshot before resubmitting.",
+            "Saved PNGs keep ComfyUI's prompt metadata (input file names are replaced with [input image]); strip metadata "
+            "before sending an image somewhere that should not see the prompt.",
+        ],
+        "warning_codes": {
+            "input_downscaled": "An input was shrunk to fit the route; original_size and used_size say how.",
+            "input_resized": "An input or the output size was adjusted to the route's size rules.",
+            "input_first_frame": "An animated input was reduced to its first frame.",
+            "over_pixel_budget": "The request exceeds the route's tested pixel budget; it still runs but may be slow or "
+                                 "fail with out_of_memory.",
+            "outside_recommended_range": "A sampling value is outside the route's recommended range; it was kept.",
+            "negative_prompt_inactive": "You sent negative_prompt to a route running at CFG 1, where it has no effect.",
+            "deprecated_selector": "An API 1.x field was sent; it is ignored.",
         },
         "error_codes": {
             "input_not_found": "The named input file is not in ComfyUI's input directory; upload it or check GET /project/inputs.",
@@ -1551,265 +1466,41 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "mask_alpha_missing": "mask_channel=alpha was requested but the mask has no transparency.",
             "unsupported_parameter": "The route does not expose this parameter (for example an image sent to a text-only route).",
             "invalid_parameter": "A parameter value is outside its allowed set.",
-            "pose_unsupported": "The selected route does not take a pose yet; details.routes_with_pose lists routes that do.",
+            "pose_unsupported": "The route takes no pose, or the request also sends input_image; details.routes_with_pose "
+                                "lists routes that do take one.",
             "pose_unknown_id": "The pose value is neither a library pose id nor an uploaded image; search GET /project/poses.",
             "pose_not_detected": "No human body pose was found in the pose image; use a clearer image of the whole body.",
             "pose_fetch_failed": "The library sketch could not be fetched from the pose gallery; retry later or pick another pose.",
             "pose_unavailable": "Pose dependencies are not installed on this server.",
             "out_of_memory": "Job error.code: the job ran out of RAM/VRAM while running.",
         },
-        "instructions": [
-            "Read /.well-known/agent-manifest.json first; the root path is the native ComfyUI UI, not the preferred agent entrypoint.",
-            "Call POST /project/resolve with domain, content_mode, style, input_type, input_mode, optional family and prompt_granularity when the route is not already known.",
-            "Take domain and style words from route_table[].selectors and match the request to route_table[].best_for; requests that match no selector fall back to the anime routes. Real-world photos, products, landscapes and posters: domain 'photo', 'product', 'landscape' or 'poster' (Qwen-Image). Exact layout or UI mock-ups: domain 'layout' or 'ui mockup' (MOSS-Image).",
-            "Before generating, read selection.prefer_instead in the resolve response: if its 'when' matches the request, use that workflow instead. Pass a style selector (e.g. 'visual novel' or 'mainstream anime') when the requester describes a look.",
-            "Choose only an entry with ready=true and use the selected workflow's models, capabilities, routing and agent_hints together.",
-            "Treat compatibility_notes, selection.not_for, model compatibility and prompting as constraints, not optional suggestions.",
-            "When the selected route has prompting.content_modes, apply the line for the requested content_mode; other routes leave content to the prompt.",
-            "Match the prompt dialect and granularity to the selected workflow; do not copy tag triggers from another model family.",
-            "Use parameter_schema for allowed fields, required inputs and actual defaults. The AI-mascot character routes (domains 'deepseek', 'claude girl', 'chatgpt', 'qwen girl', 'gemini girl', 'glm girl', 'grok girl', 'kimi girl' and aliases such as 大肥鱼, Claude娘, 千问娘, 哈基米, 智谱娘, Grok娘, Kimi娘) carry character LoRAs tuned with loras.character; use them only for that character and write her as an adult. The Pony-trained Rapi adapter is disabled by default on Animagine.",
-            "Supply parameters.prompt explicitly (empty string is allowed); subject is a compatibility alias. Suggested subject/appearance details are prompt-writing advice, not separate required API fields. Seed is random when omitted.",
-            "Responses include identical prompt_id/job_id, applied_parameters, ignored_parameters (empty; unknown fields are rejected), effective_parameters, resource budgets and advisory warnings (sampling ranges, over_pixel_budget); warnings never block a job. dry_run validates without executing.",
-            "When the requester supplies an image, first decide what it is for using input_files.reference_uses (instruction edit, restyle/vary, inpaint, face reference or pose), then resolve with that input_mode. Send only the image parameters listed in route_table[].image_inputs; text_only_routes accept none.",
-            "For any image input, call GET /project/inputs to discover references or POST multipart/form-data to /upload/image with image and type=input, then pass the returned relative name as the route's image parameter: input_image for instruction edit, image-to-image or the inpaint source, mask_image for the inpaint mask, face_image for face reference, or pose for a pose to copy.",
-            "For a specific body pose or hand gesture, follow the poses section: search GET /project/poses, then pass a view id (or an uploaded pose image) as parameters.pose.",
-            "Image inputs are fitted automatically (input_fit=downscale). When the response has input_downscaled, input_resized or input_first_frame warnings, tell the requester the image was adjusted and give original_size and used_size. Send input_fit=none only when the requester needs the original size; then relay any refusal's error.code and message.",
-            "Use a unique basename for each new upload. With overwrite=false, the native ComfyUI endpoint may return an existing same-name file; delete only input names that this caller owns.",
-            "GET /project/resources returns an advisory selected-device memory snapshot and configured queue/input limits; it is diagnostic information, not a reservation.",
-            "If a job fails with error.code out_of_memory, report it to the requester with the current GET /project/resources snapshot before resubmitting.",
-            "For inpaint, upload a source image and a mask with the same aspect ratio (normally the same size). RGB white/red pixels are redrawn; alpha masks redraw transparent pixels. denoise 1.0 (default) replaces the masked region; lower keeps more of the original inside it. Unmasked original pixels are composited back after decode.",
-            "For face-reference, pass face_image to a face-reference route; it is not FaceID recognition. Use a head-and-shoulders crop. The Anima route encodes the whole reference: keep ipadapter_weight at its 0.6 default unless likeness matters more than the prompted outfit and scene, since 0.8-1.0 copies the reference's outfit and background.",
-            "After confirming a file is no longer needed, DELETE /project/inputs/{name}; only a single regular input file is removed.",
-            "The upload response is an input filename, not an output-job reference; automatic output-to-input bindings are not yet implemented.",
-            "POST /project/generate (or /project/prompt) returns prompt_id; poll GET /project/jobs/{prompt_id} until state is succeeded or failed.",
-        ],
-        "workflow_selection": {
-            "required_fields": [
-                "ready",
-                "family",
-                "model_ids",
-                "models",
-                "capabilities",
-                "routing",
-                "input_contract",
-                "selection",
-                "prompting",
-                "agent_hints",
-                "defaults",
-                "parameter_schema",
-                "resource_limits",
-            ],
-            "matching_order": [
-                "honor routing.required_selectors for capability-specific routes such as inpaint and face-reference",
-                "content_mode against routing.content_modes and capabilities.nsfw_capable",
-                "domain/content mode/style against the workflow's routing selectors and model capabilities",
-                "input_type/input_mode against capabilities.input_types and capabilities.input_modes",
-                "prompt_granularity against prompting.granularity and agent_hints",
-                "model readiness and compatibility_notes",
-            ],
-            "recommended_operation": "POST /project/resolve",
-            "routing_boundary": "Routing selects a workflow/model combination only. Character, outfit and other subject details belong in the final prompt; an exact body pose goes in parameters.pose.",
-        },
-        "prompting": {
-            "granularity_levels": [
-                {
-                    "id": "minimal",
-                    "meaning": "Subject and broad visual intent; useful for natural-language or fast general routes.",
-                },
-                {
-                    "id": "structured",
-                    "meaning": "Subject/series/character plus appearance, pose and composition blocks.",
-                },
-                {
-                    "id": "detailed",
-                    "meaning": "Structured tags or prose with outfit, accessories, lighting, camera and environment details.",
-                },
-                {
-                    "id": "expert",
-                    "meaning": "Model-specific trigger words, weighted adapter tokens, negative prompt and tuned sampling settings.",
-                },
-            ],
-            "selection_rule": "Use the selected workflow's prompting.granularity.recommended value unless the caller explicitly requests another accepted level.",
-            "agent_supplies_final_prompt": True,
-            "input_rule": "Use only the selected workflow's declared input_contract. Upload or discover the declared input first, then provide input_image, mask_image, face_image or pose exactly as documented; text-to-image does not require an input file.",
-        },
-        "routing_boundary": {
-            "route_selectors": ["domain", "content_mode", "style", "input_type", "input_mode", "prompt_granularity"],
-            "prompt_inputs_after_selection": [
-                "character",
-                "outfit",
-                "pose",
-                "appearance",
-                "accessories",
-                "weapon",
-                "camera",
-                "scene",
-                "lighting",
-            ],
-            "rule": "Do not create a route per character or outfit when the same workflow/model can handle it; keep those details in parameters.prompt.",
-        },
-        "scheduling": {
-            "queue": "project_workflow_serial",
-            "mutex": "At most one named project workflow is submitted to ComfyUI for execution at a time.",
-            "model_lifecycle": {
-                "same_workflow": "Keep the selected workflow resident for consecutive jobs.",
-                "different_workflow": "Release ComfyUI's loaded models and CUDA cache before starting the next workflow.",
-                "failed_job": "Treat model residency as unknown after a failed job and establish a clean boundary before the next job.",
-            },
-            "job_phases": ["waiting_for_turn", "model_switch", "generation", "complete"],
-            "max_pending_jobs": MAX_PROJECT_QUEUE,
-            "queue_scope": "Named jobs enter the native serial worker. Model cleanup happens inside that worker, so it cannot unload a concurrently executing native job. Native graph sizes bypass project admission budgets.",
-        },
-        "operations": [
-            {"id": "resources", "method": "GET", "path": "/project/resources", "description": "Inspect the selected device, live memory estimates and launcher safeguards."},
-            {
-                "id": "agent_manifest",
-                "method": "GET",
-                "path": "/.well-known/agent-manifest.json",
-                "description": "Preferred first-read entrypoint for an independent agent.",
-            },
-            {
-                "id": "agent_manifest_legacy",
-                "method": "GET",
-                "path": "/project/agent-manifest",
-                "description": "Backward-compatible alias for the agent operating guide.",
-            },
-            {
-                "id": "openapi_document",
-                "method": "GET",
-                "path": "/project/openapi.json",
-                "description": "OpenAPI 3.1 contract for importing the agent API into an independent client.",
-            },
-            {
-                "id": "project_resources",
-                "method": "GET",
-                "path": "/project/resources",
-                "description": "Return an advisory selected-device memory snapshot and configured project resource limits.",
-            },
-            {
-                "id": "list_project_inputs",
-                "method": "GET",
-                "path": "/project/inputs",
-                "description": "List files currently available in ComfyUI's input directory with relative names and byte sizes.",
-            },
-            {
-                "id": "delete_project_input",
-                "method": "DELETE",
-                "path": "/project/inputs/{name}",
-                "description": "Delete one regular file from ComfyUI's input directory; nested names must be URL-encoded when needed.",
-            },
-            {
-                "id": "upload_input_image",
-                "method": "POST",
-                "path": "/upload/image",
-                "description": "Upload a reference image through ComfyUI's native unauthenticated multipart endpoint on this same port.",
-                "content_type": "multipart/form-data",
-                "request_fields": {
-                    "image": "binary file (required)",
-                    "type": "input (required for a reference image)",
-                    "overwrite": "optional true/false",
-                    "subfolder": "optional relative subfolder",
-                },
-                "response": "Join returned subfolder and name with '/' and pass it as the selected route's image parameter (input_image, mask_image, face_image or pose).",
-            },
-            {
-                "id": "search_poses",
-                "method": "GET",
-                "path": "/project/poses",
-                "description": "Search the pose library; pass a returned view id as parameters.pose.",
-            },
-            {
-                "id": "list_workflows",
-                "method": "GET",
-                "path": "/project/workflows",
-                "description": "Discover available workflows, capabilities, prompt guidance and model readiness.",
-            },
-            {
-                "id": "list_routes",
-                "method": "GET",
-                "path": "/project/routes",
-                "description": "Return the workflow/model route table, optionally filtered by domain, content mode, style or prompt granularity.",
-            },
-            {
-                "id": "resolve_route",
-                "method": "POST",
-                "path": "/project/resolve",
-                "description": "Rank ready workflows for an agent request without loading models or queueing a job.",
-            },
-            {
-                "id": "list_models",
-                "method": "GET",
-                "path": "/project/models",
-                "description": "Discover model and adapter capability hints, compatibility and readiness.",
-            },
-            {
-                "id": "describe_model",
-                "method": "GET",
-                "path": "/project/models/{model_id}",
-                "description": "Inspect one model or adapter profile used by a workflow route.",
-            },
-            {
-                "id": "describe_workflow",
-                "method": "GET",
-                "path": "/project/workflows/{workflow_id}",
-                "description": "Return the selected API-format graph plus its agent metadata.",
-            },
-            {
-                "id": "queue_workflow",
-                "method": "POST",
-                "path": "/project/generate",
-                "description": "Resolve parameters into a named graph and queue it through the serial model scheduler.",
-            },
-            {
-                "id": "get_job",
-                "method": "GET",
-                "path": "/project/jobs/{prompt_id}",
-                "description": "Return a compact job state and downloadable output references.",
-            },
-        ],
-        "prompt_contract": {
-            "request_shape": {
-                "workflow": "workflow id from /project/workflows",
-                "parameters": "object containing only bindings exposed by the selected workflow",
-                "prompt_granularity": "optional advisory level; does not restrict prompt content or reject otherwise valid prompts",
-                "client_id": "optional caller label",
-                "dry_run": "optional boolean; resolve without queueing",
-            },
-            "limits": {
-                "prompt_characters": MAX_PROMPT_LENGTH,
-                "width_min": 64,
-                "height_min": 64,
-                "width_max": 2048,
-                "height_max": 2048,
-                "dimension_multiple": 8,
-                "batch_size_max": 4,
-                "steps_max": 100,
-            },
-        },
         "result_contract": {
-            "queue_response": "contains identical prompt_id and job_id, job_url, applied_parameters, ignored_parameters and warnings",
-            "timing": "Job queued_ms is time from acceptance until worker start. elapsed_ms includes model switching, generation and failure cleanup after worker start; it excludes queue time. Native-only jobs may report unknown (null) queue timing.",
+            "queue_response": "prompt_id (also job_id), job_url, applied_parameters, effective_parameters, warnings and, "
+                              "with a pose, a pose object. A dry run returns the same fields plus validated and the "
+                              "API-format graph (prompt), without prompt_id.",
             "job_states": ["queued", "running", "succeeded", "failed"],
             "job_phases": ["waiting_for_turn", "model_switch", "generation", "complete"],
-            "queued_position": "queue_position is scoped to the named project queue and is zero-based",
-            "download_urls": "relative /view URLs returned by /project/jobs/{prompt_id}",
-            "output_metadata": "Saved PNGs keep ComfyUI's prompt metadata (prompts, seeds, models, settings) for reproducibility; input image file names in it are replaced with [input image] before the job is reported. Strip all metadata yourself before sending an image somewhere that should not see the prompt.",
+            "queue": f"Named jobs run one at a time; at most {MAX_PROJECT_QUEUE} wait. queue_position is zero-based. "
+                     "queued_ms is the wait before start; elapsed_ms covers model switching and generation.",
+            "download_urls": "relative /view URLs in outputs[] of GET /project/jobs/{prompt_id}",
         },
-        "openapi": "/project/openapi.json",
-        "workflows": [
-            _public_entry(entry, model_registry)
-            for entry in catalog["workflows"]
-            if isinstance(entry, dict)
+        "operations": [
+            {"method": "GET", "path": "/.well-known/agent-manifest.json", "description": "This guide (alias: /project/agent-manifest)."},
+            {"method": "GET", "path": "/project/openapi.json", "description": "OpenAPI 3.1 contract."},
+            {"method": "POST", "path": "/project/resolve", "description": "Rank ready routes for a request; the selected route's full entry is in matches[0].workflow."},
+            {"method": "GET", "path": "/project/routes", "description": "Same ranking as resolve, as GET query parameters."},
+            {"method": "GET", "path": "/project/workflows", "description": "All routes with capabilities, prompt guidance and readiness."},
+            {"method": "GET", "path": "/project/workflows/{workflow_id}", "description": "One route: {\"workflow\": its entry with parameter_schema, prompting and agent_hints, \"prompt\": its API-format graph (not parameters.prompt)}."},
+            {"method": "GET", "path": "/project/models", "description": "Model and adapter profiles (include_candidates=true adds unused ones)."},
+            {"method": "GET", "path": "/project/models/{model_id}", "description": "One model or adapter profile."},
+            {"method": "GET", "path": "/project/poses", "description": "Search the pose library; pass a view id as parameters.pose."},
+            {"method": "GET", "path": "/project/inputs", "description": "List files in ComfyUI's input directory."},
+            {"method": "POST", "path": "/upload/image", "description": "Upload a reference image (multipart: image, type=input, optional overwrite, subfolder)."},
+            {"method": "DELETE", "path": "/project/inputs/{name}", "description": "Delete one input file."},
+            {"method": "POST", "path": "/project/generate", "description": "Queue a named route (alias: /project/prompt), or validate it with dry_run."},
+            {"method": "GET", "path": "/project/jobs/{prompt_id}", "description": "Job state and output download URLs."},
+            {"method": "GET", "path": "/project/resources", "description": "Advisory device memory snapshot and queue/input limits."},
         ],
-        "models": [
-            _public_model(model)
-            for model in model_registry
-            if isinstance(model, dict) and model.get("id") in ready_model_ids
-        ],
-        "model_registry": {
-            "default_scope": "models referenced by ready workflows",
-            "candidate_access": "GET /project/models?include_candidates=true",
-        },
     }
 
 
@@ -1990,11 +1681,8 @@ def _openapi_document() -> dict[str, Any]:
                     "summary": "List ranked workflow routes",
                     "parameters": [
                         {"$ref": "#/components/parameters/DomainQuery"},
-                        {"$ref": "#/components/parameters/ContentModeQuery"},
                         {"$ref": "#/components/parameters/StyleQuery"},
-                        {"$ref": "#/components/parameters/InputTypeQuery"},
                         {"$ref": "#/components/parameters/InputModeQuery"},
-                        {"$ref": "#/components/parameters/PromptGranularityQuery"},
                         {"$ref": "#/components/parameters/FamilyQuery"},
                         {"$ref": "#/components/parameters/IncludeUnreadyQuery"},
                     ],
@@ -2149,33 +1837,15 @@ def _openapi_document() -> dict[str, Any]:
                     "in": "query",
                     "schema": {"type": "string", "maxLength": 256},
                 },
-                "ContentModeQuery": {
-                    "name": "content_mode",
-                    "in": "query",
-                    "schema": {"type": "string", "maxLength": 256},
-                },
                 "StyleQuery": {
                     "name": "style",
                     "in": "query",
                     "schema": {"type": "string", "maxLength": 256},
                 },
-                "InputTypeQuery": {
-                    "name": "input_type",
-                    "in": "query",
-                    "schema": {"type": "string", "enum": ["text", "image"]},
-                },
                 "InputModeQuery": {
                     "name": "input_mode",
                     "in": "query",
-                    "schema": {
-                        "type": "string",
-                        "enum": ["text-to-image", "image-edit", "image-to-image", "inpaint", "face-reference", "openpose-control"],
-                    },
-                },
-                "PromptGranularityQuery": {
-                    "name": "prompt_granularity",
-                    "in": "query",
-                    "schema": {"$ref": "#/components/schemas/PromptGranularity"},
+                    "schema": {"type": "string", "enum": INPUT_MODES},
                 },
                 "IncludeUnreadyQuery": {
                     "name": "include_unready",
@@ -2209,9 +1879,9 @@ def _openapi_document() -> dict[str, Any]:
                 },
             },
             "schemas": {
-                "PromptGranularity": {
-                    "type": "string",
-                    "enum": list(PROMPT_GRANULARITY_LEVELS),
+                "Deprecated": {
+                    "description": "API 1.x field; accepted, ignored, and reported as a deprecated_selector warning.",
+                    "deprecated": True,
                 },
                 "RouteResolutionRequest": {
                     "type": "object",
@@ -2219,13 +1889,10 @@ def _openapi_document() -> dict[str, Any]:
                         "domain": {"type": "string", "maxLength": 256},
                         "family": {"type": "string", "maxLength": 256, "description": "Exact workflow family from the catalog, e.g. sdxl-ipadapter or anima-ipadapter."},
                         "style": {"type": "string", "maxLength": 256},
-                        "content_mode": {"type": "string", "maxLength": 256},
-                        "input_type": {"type": "string", "enum": ["text", "image"]},
-                        "input_mode": {
-                            "type": "string",
-                            "enum": ["text-to-image", "image-edit", "image-to-image", "inpaint", "face-reference", "openpose-control"],
-                        },
-                        "prompt_granularity": {"$ref": "#/components/schemas/PromptGranularity"},
+                        "input_mode": {"type": "string", "enum": INPUT_MODES},
+                        "content_mode": {"$ref": "#/components/schemas/Deprecated"},
+                        "input_type": {"$ref": "#/components/schemas/Deprecated"},
+                        "prompt_granularity": {"$ref": "#/components/schemas/Deprecated"},
                         "workflow": {"type": "string"},
                         "include_unready": {"type": "boolean", "default": False},
                         "limit": {"type": "integer", "minimum": 1, "maximum": 20, "default": 1},
@@ -2239,7 +1906,7 @@ def _openapi_document() -> dict[str, Any]:
                         "workflow": {"type": "string"},
                         "workflow_id": {"type": "string"},
                         "parameters": {"$ref": "#/components/schemas/WorkflowParameters"},
-                        "prompt_granularity": {"$ref": "#/components/schemas/PromptGranularity"},
+                        "prompt_granularity": {"$ref": "#/components/schemas/Deprecated"},
                         "client_id": {"type": "string", "maxLength": 256},
                         "dry_run": {"type": "boolean", "default": False},
                     },
@@ -2341,11 +2008,13 @@ def _openapi_document() -> dict[str, Any]:
         "ignored_parameters": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
         "effective_parameters": {"type": "object"}, "resources": {"type": "object"},
         "warnings": {"type": "array", "items": {"$ref": "#/components/schemas/Warning"}},
+        "workflow": {"type": "string"},
+        "pose": {"type": ["object", "null"], "description": "The pose used, people_detected and skeleton_url; null without a pose."},
     }
     schemas["QueuedJob"] = {"type": "object", "required": ["prompt_id", "job_id", "job_url", "state", *common], "properties": {
         **common, "prompt_id": {"type": "string", "format": "uuid"},
         "job_id": {"type": "string", "format": "uuid", "description": "Compatibility alias, identical to prompt_id."},
-        "job_url": {"type": "string"}, "state": {"const": "queued"}, "workflow": {"type": "string"},
+        "job_url": {"type": "string"}, "state": {"const": "queued"},
     }}
     schemas["DryRun"] = {"type": "object", "required": ["prompt", "ready", "validated", *common], "properties": {
         **common, "prompt": {"type": "object"}, "ready": {"type": "boolean"}, "validated": {"type": "boolean"},
@@ -2885,12 +2554,13 @@ async def list_poses(request: web.Request) -> web.Response:
 
 async def list_routes(request: web.Request) -> web.Response:
     try:
-        query = _route_query(dict(request.query))
+        query, deprecated = _route_query(dict(request.query))
         result = _resolve_routes(
             _read_catalog(),
             query,
             include_unready=_query_boolean(request.query.get("include_unready"), "include_unready"),
             limit=_query_limit(request.query.get("limit"), default=10),
+            deprecated=deprecated,
         )
         return web.json_response(result)
     except ApiError as error:
@@ -2900,13 +2570,13 @@ async def list_routes(request: web.Request) -> web.Response:
 async def resolve_route(request: web.Request) -> web.Response:
     try:
         body = await _read_json(request)
-        query = _route_query(body)
+        query, deprecated = _route_query(body)
         include_unready = body.get("include_unready", False)
         if not isinstance(include_unready, bool):
             raise ApiError(400, "include_unready must be a boolean")
         limit = _as_int("limit", body.get("limit", 1), 1, 20)
         result = _resolve_routes(
-            _read_catalog(), query, include_unready=include_unready, limit=limit
+            _read_catalog(), query, include_unready=include_unready, limit=limit, deprecated=deprecated
         )
         return web.json_response(result)
     except ApiError as error:
@@ -3026,14 +2696,6 @@ async def get_workflow(request: web.Request) -> web.Response:
         return _json_error(error)
 
 
-def _validate_prompt_granularity(entry: dict[str, Any], body: dict[str, Any]) -> str | None:
-    requested = body.get("prompt_granularity")
-    if requested is None:
-        return None
-    requested = _normalise_granularity(requested)
-    return requested
-
-
 async def post_project_prompt(request: web.Request) -> web.Response:
     entry = None
     workflow_id = None
@@ -3045,7 +2707,6 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if "workflow" in body and "workflow_id" in body and body["workflow"] != body["workflow_id"]:
             raise ApiError(400, "workflow and workflow_id disagree")
         entry = _find_workflow(workflow_id)
-        requested_granularity = _validate_prompt_granularity(entry, body)
         pose_request = await asyncio.to_thread(_resolve_pose, entry, body)
         graph = _prepare_graph(entry, body, fit_report, pose_request)
         public = _public_entry(entry, _read_catalog().get("model_registry", []))
@@ -3072,7 +2733,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             applied["pose"] = pose_request.get("id") or pose_request.get("file")
             if pose_request["strength"] is not None:
                 applied["pose_strength"] = pose_request["strength"]
-        warnings = []
+        warnings = _deprecation_warnings([name for name in ("prompt_granularity",) if name in body])
         for record in fit_report:
             original, used, name = record["original_size"], record["used_size"], record["parameter"]
             if record["first_frame"]:
@@ -3088,7 +2749,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             warnings.append({"code": "over_pixel_budget", "parameter": "total_pixels",
                              "value": resources["total_pixels"], "recommended": [0, resources["limits"]["max_total_pixels"]],
                              "message": f"{resources['total_pixels']} total pixels exceeds the tested budget of {resources['limits']['max_total_pixels']} for {workflow_id}; the job was kept but may be slow or fail with out_of_memory."})
-        if effective.get("cfg") == 1 and "negative_prompt" in entry["bindings"]:
+        if effective.get("cfg") == 1 and "negative_prompt" in _request_parameters(body):
             warnings.append({"code": "negative_prompt_inactive", "parameter": "negative_prompt", "message": "At CFG 1 the sampler skips negative conditioning; negative_prompt has no effect at this setting."})
         for name, interval in entry.get("agent_hints", {}).get("recommended", {}).items():
             if name not in effective or not isinstance(interval, (list, tuple)) or len(interval) != 2:
@@ -3100,7 +2761,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         if dry_run:
             return web.json_response(
                 {
-                    "workflow": public,
+                    "workflow": entry["id"],
                     "ready": public["ready"],
                     "missing_files": public["missing_files"],
                     "validated": valid is not None,
@@ -3109,7 +2770,6 @@ async def post_project_prompt(request: web.Request) -> web.Response:
                     "ignored_parameters": [],
                     "resources": resources,
                     "warnings": warnings,
-                    "prompt_granularity": requested_granularity,
                     "pose": _pose_summary(pose_request),
                     "prompt": graph,
                 }
@@ -3119,7 +2779,6 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         result = await _enqueue(PromptServer.instance, graph, client_id, workflow_id, resources, valid)
         queued = True  # the job now owns its fitted inputs and deletes them when it ends
         result["workflow"] = entry["id"]
-        result["prompt_granularity"] = requested_granularity
         result["job_url"] = f"/project/jobs/{result['prompt_id']}"
         result["effective_parameters"] = effective
         result["applied_parameters"] = applied

@@ -172,7 +172,6 @@
         "natural-language",
         "text-to-image"
       ],
-      "content_class": "general",
       "file": "qwen_image_2_1_t2i.json",
       "model_ids": [
         "qwen-image-2.1-diffusion",
@@ -221,22 +220,8 @@
           "documentary photo",
           "cinematic photo"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
         "priority": 30,
-        "exclusive": true,
-        "prompt_granularity": {
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "recommended": "detailed"
-        }
+        "exclusive": true
       },
       "capabilities": {
         "modalities": [
@@ -253,12 +238,6 @@
         ],
         "natural_language": true,
         "prompt_dialect": "natural-language",
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "recommended_resolutions": [
           "1024x1024"
@@ -359,7 +338,6 @@
         "image_to_image": false
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "recommended": {
           "steps": [
             25,
@@ -433,7 +411,7 @@
       },
       "selection": {
         "best_for": [
-          "general-purpose SFW and NSFW images of real-world subjects: photos, products, food, landscapes, architecture",
+          "general-purpose images of real-world subjects: photos, products, food, landscapes, architecture",
           "short or terse prompts (it stays anatomically clean where MOSS-Image does not)",
           "recognisable real places and regional detail",
           "posters and legible text inside the image, including Chinese calligraphy, without invented extra text"
@@ -466,7 +444,6 @@
         "natural-language",
         "image-edit"
       ],
-      "content_class": "general",
       "file": "qwen_image_2_1_edit.json",
       "model_ids": [
         "qwen-image-2.1-diffusion",
@@ -496,27 +473,10 @@
           "qwen",
           "qwen image 2.1"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
         "priority": 30,
         "exclusive": false,
         "required_selectors": [
           "input_mode"
-        ],
-        "prompt_granularity": {
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "recommended": "detailed"
-        },
-        "input_types": [
-          "image"
         ]
       },
       "capabilities": {
@@ -536,12 +496,6 @@
         ],
         "natural_language": true,
         "prompt_dialect": "natural-language",
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "recommended_resolutions": [
           "1024x1024"
@@ -642,7 +596,6 @@
         "image_to_image": true
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "recommended": {
           "steps": [
             25,
@@ -746,7 +699,6 @@
         "text-rendering",
         "text-to-image"
       ],
-      "content_class": "general",
       "file": "moss_image_sft.json",
       "model_ids": [
         "moss-image-sft-transformer",
@@ -794,20 +746,8 @@
           "ui mockup",
           "flat ui"
         ],
-        "content_modes": [
-          "sfw",
-          "general"
-        ],
         "priority": 30,
-        "exclusive": true,
-        "prompt_granularity": {
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "recommended": "detailed"
-        }
+        "exclusive": true
       },
       "capabilities": {
         "modalities": [
@@ -829,11 +769,6 @@
           "tags",
           "layout-json"
         ],
-        "content_modes": [
-          "sfw",
-          "general"
-        ],
-        "nsfw_capable": false,
         "lora_support": false,
         "recommended_resolutions": [
           "1024x1024",
@@ -930,7 +865,6 @@
         "image_to_image": false
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "recommended": {
           "steps": [
             50,
@@ -946,6 +880,7 @@
         "negative_prompt": "Active at CFG 3. Empty by default; the publisher suggests 'worst quality, bad anatomy, watermark, jpeg artifact'.",
         "size": "Width and height should be multiples of 16; other values are floored to 16 by the latent node.",
         "layout": "For exact placement, pass a JSON object as the prompt string: {\"summary\": {\"caption\": ...}, \"items\": [{\"label\", \"caption\", \"text\"?, \"bbox\": [y_min, x_min, y_max, x_max]}], \"bbox_format\": \"yxyx\", \"bbox_coord_space\": \"abs_centralized\"}. Coordinates are integer pixels with the canvas centre as origin (x right, y down), so a 1024 square spans -512..512 on both axes.",
+        "layout_example": "For a 1024x1024 poster with the title across the top centre and an umbrella at the bottom left, send this string as the prompt: {\"summary\": {\"caption\": \"A bright summer sale poster on a sunny beach with bold title typography.\"}, \"items\": [{\"label\": \"title\", \"caption\": \"Bold white headline with an orange outline\", \"text\": \"SUMMER SALE\", \"bbox\": [-460, -360, -300, 360]}, {\"label\": \"beach umbrella\", \"caption\": \"A striped beach umbrella standing in the sand\", \"bbox\": [100, -480, 480, -120]}], \"bbox_format\": \"yxyx\", \"bbox_coord_space\": \"abs_centralized\"}",
         "prompt_length": "Write at least one full descriptive sentence (subject, setting, lighting, style). Terse prompts underperform at CFG 3; the publisher notes they may need a higher CFG."
       },
       "prompting": {
@@ -1019,8 +954,7 @@
         "not_for": [
           "short prompts: a bare subject such as 'a cat' can produce deformed anatomy; use qwen-image-2.1-t2i or expand the prompt",
           "editing an uploaded image (use qwen-image-2.1-edit)",
-          "everyday anime (the anime routes are 5-10x faster and NSFW-capable)",
-          "NSFW requests (not advertised)"
+          "everyday anime (the anime routes are 5-10x faster)"
         ],
         "prefer_instead": [
           {
@@ -1040,10 +974,8 @@
         "anime",
         "anima",
         "fast",
-        "fallback",
-        "nsfw-capable"
+        "fallback"
       ],
-      "content_class": "anime-nsfw-capable",
       "file": "moody_anima_mix_minimal.json",
       "model_ids": [
         "moody-anima-mix-checkpoint",
@@ -1054,11 +986,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -1081,21 +1010,6 @@
           "stylized",
           "anima"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 25,
         "fallback": true,
         "exclusive": false,
@@ -1129,23 +1043,8 @@
           "portrait",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
         "prompt_dialect": "natural-language-or-light-anime-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "weak; no character-specific adapter is bundled",
         "style_control": "medium",
@@ -1232,7 +1131,7 @@
           "generic anime illustration",
           "generic anime portrait",
           "fast low-step generation",
-          "SFW or NSFW-capable anime prompts without a dedicated identity route"
+          "anime prompts without a dedicated identity route"
         ],
         "not_for": [
           "exact DeepSeek whale girl identity",
@@ -1245,8 +1144,7 @@
           "anime fallback",
           "fast",
           "Anima",
-          "minimal prompt",
-          "SFW/NSFW-capable"
+          "minimal prompt"
         ],
         "specific_route_precedence": [
           "moody-anima-inpaint",
@@ -1263,7 +1161,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "minimal",
         "prompt_scope": "Describe subject, action, composition, environment and lighting in natural language. Add concise anime style tags only when useful; do not invent an identity trigger because this route has no character adapter.",
         "optional_fields": [
           "character",
@@ -1272,13 +1169,12 @@
           "environment",
           "outfit",
           "lighting",
-          "style",
-          "content_mode"
+          "style"
         ],
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "input_image": "Optional reference image is accepted through input_image for latent image-to-image; use denoise to control adherence.",
         "avoid": [
-          "routing explicit DeepSeek whale girl or NIKKE identity requests here",
+          "routing named DeepSeek whale girl or NIKKE requests here",
           "SDXL-specific LoRA trigger words",
           "assuming the base checkpoint alone guarantees a named character likeness",
           "requesting the optional reference-workflow upscale branch through this minimal route"
@@ -1314,18 +1210,6 @@
           "lighting",
           "style"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use minimal for ordinary requests; use structured or detailed only when the user specifies composition, outfit, camera or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "recommended": {
           "width": 960,
           "height": 1472,
@@ -1441,10 +1325,8 @@
         "anima",
         "inpaint",
         "masked-edit",
-        "clothing-edit",
-        "nsfw-capable"
+        "clothing-edit"
       ],
-      "content_class": "anime-nsfw-capable",
       "file": "moody_anima_inpaint.json",
       "model_ids": [
         "moody-anima-mix-checkpoint",
@@ -1455,11 +1337,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -1481,28 +1360,9 @@
           "wardrobe replacement",
           "局部重绘"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "input_types": [
-          "image",
-          "mask"
-        ],
         "input_modes": [
           "inpaint"
         ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 60,
         "fallback": false,
         "exclusive": false,
@@ -1537,25 +1397,10 @@
           "masked edit",
           "clothing edit"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
         "inpaint_support": true,
         "mask_support": true,
         "prompt_dialect": "short-natural-language-or-light-anime-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "weak; no character-specific adapter is bundled",
         "style_control": "medium",
@@ -1680,7 +1525,6 @@
         "specific_route_precedence": []
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "minimal",
         "prompt_scope": "Describe only the desired replacement in the masked region plus a short preservation cue. Keep the prompt short; explicitly add 1girl, solo when a reference sheet could induce multiple views.",
         "optional_fields": [
           "mask_channel",
@@ -1731,18 +1575,6 @@
           "color/material",
           "short preservation cue"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use minimal for clothing changes; add structured details only for material, color, fit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "recommended": {
           "steps": 4,
           "cfg": 1.0,
@@ -1859,10 +1691,8 @@
         "sdxl",
         "face-reference",
         "ipadapter",
-        "portrait",
-        "nsfw-capable"
+        "portrait"
       ],
-      "content_class": "anime-nsfw-capable",
       "file": "sdxl_face_reference_ipadapter.json",
       "model_ids": [
         "animagine-xl-3.1-checkpoint",
@@ -1873,11 +1703,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -1902,27 +1729,9 @@
           "portrait identity",
           "portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "input_types": [
-          "image"
-        ],
         "input_modes": [
           "face-reference"
         ],
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
         "priority": 70,
         "fallback": false,
         "exclusive": false,
@@ -1958,16 +1767,6 @@
           "face-reference",
           "gacha illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
         "ipadapter_support": true,
         "face_only": true,
@@ -1982,11 +1781,6 @@
           "pixel identity guarantee"
         ],
         "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "medium; face-centric reference conditioning, not FaceID recognition",
         "style_control": "medium",
@@ -2066,7 +1860,7 @@
         "best_for": [
           "face-centric reference portraits",
           "keeping a supplied face while changing the scene or outfit",
-          "SFW or NSFW-capable SDXL anime generation with a portrait reference"
+          "SDXL anime generation with a portrait reference"
         ],
         "not_for": [
           "local clothing edits",
@@ -2084,7 +1878,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered SDXL tags for subject count, character, series, appearance, outfit, pose, camera, scene and lighting. The face image supplies an additional face-centric cue.",
         "optional_fields": [
           "negative_prompt",
@@ -2138,18 +1931,6 @@
           "scene",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use detailed for a normal character request; keep the reference-image role face-centric and put outfit/pose/scene details in the prompt.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
           "width": 832,
@@ -2261,7 +2042,7 @@
     {
       "id": "moody-desire-v30",
       "name": "Moody Desire Mix v3.0",
-      "description": "Flux.2/Klein-style low-step workflow for the installed Moody Desire checkpoint; the route is marked SFW/NSFW-capable and accepts concise natural-language prompts.",
+      "description": "Flux.2/Klein-style low-step workflow for the installed Moody Desire checkpoint; accepts concise natural-language prompts.",
       "family": "flux2-klein",
       "resident_group": "flux2-klein-moody-desire",
       "tags": [
@@ -2269,7 +2050,6 @@
         "portrait",
         "moody"
       ],
-      "content_class": "general-nsfw-capable",
       "file": "moody_desire_v30_minimal.json",
       "model_ids": [
         "moody-desire-v30-checkpoint",
@@ -2280,11 +2060,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -2303,21 +2080,6 @@
           "stylized",
           "moody"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 10,
         "fallback": true,
         "exclusive": false
@@ -2343,23 +2105,8 @@
           "portrait",
           "stylized"
         ],
-        "content_levels": [
-          "general",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
         "lora_support": false,
         "prompt_dialect": "natural-language",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "base-model style only; no character adapter",
         "style_control": "medium",
@@ -2447,8 +2194,7 @@
       "selection": {
         "best_for": [
           "fast general anime portraits",
-          "low-step Flux.2/Klein generation",
-          "general SFW/NSFW-capable anime or portrait prompts"
+          "low-step Flux.2/Klein generation"
         ],
         "not_for": [
           "SDXL-specific LoRAs",
@@ -2458,12 +2204,10 @@
           "fast",
           "portrait",
           "Flux.2",
-          "Klein",
-          "NSFW-capable"
+          "Klein"
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "minimal",
         "prompt_scope": "Describe the main subject, action, composition, environment and lighting in short natural language.",
         "optional_fields": [
           "action",
@@ -2503,18 +2247,6 @@
           "lighting",
           "style"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use minimal for speed; add structured or detailed blocks only when composition needs them.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "negative_prompt_supported": false,
         "notes": [
           "This graph exposes only a positive prompt; do not assume a negative_prompt binding.",
@@ -2598,17 +2330,15 @@
     {
       "id": "animagine-xl-3.1-nsfw",
       "name": "Animagine XL 3.1 - NIKKE (optional Rapi adapter)",
-      "description": "Anime/NSFW-capable SDXL workflow using Animagine XL 3.1 with NIKKE profile and Rapi LoRAs.",
+      "description": "Anime SDXL workflow using Animagine XL 3.1 with NIKKE profile and Rapi LoRAs.",
       "family": "sdxl",
       "resident_group": "sdxl-animagine31-nikke",
       "tags": [
         "anime",
         "sdxl",
         "nikke",
-        "rapi",
-        "nsfw"
+        "rapi"
       ],
-      "content_class": "nsfw-capable",
       "file": "animagine_xl_3_1_nsfw.json",
       "model_ids": [
         "animagine-xl-3.1-checkpoint",
@@ -2619,11 +2349,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "nikke",
@@ -2641,21 +2368,6 @@
           "danbooru",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true
@@ -2685,22 +2397,8 @@
           "NIKKE",
           "Rapi"
         ],
-        "content_levels": [
-          "general",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
         "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "LoRA-assisted; Rapi identity depends on the selected Rapi trigger",
         "style_control": "profile LoRA plus tags",
@@ -2807,7 +2505,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered comma-separated tags and include the series, character, appearance, outfit trigger, pose and camera/scene details.",
         "optional_fields": [
           "outfit",
@@ -2857,18 +2554,6 @@
           "scene",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use expert only when supplying adapter triggers, weights and tuned sampler settings; detailed is the normal character request.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
           "width": 832,
@@ -3037,10 +2722,8 @@
         "anima",
         "turbo",
         "official",
-        "bf16",
-        "nsfw-capable"
+        "bf16"
       ],
-      "content_class": "anime-nsfw-capable",
       "file": "anima_turbo_v1_1.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -3056,11 +2739,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -3084,21 +2764,6 @@
           "anima",
           "turbo"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 40,
         "fallback": true,
         "exclusive": false,
@@ -3132,23 +2797,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "weak-to-medium from prompt; no character-specific adapter is bundled",
@@ -3232,7 +2882,7 @@
           "generic anime illustration",
           "generic anime portrait",
           "official Anima comparison against Moody",
-          "SFW or NSFW-capable anime prompts without a dedicated identity route"
+          "anime prompts without a dedicated identity route"
         ],
         "not_for": [
           "exact DeepSeek whale girl identity",
@@ -3264,7 +2914,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Use a concise ordered prompt: quality/meta tags, subject count, character or subject, series, appearance, outfit, pose, composition, environment and lighting. The model accepts both natural language and Danbooru-style tags.",
         "optional_fields": [
           "character",
@@ -3275,8 +2924,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -3321,18 +2969,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -3444,10 +3080,8 @@
         "anima",
         "turbo",
         "deepseek",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "deepseek_whale_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -3465,11 +3099,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "deepseek",
@@ -3498,21 +3129,6 @@
           "illustration",
           "ZipZipPipe"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -3545,23 +3161,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'deepseek_whale_girl_zipzippipe' plus her identity tags",
@@ -3654,7 +3255,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, deepseek_whale_girl_zipzippipe, 1girl, solo, adult', then her identity tags (blue hair, very long hair, gradient blue hair, whale fin ears, blue hair bows, cetacean tail, blue eyes), then outfit, pose, scene. For the maid design add 'deepseek_maid_outfit_zipzippipe, maid, maid headdress' and one skirt length (long skirt / midi skirt / mini skirt). Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -3665,8 +3265,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -3714,18 +3313,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -3859,10 +3446,8 @@
         "anima",
         "turbo",
         "claude",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "claude_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -3880,11 +3465,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "claude girl",
@@ -3906,21 +3488,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -3954,23 +3521,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'ors scholar' plus her identity tags",
@@ -4056,7 +3608,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, ors scholar, 1girl, solo, adult, orange hair, very long hair, orange eyes, hair flower, orange flower, black hair bow', then outfit (white dress, black corset, white capelet, gold chain, long skirt is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -4067,8 +3618,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -4115,18 +3665,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -4259,10 +3797,8 @@
         "anima",
         "turbo",
         "chatgpt",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "chatgpt_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -4280,11 +3816,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "chatgpt",
@@ -4307,21 +3840,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -4354,23 +3872,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'Chatgpt_dragon_girl' plus her identity tags",
@@ -4456,7 +3959,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, Chatgpt_dragon_girl, 1girl, solo, adult, dragon girl, white hair, long hair, white horns, dragon horns, pointy ears, purple eyes, ahoge, hair ornament, dragon wings, dragon tail', then outfit (white dress is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -4467,8 +3969,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -4517,18 +4018,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -4661,10 +4150,8 @@
         "anima",
         "turbo",
         "qwen",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "qwen_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -4682,11 +4169,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "qwen girl",
@@ -4707,21 +4191,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -4754,23 +4223,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'qwen \\(girl\\)' plus her identity tags",
@@ -4856,7 +4310,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, qwen \\(girl\\), 1girl, solo, adult, purple hair, blue hair, very long hair, wavy hair, braid, purple eyes', then outfit (white dress, chinese clothes, gold trim, robe, long sleeves, wide sleeves is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -4867,8 +4320,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -4917,18 +4369,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -5061,10 +4501,8 @@
         "anima",
         "turbo",
         "gemini",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "gemini_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -5082,11 +4520,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "gemini girl",
@@ -5107,21 +4542,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -5155,23 +4575,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'gemini_ai' plus her identity tags",
@@ -5257,7 +4662,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, gemini_ai, 1girl, solo, adult, blue hair, purple hair, gradient hair, long hair, hair bun, ahoge, cat ears, animal ear fluff, heterochromia, red right eye, golden left eye, star-shaped hair ornament', then outfit (sleeveless crop top, black skirt, detached sleeves is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -5268,8 +4672,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -5318,18 +4721,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -5462,10 +4853,8 @@
         "anima",
         "turbo",
         "glm",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "glm_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -5483,11 +4872,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "glm girl",
@@ -5509,21 +4895,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -5556,23 +4927,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'aigirls, aigirls（glm）' plus her identity tags",
@@ -5660,7 +5016,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, aigirls, aigirls（glm）, 1girl, solo, adult, black hair, very long hair, black eyes, fox ears, fox tail, sleep mask, Z hair ornament, hair bell, white lace headdress, tassel', then outfit (white blouse, frilled sleeves, frilled collar, black ribbon, black corset, white gem, chain, black long skirt, frills, white pleated skirt, white lace-up boots is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -5671,8 +5026,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -5719,18 +5073,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -5863,10 +5205,8 @@
         "anima",
         "turbo",
         "grok",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "grok_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -5884,11 +5224,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "grok girl",
@@ -5907,21 +5244,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -5954,23 +5276,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'aigirls, aigirls（grok）' plus her identity tags",
@@ -6058,7 +5365,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, aigirls, aigirls（grok）, 1girl, solo, adult, blonde hair, very long hair, twintails, ahoge, blue eyes, slit pupils, pointy ears, fang, vampire, black crown, gold crescent, bat wings, black hair bow', then outfit (black dress, wine red high collar, black lace choker, off shoulder, gold chain, frills, high-low skirt, red lining, black pantyhose is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -6069,8 +5375,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -6117,18 +5422,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -6261,10 +5554,8 @@
         "anima",
         "turbo",
         "kimi",
-        "character-lora",
-        "nsfw-capable"
+        "character-lora"
       ],
-      "content_class": "anime-character-nsfw-capable",
       "file": "kimi_girl_anima_turbo.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -6282,11 +5573,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "kimi girl",
@@ -6306,21 +5594,6 @@
           "anime illustration",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 100,
         "fallback": false,
         "exclusive": true,
@@ -6353,23 +5626,8 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "precision": "bf16 published weights",
         "character_identity": "LoRA-assisted; trigger 'aigirls, aigirls（kimi）' plus her identity tags",
@@ -6457,7 +5715,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Start with 'masterpiece, best quality, aigirls, aigirls（kimi）, 1girl, solo, adult, white hair, very long hair, wavy hair, gradient hair, light blue hair tips, blue eyes, maid headdress, navy hair bow, crescent hair ornament', then outfit (letter K pendant, white frilled blouse, long sleeves, navy corset, navy starry cloak, star print, white layered skirt, frilled skirt, white pantyhose, navy high heels is her own), pose, scene and lighting. Write her as an adult woman: keep 'adult' in the prompt and never add age-lowering tags (loli, child, petite body descriptors aimed at youth).",
         "optional_fields": [
           "character",
@@ -6468,8 +5725,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -6516,18 +5772,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -6661,10 +5905,8 @@
         "turbo",
         "ipadapter",
         "face-reference",
-        "character-reference",
-        "nsfw-capable"
+        "character-reference"
       ],
-      "content_class": "anime-nsfw-capable",
       "file": "anima_turbo_face_reference_ipadapter.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -6687,11 +5929,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -6717,27 +5956,9 @@
           "portrait",
           "anima"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "input_types": [
-          "image"
-        ],
         "input_modes": [
           "face-reference"
         ],
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
         "priority": 85,
         "fallback": false,
         "exclusive": false,
@@ -6773,16 +5994,6 @@
           "portrait",
           "face-reference"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
         "ipadapter_support": true,
         "face_reference": true,
@@ -6801,11 +6012,6 @@
           "FaceID embedding identity"
         ],
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": true,
         "character_identity": "medium; experimental Anima IPAdapter reference conditioning, not FaceID recognition",
         "style_control": "medium",
@@ -6888,7 +6094,7 @@
         "best_for": [
           "Anima-native face or character reference",
           "keeping facial cues while changing outfit, pose or scene",
-          "SFW or NSFW-capable prompts with a supplied portrait reference"
+          "prompts with a supplied portrait reference"
         ],
         "not_for": [
           "local clothing edits",
@@ -6906,7 +6112,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use ordered Anima tags or concise prose for subject count, character/series, appearance, outfit, pose, camera, scene and lighting. The face_image is an additional reference, not a replacement for the prompt.",
         "optional_fields": [
           "negative_prompt",
@@ -6963,18 +6168,6 @@
           "scene",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use detailed for ordinary face-reference requests; use expert only when tuning adapter weight, sampling or tag emphasis.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "width": 896,
@@ -7097,10 +6290,8 @@
         "anima",
         "turbo",
         "inpaint",
-        "masked-edit",
-        "nsfw-capable"
+        "masked-edit"
       ],
-      "content_class": "anime-nsfw-capable",
       "file": "anima_turbo_inpaint.json",
       "model_ids": [
         "anima-turbo-v1-1-checkpoint",
@@ -7111,11 +6302,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "general",
@@ -7134,28 +6322,9 @@
           "wardrobe replacement",
           "局部重绘"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "input_types": [
-          "image",
-          "mask"
-        ],
         "input_modes": [
           "inpaint"
         ],
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ]
-        },
         "priority": 90,
         "fallback": false,
         "exclusive": false,
@@ -7190,25 +6359,10 @@
           "masked edit",
           "clothing edit"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
         "inpaint_support": true,
         "mask_support": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "weak; no character-specific adapter is bundled",
         "style_control": "medium",
@@ -7326,7 +6480,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "structured",
         "prompt_scope": "Use a concise ordered prompt: quality/meta tags, subject count, character or subject, series, appearance, outfit, pose, composition, environment and lighting. The model accepts both natural language and Danbooru-style tags.",
         "optional_fields": [
           "character",
@@ -7337,8 +6490,7 @@
           "pose",
           "composition",
           "environment",
-          "lighting",
-          "content_mode"
+          "lighting"
         ],
         "quality_prefix": "masterpiece, best quality",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
@@ -7385,18 +6537,6 @@
           "environment",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed",
-          "accepted": [
-            "minimal",
-            "structured",
-            "detailed"
-          ],
-          "selection_hint": "Use structured for normal character requests; use detailed only when the caller specifies multiple composition, outfit or lighting constraints.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality",
         "recommended": {
           "steps": 12,
@@ -7513,10 +6653,8 @@
         "illustrious",
         "janku",
         "mainstream-anime",
-        "detailed-background",
-        "nsfw-capable"
+        "detailed-background"
       ],
-      "content_class": "anime-illustration-nsfw-capable",
       "file": "janku_illustrious.json",
       "model_ids": [
         "janku-v7-77"
@@ -7528,11 +6666,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "anime",
@@ -7566,33 +6701,13 @@
           "illustration",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_mode_preferences": {
-          "nsfw": 90,
-          "sfw": -10,
-          "general": -10
-        },
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
         "priority": 30,
         "fallback": false,
         "exclusive": false,
         "strict_style": false,
         "explicit_only": false,
         "exclusion_rules": [
-          "Do not use this generic route for explicit DeepSeek whale girl, NIKKE, face-reference, OpenPose or inpaint requirements; those capability-specific routes take precedence."
+          "Do not use this route for named DeepSeek whale girl or NIKKE requests, or for face-reference or inpaint requests; those routes take precedence."
         ]
       },
       "capabilities": {
@@ -7631,22 +6746,8 @@
           "anime portraits",
           "illustration"
         ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
         "prompt_dialect": "illustrious-noobai-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "strong character-tag knowledge without a trigger word; more mature default face; weaker artist-tag knowledge than v5 (author note)",
         "style_control": "strong for mainstream modern anime with detailed, cinematic backgrounds",
@@ -7720,7 +6821,7 @@
       },
       "selection": {
         "best_for": [
-          "generic NSFW anime when no specialized capability or style is requested (default JANKU route)",
+          "the default JANKU version when JANKU is named without a version",
           "mainstream modern anime: TV-anime and key-visual look",
           "scenes where background and lighting matter: detailed environments, cinematic light",
           "characters whose default face should read as an adult",
@@ -7728,7 +6829,7 @@
         ],
         "not_for": [
           "visual novel / galge / bishoujo-game CG look, soft delicate faces or artist-tag-driven styles (use janku-v5-illustrious)",
-          "explicit DeepSeek whale girl or NIKKE identity/style routes",
+          "named DeepSeek whale girl or NIKKE requests (they have their own routes)",
           "face-reference, OpenPose or inpaint requests",
           "requests requiring optional detailers, embeddings or LoRAs"
         ],
@@ -7763,7 +6864,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use normal Illustrious quality tags, then ordered Danbooru/NoobAI tags: subject count, character, appearance, outfit, pose, camera, scene and lighting. Describe the background; this model renders detailed environments well. Artist tags work less reliably than on v5. If output drifts semi-realistic, add 'realistic, photorealistic, 3d' to the negative prompt. No trigger word is required.",
         "optional_fields": [
           "character",
@@ -7777,7 +6877,7 @@
         ],
         "avoid": [
           "injecting sexual terms into a caller prompt",
-          "using this generic route for explicit capability-specific requests",
+          "using this route when the request needs inpaint or face reference (those routes take precedence)",
           "adding optional LoRAs or embeddings that are not declared by this route"
         ],
         "suggested_prompt_details": [
@@ -7806,7 +6906,6 @@
         "JANKU v7.77 is a new JANKU + Chenkin v0.2 base exposed through the canonical single-file SDXL/Illustrious checkpoint loader (epsilon prediction).",
         "The author notes thicker linework, more detailed backgrounds and less artist knowledge than earlier JANKU versions; artist tags may have weaker effect than on v5.",
         "No trigger word, optional embedding, detailer or LoRA is required by the route.",
-        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text.",
         "JANKU v5.0 stays available as janku-v5-illustrious with a different house style (visual novel); selection.prefer_instead says when to switch."
       ],
       "prompting": {
@@ -7823,18 +6922,6 @@
           "scene",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
           "width": 1024,
@@ -7855,9 +6942,9 @@
             "prompt": "masterpiece, best quality, very aesthetic, absurdres, 1girl, solo, adult, black hair, ponytail, white blouse, cafe interior, morning sunlight through window, detailed background, depth of field, looking at viewer, upper body"
           }
         ],
-        "content_modes": {
-          "sfw": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
-          "nsfw": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
+        "content_lines": {
+          "safe": "Add 'safe' after the quality tags and 'nsfw, explicit, underwear, lingerie, see-through' to the negative prompt.",
+          "explicit": "Add 'nsfw' (or 'explicit') after the quality tags; keep those words out of the negative prompt."
         }
       },
       "source": {
@@ -7955,10 +7042,8 @@
         "janku",
         "visual-novel",
         "galge",
-        "glossy",
-        "nsfw-capable"
+        "glossy"
       ],
-      "content_class": "anime-illustration-nsfw-capable",
       "file": "janku_v5_illustrious.json",
       "model_ids": [
         "janku-v5"
@@ -7970,11 +7055,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "anime",
@@ -8012,33 +7094,13 @@
           "anime portrait",
           "illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_mode_preferences": {
-          "nsfw": 90,
-          "sfw": -10,
-          "general": -10
-        },
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
         "priority": 29,
         "fallback": false,
         "exclusive": false,
         "strict_style": false,
         "explicit_only": false,
         "exclusion_rules": [
-          "Do not use this generic route for explicit DeepSeek whale girl, NIKKE, face-reference, OpenPose or inpaint requirements; those capability-specific routes take precedence."
+          "Do not use this route for named DeepSeek whale girl or NIKKE requests, or for face-reference or inpaint requests; those routes take precedence."
         ]
       },
       "capabilities": {
@@ -8078,22 +7140,8 @@
           "anime portraits",
           "illustration"
         ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
         "prompt_dialect": "illustrious-noobai-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "strongest character and artist-tag knowledge of the JANKU routes (RouWei tag set, by artistname); default face reads young",
         "style_control": "strong for the soft, glossy visual-novel character look",
@@ -8189,8 +7237,8 @@
         ],
         "not_for": [
           "mainstream modern anime or scenes needing detailed backgrounds (use janku-illustrious)",
-          "generic NSFW anime with no style request (janku-illustrious is the default)",
-          "explicit DeepSeek whale girl or NIKKE identity/style routes",
+          "generic anime with no style request (anima-turbo-v1-1 handles it)",
+          "named DeepSeek whale girl or NIKKE requests (they have their own routes)",
           "face-reference, OpenPose or inpaint requests",
           "requests requiring optional detailers, embeddings or LoRAs"
         ],
@@ -8225,7 +7273,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use Illustrious quality tags, then ordered Danbooru/NoobAI tags: subject count, character, series, appearance, outfit, pose, camera, scene and lighting. Artist tags work well here ('by artistname'). The default face reads young (author note): when a character is an adult, and always for NSFW content, say so with tags such as 'adult, mature female' instead of relying on the default face. No trigger word is required.",
         "optional_fields": [
           "character",
@@ -8239,7 +7286,7 @@
         ],
         "avoid": [
           "injecting sexual terms into a caller prompt",
-          "using this generic route for explicit capability-specific requests",
+          "using this route when the request needs inpaint or face reference (those routes take precedence)",
           "adding optional LoRAs or embeddings that are not declared by this route",
           "relying on the default face for adult characters; state adulthood explicitly"
         ],
@@ -8268,8 +7315,7 @@
       "compatibility_notes": [
         "JANKU v5.0 is exposed through the canonical single-file SDXL/Illustrious checkpoint loader.",
         "Kept deliberately alongside JANKU v7.77 (janku-illustrious): same family, different house style. v6.0+ made the default face more mature and v7.77 rebased on Chenkin v0.2 with thicker lines (author notes).",
-        "No trigger word, optional embedding, detailer or LoRA is required by the route.",
-        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
+        "No trigger word, optional embedding, detailer or LoRA is required by the route."
       ],
       "prompting": {
         "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
@@ -8285,18 +7331,6 @@
           "scene",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use detailed for normal anime requests; use expert when tuning tag weights or complex composition.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality, very aesthetic, absurdres",
         "recommended": {
           "width": 1024,
@@ -8413,10 +7447,8 @@
         "one-obsession",
         "texture",
         "dramatic-lighting",
-        "2.5d",
-        "nsfw-capable"
+        "2.5d"
       ],
-      "content_class": "anime-illustration-nsfw-capable",
       "file": "one_obsession.json",
       "model_ids": [
         "one-obsession-v24"
@@ -8428,11 +7460,8 @@
         "selector_scope": "workflow-model",
         "selector_fields": [
           "domain",
-          "content_mode",
           "style",
-          "input_type",
-          "input_mode",
-          "prompt_granularity"
+          "input_mode"
         ],
         "domains": [
           "anime",
@@ -8460,33 +7489,13 @@
           "anime portrait",
           "stylized"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "content_mode_preferences": {
-          "nsfw": 70,
-          "sfw": -10,
-          "general": -10
-        },
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ]
-        },
         "priority": 25,
         "fallback": false,
         "exclusive": false,
         "strict_style": false,
         "explicit_only": false,
         "exclusion_rules": [
-          "Do not use this generic route for explicit DeepSeek whale girl, NIKKE, face-reference, OpenPose or inpaint requirements; those capability-specific routes take precedence."
+          "Do not use this route for named DeepSeek whale girl or NIKKE requests, or for face-reference or inpaint requests; those routes take precedence."
         ]
       },
       "capabilities": {
@@ -8524,22 +7533,8 @@
           "anime portraits",
           "illustration"
         ],
-        "content_levels": [
-          "sfw",
-          "nsfw-capable"
-        ],
-        "nsfw_capable": true,
         "lora_support": false,
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
         "prompt_dialect": "illustrious-noobai-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "strong stylized character illustration from tags without a required trigger word",
         "style_control": "strong for rich texture, dramatic light/shadow and polished 2D/2.5D rendering",
@@ -8613,14 +7608,14 @@
       },
       "selection": {
         "best_for": [
-          "explicit One Obsession v24 requests",
+          "requests that name One Obsession v24",
           "stylized 2D/2.5D anime",
           "texture-focused polished character portraits",
           "dramatic light and shadow",
           "high-contrast glossy anime illustration"
         ],
         "not_for": [
-          "explicit DeepSeek whale girl or NIKKE identity/style routes",
+          "named DeepSeek whale girl or NIKKE requests (they have their own routes)",
           "face-reference, OpenPose or inpaint requests",
           "requests requiring optional LoRAs or detailers"
         ],
@@ -8648,7 +7643,6 @@
         ]
       },
       "agent_hints": {
-        "recommended_prompt_granularity": "detailed",
         "prompt_scope": "Use Illustrious/NoobAI-style tags with a quality prefix, subject count, character/appearance, outfit, pose, camera, scene and lighting. Quality tags improve consistency; no trigger word is required.",
         "optional_fields": [
           "character",
@@ -8663,7 +7657,7 @@
         "avoid": [
           "injecting sexual terms into a caller prompt",
           "forcing a 2D-only negative prompt",
-          "using this generic route for explicit capability-specific requests",
+          "using this route when the request needs inpaint or face reference (those routes take precedence)",
           "adding a LoRA that is not declared by this route"
         ],
         "suggested_prompt_details": [
@@ -8691,8 +7685,7 @@
       "compatibility_notes": [
         "This route is pinned to One Obsession v24 (2.5D texture refresh per the author); newer versions are adopted only by an explicit catalog update.",
         "The checkpoint is loaded as a normal single-file SDXL/Illustrious model and requires no LoRA.",
-        "The model supports anime through mildly 2.5D rendering; caller prompts control the final subject and content.",
-        "The route is SFW/NSFW-capable as a capability declaration; it does not mutate prompt text."
+        "The model supports anime through mildly 2.5D rendering; caller prompts control the final subject and content."
       ],
       "prompting": {
         "style": "comma-separated Illustrious/NoobAI/Danbooru-style tags",
@@ -8708,18 +7701,6 @@
           "scene",
           "lighting"
         ],
-        "granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert",
-          "accepted": [
-            "structured",
-            "detailed",
-            "expert"
-          ],
-          "selection_hint": "Use detailed for normal requests; use expert when tuning texture, tag weights, lighting or composition.",
-          "enforcement": "advisory; known levels are accepted even outside the recommended range"
-        },
         "quality_prefix": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, highres",
         "recommended": {
           "width": 1024,

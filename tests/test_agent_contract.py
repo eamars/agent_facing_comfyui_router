@@ -92,16 +92,14 @@ class AgentContractTests(unittest.TestCase):
             self.assertIsNone(api._route_score(entry, {"domain": "anime"}))
             self.assertIsNone(api._route_score(entry, {"domain": "deepseek"}))
             mode = "image-edit" if entry["id"].endswith("edit") else "text-to-image"
-            self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "content_mode": "nsfw", "input_mode": mode}))
             self.assertIsNotNone(api._route_score(entry, {"domain": "qwen", "input_mode": mode}))
         edit = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-edit")
-        self.assertIsNotNone(api._route_score(edit, {"input_type": "image", "input_mode": "image-edit"}))
+        self.assertIsNotNone(api._route_score(edit, {"input_mode": "image-edit"}))
         self.assertIsNotNone(api._route_score(edit, {"domain": "qwen", "input_mode": "image-to-image"}))
 
     def test_moss_is_explicit_and_binds_layout_prompts_verbatim(self):
         moss = next(e for e in catalog["workflows"] if e["id"] == "moss-image-sft-t2i")
-        for query in ({"domain": "anime"}, {"domain": "qwen"}, {"input_mode": "text-to-image"},
-                      {"domain": "layout", "content_mode": "nsfw"}):
+        for query in ({"domain": "anime"}, {"domain": "qwen"}, {"input_mode": "text-to-image"}):
             self.assertIsNone(api._route_score(moss, query), query)
         for query in ({"domain": "moss"}, {"domain": "layout", "input_mode": "text-to-image"}, {"style": "MOSS-Image"}):
             self.assertIsNotNone(api._route_score(moss, query), query)
@@ -117,7 +115,6 @@ class AgentContractTests(unittest.TestCase):
         for domain in ("layout", "ui mockup"):
             self.assertEqual(selected({"domain": domain}), "moss-image-sft-t2i", domain)
         self.assertEqual(selected({"domain": "anime"}), "anima-turbo-v1-1")
-        self.assertNotIn("minimal", api._route_prompt_granularity(moss)["accepted"])
         layout = json.dumps({"summary": {"caption": "poster"}, "items": [], "bbox_format": "yxyx",
                              "bbox_coord_space": "abs_centralized"})
         graph = api._prepare_graph(moss, {"parameters": {"prompt": layout, "seed": 7}})
@@ -282,9 +279,6 @@ class AgentContractTests(unittest.TestCase):
             self.assertEqual(model["file_sizes"][model["required_file"]], size)
             self.assertEqual(model["source"]["bytes"], size)
             self.assertEqual(model["source"]["sha256"], sha256)
-            self.assertTrue(model["capabilities"]["nsfw_capable"])
-            self.assertEqual(model["capabilities"]["content_modes"], ["sfw", "nsfw"])
-            self.assertEqual(entry["capabilities"]["content_modes"], ["sfw", "nsfw"])
             self.assertTrue(entry["required_files"])
             self.assertEqual(entry["required_files"], [model["required_file"]])
             self.assertIn(workflow_id, downloader)
@@ -327,17 +321,24 @@ class AgentContractTests(unittest.TestCase):
             self.assertTrue(api._public_entry(entry, [model])["ready"])
             (self.root / "model.bin").unlink()
 
-    def test_content_mode_preferences_preserve_sfw_default_and_prefer_janku_for_nsfw(self):
+    def test_content_does_not_route_and_old_selectors_are_ignored_with_a_warning(self):
+        # Every route makes SFW and explicit images; routes differ by subject and look, so content_mode, input_type and
+        # prompt_granularity (API 1.x) must change nothing and say so.
+        ready = {"workflows": catalog["workflows"]}
+        with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):
+            plain = api._resolve_routes(ready, {"domain": "anime"})
+            for old in ({"content_mode": "nsfw"}, {"content_mode": "sfw", "input_type": "text", "prompt_granularity": "detailed"}):
+                query, deprecated = api._route_query({"domain": "anime", **old})
+                self.assertEqual(query, {"domain": "anime"})
+                result = api._resolve_routes(ready, query, deprecated=deprecated)
+                self.assertEqual(result["selected_workflow"], plain["selected_workflow"])
+                self.assertEqual(sorted(w["parameter"] for w in result["warnings"]), sorted(old))
+                self.assertEqual({w["code"] for w in result["warnings"]}, {"deprecated_selector"})
+        self.assertEqual(plain["selected_workflow"], "anima-turbo-v1-1")
+        self.assertEqual(plain["warnings"], [])
         entries = {entry["id"]: entry for entry in catalog["workflows"]}
-        janku = entries["janku-illustrious"]
-        one_obsession = entries["one-obsession"]
-        anima = entries["anima-turbo-v1-1"]
-        sfw = {"domain": "anime", "content_mode": "sfw"}
-        nsfw = {"domain": "anime", "content_mode": "nsfw"}
-        self.assertLess(api._route_score(janku, sfw)[0], api._route_score(anima, sfw)[0])
-        self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0])
-        self.assertIsNotNone(api._route_score(janku, {"style": "JANKU v7.77"}))
-        self.assertIsNotNone(api._route_score(one_obsession, {"style": "One Obsession v24"}))
+        self.assertIsNotNone(api._route_score(entries["janku-illustrious"], {"style": "JANKU v7.77"}))
+        self.assertIsNotNone(api._route_score(entries["one-obsession"], {"style": "One Obsession v24"}))
 
     def test_character_lora_routes_split_by_content_and_bind_their_loras(self):
         entries = {entry["id"]: entry for entry in catalog["workflows"]}
@@ -360,16 +361,11 @@ class AgentContractTests(unittest.TestCase):
             anima, janku = entries[f"{slug}-anima-turbo"], entries.get(f"{slug}-janku")
             self.assertEqual(janku is None, slug in anima_only, slug)
             for alias in aliases:
-                sfw, nsfw = {"domain": alias, "content_mode": "sfw"}, {"domain": alias, "content_mode": "nsfw"}
-                if janku is None:
-                    self.assertIsNotNone(api._route_score(anima, nsfw), alias)
-                    continue
-                self.assertGreater(api._route_score(anima, sfw)[0], api._route_score(janku, sfw)[0], alias)
-                self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0], alias)
-                self.assertGreater(api._route_score(anima, {"domain": alias})[0], api._route_score(janku, {"domain": alias})[0], alias)
+                query = {"domain": alias}
+                self.assertIsNotNone(api._route_score(anima, query), alias)
                 for other in characters:
                     if other != slug:
-                        self.assertIsNone(api._route_score(entries[f"{other}-anima-turbo"], sfw), (alias, other))
+                        self.assertIsNone(api._route_score(entries[f"{other}-anima-turbo"], query), (alias, other))
             for entry, loader in ((janku, "LoraLoader"), (anima, "LoraLoaderModelOnly")) if janku else ((anima, "LoraLoaderModelOnly"),):
                 (lora_id,) = [m for m in entry["model_ids"] if models.get(m, {}).get("kind") == "lora"]
                 model = models[lora_id]
@@ -384,7 +380,7 @@ class AgentContractTests(unittest.TestCase):
                 self.assertEqual(prepared["2"]["inputs"]["strength_model"], 0.5)
                 default = api._prepare_graph(entry, {"parameters": {"prompt": "1girl"}})
                 self.assertEqual(default["2"]["inputs"]["strength_model"], entry["defaults"]["loras"][lora_name])
-        for query in ({"domain": "qwen"}, {"domain": "qwen", "content_mode": "nsfw", "input_mode": "text-to-image"}):
+        for query in ({"domain": "qwen"}, {"domain": "qwen", "input_mode": "text-to-image"}):
             self.assertIsNone(api._route_score(entries["qwen-girl-anima-turbo"], query))
         # Bare names that also belong to other characters must not select a character route.
         for slug, domain in (("qwen-girl", "qwen"), ("claude-girl", "Claude Monet style"), ("claude-girl", "Claude von Riegan"),
@@ -395,13 +391,13 @@ class AgentContractTests(unittest.TestCase):
                     self.assertIsNone(api._route_score(entries[f"{slug}-{side}"], {"domain": domain}), domain)
         self.assertNotIn("blue-archive", downloader)
 
-    def test_content_mode_lines_only_where_rating_tags_were_seen_to_work(self):
+    def test_content_lines_only_where_rating_tags_were_seen_to_work(self):
         # JANKU v7.77 showed a visible SFW/NSFW effect from rating tags; Anima Turbo at CFG 1 did not.
         for entry in catalog["workflows"]:
-            is_janku = entry["id"] == "janku-illustrious" or (entry["id"].endswith("-janku") and "character-lora" in entry["tags"])
-            self.assertEqual("content_modes" in entry.get("prompting", {}), is_janku, entry["id"])
+            is_janku = entry["id"] == "janku-illustrious"
+            self.assertEqual("content_lines" in entry.get("prompting", {}), is_janku, entry["id"])
             if is_janku:
-                self.assertEqual(set(entry["prompting"]["content_modes"]), {"sfw", "nsfw"})
+                self.assertEqual(set(entry["prompting"]["content_lines"]), {"safe", "explicit"})
                 # NSFW is the main use: the default negative must not suppress it.
                 default_negative = api._binding_value(api._read_workflow(entry), entry, "negative_prompt")
                 self.assertNotIn("nsfw", default_negative, entry["id"])
@@ -430,13 +426,11 @@ class AgentContractTests(unittest.TestCase):
         # A pose sent to a route without an adapter would be silently lost, so routing must never pick one.
         annotated = api._read_catalog()
         with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):
-            for content_mode in ("sfw", "nsfw"):
-                result = api._resolve_routes(annotated, {"domain": "anime", "content_mode": content_mode, "input_mode": "openpose-control"}, limit=20)
-                self.assertTrue(result["matches"], content_mode)
-                for match in result["matches"]:
-                    self.assertTrue(match["workflow"]["pose"]["supported"], match["workflow_id"])
-            nsfw = api._resolve_routes(annotated, {"domain": "anime", "content_mode": "nsfw", "input_mode": "openpose-control"})
-            self.assertEqual(nsfw["selected_workflow"], "janku-illustrious")
+            result = api._resolve_routes(annotated, {"domain": "anime", "input_mode": "openpose-control"}, limit=20)
+            self.assertTrue(result["matches"])
+            for match in result["matches"]:
+                self.assertTrue(match["workflow"]["pose"]["supported"], match["workflow_id"])
+            self.assertEqual(result["selected_workflow"], "anima-turbo-v1-1")
         entry = next(e for e in annotated["workflows"] if e["id"] == "janku-illustrious")
         moss = next(e for e in annotated["workflows"] if e["id"] == "moss-image-sft-t2i")
         with self.assertRaises(api.ApiError) as raised:
@@ -510,13 +504,11 @@ class AgentContractTests(unittest.TestCase):
     def test_janku_versions_split_by_style_and_point_at_each_other(self):
         ready = {"workflows": catalog["workflows"]}
         with patch.object(api, "_public_entry", side_effect=lambda entry, registry: {**entry, "ready": True, "missing_files": []}):
-            generic = api._resolve_routes(ready, {"domain": "anime", "content_mode": "nsfw"})
-            novel = api._resolve_routes(ready, {"domain": "anime", "content_mode": "nsfw", "style": "visual novel"})
-            mainstream = api._resolve_routes(ready, {"domain": "anime", "content_mode": "nsfw", "style": "mainstream anime"})
-        self.assertEqual(generic["selected_workflow"], "janku-illustrious")
+            novel = api._resolve_routes(ready, {"domain": "anime", "style": "visual novel"})
+            mainstream = api._resolve_routes(ready, {"domain": "anime", "style": "mainstream anime"})
         self.assertEqual(novel["selected_workflow"], "janku-v5-illustrious")
         self.assertEqual(mainstream["selected_workflow"], "janku-illustrious")
-        self.assertEqual([p["workflow"] for p in generic["selection"]["prefer_instead"]], ["janku-v5-illustrious"])
+        self.assertEqual([p["workflow"] for p in mainstream["selection"]["prefer_instead"]], ["janku-v5-illustrious"])
         self.assertEqual([p["workflow"] for p in novel["selection"]["prefer_instead"]], ["janku-illustrious"])
 
     def test_readiness_includes_registry_eligibility_nodes_and_size(self):

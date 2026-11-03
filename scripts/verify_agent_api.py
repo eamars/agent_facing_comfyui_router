@@ -81,7 +81,7 @@ def main() -> None:
             return Image.open(io.BytesIO(response.read())).convert("RGB")
 
     manifest = http("/.well-known/agent-manifest.json")
-    check("API 1.6 discovery", manifest.get("api_version") == "1.6.0")
+    check("API 2.0 discovery", manifest.get("api_version") == "2.0.0")
     report["initial_resources"] = http("/project/resources")
     entries = http("/project/workflows")["workflows"]
     source = Image.new("RGB", (320, 384), (40, 70, 110))
@@ -92,12 +92,12 @@ def main() -> None:
         source_name, mask_name = upload("source", source), upload("mask", mask)
         references = {"input_image": source_name, "face_image": source_name, "mask_image": mask_name}
         routes = [
-            ({"domain": "大肥鱼", "content_mode": "sfw"}, "deepseek-whale-girl-anima-turbo"),
+            ({"domain": "大肥鱼"}, "deepseek-whale-girl-anima-turbo"),
             ({"domain": "bathroom"}, "anima-turbo-v1-1"),
             ({"domain": "anime", "input_mode": "inpaint"}, "anima-turbo-inpaint"),
             ({"domain": "anime", "input_mode": "face-reference", "family": "sdxl-ipadapter"}, "sdxl-face-reference-ipadapter"),
-            ({"domain": "deepseek", "content_mode": "nsfw"}, "deepseek-whale-girl-anima-turbo"),
-            ({"domain": "anime", "content_mode": "nsfw"}, "janku-illustrious"),
+            ({"domain": "deepseek", "content_mode": "nsfw"}, "deepseek-whale-girl-anima-turbo"),  # deprecated, ignored
+            ({"domain": "anime", "style": "mainstream anime"}, "janku-illustrious"),
         ]
         for query, expected in routes:
             check("route " + json.dumps(query), http("/project/resolve", query)["selected_workflow"] == expected)

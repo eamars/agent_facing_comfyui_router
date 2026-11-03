@@ -289,18 +289,7 @@
           "portrait",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "natural-language-or-light-anime-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "identity_strength": "weak without a character LoRA",
         "style_strength": "medium",
@@ -388,19 +377,8 @@
         "output_types": [
           "conditioning"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "natural-language-or-light-anime-tags",
-        "natural_language": true,
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed"
-        }
+        "natural_language": true
       },
       "compatibility": {
         "workflow_families": [
@@ -471,12 +449,6 @@
           "image",
           "latent"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "styles": [
           "anime",
           "illustration"
@@ -563,18 +535,7 @@
           "stylized",
           "moody"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "natural-language",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "low; no character-specific adapter",
         "style_strength": "medium",
@@ -593,7 +554,6 @@
           "lighting",
           "style"
         ],
-        "recommended_granularity": "minimal",
         "notes": [
           "This checkpoint is intended for concise visual descriptions rather than SDXL tag recipes."
         ]
@@ -675,25 +635,13 @@
         "output_types": [
           "conditioning"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "natural-language",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "conditioning support only; not a character adapter"
       },
       "prompting": {
         "dialect": "natural-language or lightly structured description",
         "trigger_words": [],
-        "recommended_granularity": "structured",
         "notes": [
           "Prompt behavior is bounded by the checkpoint and graph; this component is not independently routable."
         ]
@@ -761,25 +709,13 @@
         "output_types": [
           "conditioning"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "natural-language",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "character_identity": "conditioning support only; not a character adapter"
       },
       "prompting": {
         "dialect": "natural-language or lightly structured description",
         "trigger_words": [],
-        "recommended_granularity": "structured",
         "notes": [
           "Requires a graph binding this filename explicitly; the default graph retains the FP8 mixed encoder to preserve generic VRAM headroom."
         ]
@@ -854,23 +790,11 @@
           "image",
           "latent"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
-        "prompt_relevance": "none",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "minimal",
-          "maximum": "minimal"
-        }
+        "prompt_relevance": "none"
       },
       "prompting": {
         "dialect": "not applicable",
-        "trigger_words": [],
-        "recommended_granularity": "minimal"
+        "trigger_words": []
       },
       "compatibility": {
         "workflow_families": [
@@ -939,17 +863,7 @@
           "gacha illustration",
           "danbooru"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "base style; identity normally comes from tags or an adapter",
         "style_strength": "strong for anime",
@@ -971,7 +885,6 @@
           "scene",
           "lighting"
         ],
-        "recommended_granularity": "detailed",
         "notes": [
           "Use the adapter profile to supply identity and series-specific trigger hints."
         ]
@@ -1058,17 +971,7 @@
         "characters": [
           "NIKKE universe"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "identity_strength": "series/profile-level, not a single-character identity",
         "style_strength": "strong when paired with Animagine/SDXL"
       },
@@ -1078,7 +981,6 @@
           "IncrsNikkeProfile"
         ],
         "recommended_strength": 0.9,
-        "recommended_granularity": "detailed",
         "notes": [
           "Place the trigger with the series and character tags; the adapter does not select a character by itself."
         ]
@@ -1160,17 +1062,7 @@
           "rapiswim",
           "rapirnd"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "identity_strength": "character-specific when the correct trigger is used",
         "outfit_strength": "trigger-dependent",
         "style_strength": "medium"
@@ -1183,7 +1075,6 @@
           "rapirnd"
         ],
         "recommended_strength": 0.8,
-        "recommended_granularity": "detailed",
         "notes": [
           "Choose one outfit trigger; do not combine all outfit triggers in one request."
         ]
@@ -1265,12 +1156,6 @@
         "output_types": [
           "model-conditioning"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "reference_scope": "face-centric reference; not a pixel-locked identity recognizer",
         "identity_strength": "medium for a clear single-face portrait",
         "style_strength": "low-to-medium",
@@ -1278,18 +1163,12 @@
         "outfit_strength": "low",
         "pose_strength": "low",
         "natural_language": false,
-        "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        }
+        "prompt_dialect": "danbooru-tags"
       },
       "prompting": {
         "dialect": "short-to-structured SDXL anime tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "notes": [
           "Describe the requested character, outfit, pose and scene in the prompt; the face reference is an additional face-centric conditioning signal."
         ]
@@ -1360,18 +1239,11 @@
         "output_types": [
           "image-embedding"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_relevance": "none"
       },
       "prompting": {
         "dialect": "not applicable",
-        "trigger_words": [],
-        "recommended_granularity": "minimal"
+        "trigger_words": []
       },
       "compatibility": {
         "workflow_families": [
@@ -1445,30 +1317,18 @@
         "control_types": [
           "openpose"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "pose_strength": "strong when the pose image yields a usable skeleton",
         "identity_strength": "none; identity remains prompt/model dependent",
         "outfit_strength": "prompt dependent",
         "style_strength": "base checkpoint dependent",
         "composition_strength": "strong for body pose and orientation",
         "natural_language": false,
-        "prompt_dialect": "danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        }
+        "prompt_dialect": "danbooru-tags"
       },
       "prompting": {
         "dialect": "short-to-structured SDXL anime tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "notes": [
           "Use the control image for pose and orientation. Keep the prompt responsible for character identity, outfit, expression and scene."
         ]
@@ -1541,30 +1401,18 @@
         "control_types": [
           "openpose"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "pose_strength": "follows standing, arm and seated poses from a usable skeleton; side views are least reliable",
         "identity_strength": "none; the adapter's LoRA pulls skin tone and face style toward its own default",
         "outfit_strength": "prompt dependent",
         "style_strength": "base checkpoint dependent",
         "composition_strength": "strong for body pose and orientation",
         "natural_language": true,
-        "prompt_dialect": "anima-tags-and-natural-language",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        }
+        "prompt_dialect": "anima-tags-and-natural-language"
       },
       "prompting": {
         "dialect": "Anima tags and natural language",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "notes": [
           "The skeleton sets the pose; keep the character's appearance tags in the prompt, since the adapter can drift skin tone and face style."
         ]
@@ -1643,18 +1491,11 @@
         "control_types": [
           "openpose"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_relevance": "none"
       },
       "prompting": {
         "dialect": "not applicable",
-        "trigger_words": [],
-        "recommended_granularity": "minimal"
+        "trigger_words": []
       },
       "compatibility": {
         "workflow_families": [
@@ -1725,18 +1566,7 @@
           "stylized",
           "anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "minimal",
-          "recommended": "structured",
-          "maximum": "detailed"
-        },
         "natural_language": true,
         "identity_strength": "weak-to-medium from prompt; no identity adapter bundled",
         "style_strength": "medium-to-strong",
@@ -1748,7 +1578,6 @@
         "dialect": "ordered natural-language description with optional Danbooru-style tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "structured",
         "recommended_structure": [
           "quality/meta",
           "subject count",
@@ -1847,12 +1676,6 @@
         "output_types": [
           "model-conditioning"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "ipadapter_support": true,
         "face_reference": true,
         "face_only": false,
@@ -1863,18 +1686,12 @@
         "outfit_strength": "low; keep outfit in prompt",
         "pose_strength": "low; keep pose in prompt",
         "prompt_dialect": "natural-language-and-danbooru-style-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": true
       },
       "prompting": {
         "dialect": "detailed Anima-compatible natural language or ordered anime tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "notes": [
           "Use a clear single-person portrait. The adapter is reference conditioning, not a prompt replacement and not a pixel-locked face recognizer."
         ],
@@ -1957,20 +1774,13 @@
         "output_types": [
           "image-embedding"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "prompt_relevance": "none",
         "reference_scope": "whole-image visual embedding for Anima IPAdapter",
         "natural_language": false
       },
       "prompting": {
         "dialect": "not applicable",
-        "trigger_words": [],
-        "recommended_granularity": "minimal"
+        "trigger_words": []
       },
       "compatibility": {
         "workflow_families": [
@@ -2059,17 +1869,7 @@
           "cinematic lighting",
           "thick clean linework"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "illustrious-noobai-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "strong character-tag knowledge; the author notes less artist knowledge than earlier JANKU versions; no trigger word is required",
         "style_strength": "strong for vibrant, glossy anime illustration",
@@ -2084,7 +1884,6 @@
         "dialect": "Illustrious/NoobAI Danbooru-style tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "recommended_structure": [
           "quality",
           "subject count",
@@ -2206,17 +2005,7 @@
           "glossy anime",
           "thin linework"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "illustrious-noobai-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "strongest character and artist-tag knowledge of the JANKU checkpoints; default face reads young, so state adulthood explicitly for adult characters",
         "style_strength": "strong for vibrant, glossy anime illustration",
@@ -2231,7 +2020,6 @@
         "dialect": "Illustrious/NoobAI Danbooru-style tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "recommended_structure": [
           "quality",
           "subject count",
@@ -2358,17 +2146,7 @@
           "dramatic light and shadow",
           "polished anime portrait"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw"
-        ],
-        "nsfw_capable": true,
         "prompt_dialect": "illustrious-noobai-danbooru-tags",
-        "prompt_granularity": {
-          "minimum": "structured",
-          "recommended": "detailed",
-          "maximum": "expert"
-        },
         "natural_language": false,
         "character_identity": "strong stylized character illustration from tags; no trigger word is required",
         "style_strength": "strong for texture, light/shadow and polished 2D/2.5D rendering",
@@ -2383,7 +2161,6 @@
         "dialect": "Illustrious/NoobAI Danbooru-style tags",
         "trigger_words": [],
         "negative_prompt_supported": true,
-        "recommended_granularity": "detailed",
         "recommended_structure": [
           "quality",
           "subject count",
@@ -2504,12 +2281,6 @@
           "anime",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "identity_strength": "character-specific when the trigger is included"
       },
       "prompting": {
@@ -2603,12 +2374,6 @@
           "anime",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "identity_strength": "character-specific when the trigger is included"
       },
       "prompting": {
@@ -2702,12 +2467,6 @@
           "anime",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "identity_strength": "character-specific when the trigger is included"
       },
       "prompting": {
@@ -2801,12 +2560,6 @@
           "anime",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "identity_strength": "character-specific when the trigger is included"
       },
       "prompting": {
@@ -2900,12 +2653,6 @@
           "anime",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "identity_strength": "character-specific when the trigger is included"
       },
       "prompting": {
@@ -3005,12 +2752,6 @@
           "anime",
           "character illustration"
         ],
-        "content_modes": [
-          "sfw",
-          "nsfw",
-          "general"
-        ],
-        "nsfw_capable": true,
         "identity_strength": "character-specific when the character's own trigger is included"
       },
       "prompting": {
