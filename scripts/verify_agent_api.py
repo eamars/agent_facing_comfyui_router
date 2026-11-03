@@ -96,7 +96,7 @@ def main() -> None:
             ({"domain": "bathroom"}, "anima-turbo-v1-1"),
             ({"domain": "anime", "input_mode": "inpaint"}, "anima-turbo-inpaint"),
             ({"domain": "anime", "input_mode": "face-reference", "family": "sdxl-ipadapter"}, "sdxl-face-reference-ipadapter"),
-            ({"domain": "deepseek", "content_mode": "nsfw"}, "deepseek-whale-girl-janku"),
+            ({"domain": "deepseek", "content_mode": "nsfw"}, "deepseek-whale-girl-anima-turbo"),
             ({"domain": "anime", "content_mode": "nsfw"}, "janku-illustrious"),
         ]
         for query, expected in routes:

@@ -43,9 +43,9 @@
         "style": "anime",
         "prompt_granularity": "detailed"
       },
-      "prompt": "masterpiece, best quality, very aesthetic, absurdres, deepseek whalegirl, 1girl, solo, adult, mature adult woman, sheer silk robe, seated by a seaside villa window, tasteful implied nudity, glamour editorial, soft evening light",
+      "prompt": "masterpiece, best quality, nsfw, deepseek_whale_girl_zipzippipe, 1girl, solo, adult, blue hair, very long hair, gradient blue hair, whale fin ears, blue hair bows, cetacean tail, blue eyes, mature adult woman, sheer silk robe, seated by a seaside villa window, tasteful implied nudity, glamour editorial, soft evening light",
       "negative_prompt": "worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, blurry, text, watermark, logo, signature",
-      "expected_workflow": "deepseek-whale-girl-janku"
+      "expected_workflow": "deepseek-whale-girl-anima-turbo"
     },
     {
       "id": "nikke-sfw-rapi",

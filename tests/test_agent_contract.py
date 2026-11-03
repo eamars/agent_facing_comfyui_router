@@ -239,7 +239,7 @@ class AgentContractTests(unittest.TestCase):
 
     def test_route_scope_and_exact_capabilities(self):
         entries = {e["id"]: e for e in catalog["workflows"]}
-        self.assertIsNone(api._route_score(entries["deepseek-whale-girl-janku"], {"domain": "anime"}))
+        self.assertIsNone(api._route_score(entries["chatgpt-girl-anima-turbo"], {"domain": "anime"}))
         self.assertIsNone(api._route_score(entries["deepseek-whale-girl-anima-turbo"], {"domain": "bathroom"}))
         self.assertIsNone(api._route_score(entries["deepseek-whale-girl-anima-turbo"], {"input_type": "text"}))
         self.assertIsNotNone(api._route_score(entries["moody-anima-inpaint"], {"workflow": "moody-anima-inpaint"}))
@@ -350,17 +350,24 @@ class AgentContractTests(unittest.TestCase):
             "qwen-girl": ("qwen girl", "千问娘", "Qwen-chan"),
             "gemini-girl": ("gemini girl", "Gemini娘", "哈基米"),
         }
+        # Every character has one Anima route for SFW and NSFW. The JANKU character routes were removed: their LoRAs
+        # drew a different design (Claude, DeepSeek) or a less faithful one, and granularity alone could select them.
+        anima_only = set(characters)
         for slug, aliases in characters.items():
-            anima, janku = entries[f"{slug}-anima-turbo"], entries[f"{slug}-janku"]
+            anima, janku = entries[f"{slug}-anima-turbo"], entries.get(f"{slug}-janku")
+            self.assertEqual(janku is None, slug in anima_only, slug)
             for alias in aliases:
                 sfw, nsfw = {"domain": alias, "content_mode": "sfw"}, {"domain": alias, "content_mode": "nsfw"}
+                if janku is None:
+                    self.assertIsNotNone(api._route_score(anima, nsfw), alias)
+                    continue
                 self.assertGreater(api._route_score(anima, sfw)[0], api._route_score(janku, sfw)[0], alias)
                 self.assertGreater(api._route_score(janku, nsfw)[0], api._route_score(anima, nsfw)[0], alias)
                 self.assertGreater(api._route_score(anima, {"domain": alias})[0], api._route_score(janku, {"domain": alias})[0], alias)
                 for other in characters:
                     if other != slug:
                         self.assertIsNone(api._route_score(entries[f"{other}-anima-turbo"], sfw), (alias, other))
-            for entry, loader in ((janku, "LoraLoader"), (anima, "LoraLoaderModelOnly")):
+            for entry, loader in ((janku, "LoraLoader"), (anima, "LoraLoaderModelOnly")) if janku else ((anima, "LoraLoaderModelOnly"),):
                 (lora_id,) = [m for m in entry["model_ids"] if m.startswith(slug)]
                 model = models[lora_id]
                 (lora_name,) = entry["lora_bindings"]
@@ -380,7 +387,8 @@ class AgentContractTests(unittest.TestCase):
         for slug, domain in (("qwen-girl", "qwen"), ("claude-girl", "Claude Monet style"), ("claude-girl", "Claude von Riegan"),
                              ("gemini-girl", "Gemini Saga"), ("gemini-girl", "Saint Seiya Gemini")):
             for side in ("anima-turbo", "janku"):
-                self.assertIsNone(api._route_score(entries[f"{slug}-{side}"], {"domain": domain}), domain)
+                if f"{slug}-{side}" in entries:
+                    self.assertIsNone(api._route_score(entries[f"{slug}-{side}"], {"domain": domain}), domain)
         self.assertNotIn("blue-archive", downloader)
 
     def test_content_mode_lines_only_where_rating_tags_were_seen_to_work(self):

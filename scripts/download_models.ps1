@@ -215,13 +215,6 @@ $AssetSets = @{
     'deepseek-whale-girl' = @(
         # Civitai-only files with no Hugging Face mirror; set CIVITAI_TOKEN before downloading.
         [pscustomobject]@{
-            Name = 'DeepSeek whale girl JANKU LoRA (yrx0110121, Civitai model 2595806, version 2915962)'
-            Url = 'https://civitai.com/api/download/models/2915962?fileId=2794189'
-            Path = (Join-Path $ModelRoot 'loras\DeepSeek_WhaleGirl_ChenkinNoobXL.safetensors')
-            Bytes = [int64]228452020
-            Sha256 = '54A721895A0AA6A38F1A48C232916A091A9C881941D024779E3C12A061344AEF'
-        },
-        [pscustomobject]@{
             Name = 'DeepSeek whale girl ZipZipPipe-style Anima 2B LoRA (HermitST, Civitai model 2919135, version 3302634)'
             Url = 'https://civitai.com/api/download/models/3302634?fileId=3187626'
             Path = (Join-Path $ModelRoot 'loras\DeepSeek_WhaleGirl_ZipZipPipe_Anima2B.safetensors')
@@ -239,25 +232,11 @@ $AssetSets = @{
             Sha256 = '21986AFC5D6731A9985920318B1DC811E00D34C371ED0813E5949A554BE6BECF'
         },
         [pscustomobject]@{
-            Name = 'Claude girl Illustrious LoRA (kadaizuo604, Civitai model 3014460, version 3421596)'
-            Url = 'https://civitai.com/api/download/models/3421596'
-            Path = (Join-Path $ModelRoot 'loras\Claude_Girl_OrsScholar_Illustrious.safetensors')
-            Bytes = [int64]57421836
-            Sha256 = '3C6ED23551298E18E183A38119AACCE1E4A1B14674F1DAF02FE09A3760941C6A'
-        },
-        [pscustomobject]@{
             Name = 'ChatGPT dragon girl Anima 2B LoRA (Ptilopsism, Civitai model 2871688, version 3244620)'
             Url = 'https://civitai.com/api/download/models/3244620'
             Path = (Join-Path $ModelRoot 'loras\ChatGPT_DragonGirl_Anima2B.safetensors')
             Bytes = [int64]138716752
             Sha256 = 'D5AB678C1D3A4982AC307C64290CCB189041A0BDB8642B2756D8618C6417152C'
-        },
-        [pscustomobject]@{
-            Name = 'ChatGPT dragon girl Illustrious LoRA (g2025942049487, Civitai model 3006307, version 3411033)'
-            Url = 'https://civitai.com/api/download/models/3411033'
-            Path = (Join-Path $ModelRoot 'loras\ChatGPT_DragonGirl_Illustrious.safetensors')
-            Bytes = [int64]198002792
-            Sha256 = '9CF9FCEBFA31C38917A6B1F21B5357649F71FD574FDDEE1A60555B8CD5A339EA'
         },
         [pscustomobject]@{
             Name = 'Qwen girl Anima 2B LoRA (Aetherlyn, Civitai model 3016389, version 3424116)'
@@ -267,25 +246,11 @@ $AssetSets = @{
             Sha256 = '61F616F4CB9A81D022DC97B0D22A15C9312A172669EBDB2DD35635A3B441EBF0'
         },
         [pscustomobject]@{
-            Name = 'Qwen girl Illustrious LoRA (zionesan5389, Civitai model 2895705, version 3273627)'
-            Url = 'https://civitai.com/api/download/models/3273627'
-            Path = (Join-Path $ModelRoot 'loras\Qwen_Girl_Illustrious.safetensors')
-            Bytes = [int64]456544636
-            Sha256 = 'BFA27AEBE1BF030DB3C6A54EF91CBC37407A0D2C84CE271C01BEA5E6AC572259'
-        },
-        [pscustomobject]@{
             Name = 'Gemini girl Anima 2B LoRA (Nopsil, Civitai model 2950198, version 3341211)'
             Url = 'https://civitai.com/api/download/models/3341211'
             Path = (Join-Path $ModelRoot 'loras\Gemini_Girl_Anima2B.safetensors')
             Bytes = [int64]91869432
             Sha256 = 'B2825DDB36FAA22168507D3CED7327E6FD81586D46FAD70E24048221C688CC08'
-        },
-        [pscustomobject]@{
-            Name = 'Gemini girl Illustrious LoRA (kadaizuo604, Civitai model 3014606, version 3421768)'
-            Url = 'https://civitai.com/api/download/models/3421768'
-            Path = (Join-Path $ModelRoot 'loras\Gemini_Girl_Illustrious.safetensors')
-            Bytes = [int64]57422076
-            Sha256 = '5A9B9F7241BC78ACF960EA1FE200428EA245B0D9BFE19CE10C538031B043FF40'
         }
     )
     'ipadapter-face-sdxl' = @(
