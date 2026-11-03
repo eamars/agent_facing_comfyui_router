@@ -549,10 +549,6 @@
           "node": "458",
           "input": "cfg"
         },
-        "denoise": {
-          "node": "458",
-          "input": "denoise"
-        },
         "sampler_name": {
           "node": "458",
           "input": "sampler_name"
@@ -577,7 +573,6 @@
       "defaults": {
         "steps": 25,
         "cfg": 1,
-        "denoise": 1,
         "sampler_name": "euler",
         "scheduler": "simple",
         "filename_prefix": "qwen_image_2_1_edit",
@@ -607,7 +602,7 @@
           ]
         },
         "recommendations_are_advisory": true,
-        "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1, denoise 1.",
+        "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1. denoise is fixed at 1 and not a parameter: sampling starts from an empty latent and the source enters only as a reference, so lower denoise returns a flat texture instead of an edit.",
         "negative_prompt": "Inactive at CFG 1.",
         "input_image": "Required relative uploaded filename. Reference size determines output size, rounded to multiples of 32; batch is one.",
         "prompt_scope": "Write the edit as a direct instruction, e.g. 'Change the teapot to cobalt blue. Keep everything else the same.' Name what must stay unchanged when it matters."

@@ -82,6 +82,9 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(graph["452"]["inputs"]["resolution"], 0)
         self.assertEqual(graph["458"]["inputs"]["latent_image"], ["452", 2])
         self.assertEqual(graph["452"]["inputs"]["images.image_1"], ["470", 0])
+        # Sampling starts from an empty latent, so denoise below 1 collapsed every edit to a flat texture.
+        self.assertEqual(graph["458"]["inputs"]["denoise"], 1)
+        self.assertBad(input_image="source.png", denoise=0.3)
         self.assertBad(input_image="source.png", width=1024)
         self.assertBad(input_image="source.png", batch_size=2)
 
