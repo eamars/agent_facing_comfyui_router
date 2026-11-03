@@ -967,7 +967,7 @@
     {
       "id": "moody-anima-mix",
       "name": "Moody Anima Mix — General Anime Fallback",
-      "description": "Fast Anima-based anime workflow for generic illustrations and portraits. It is the default anime fallback when the request does not require a DeepSeek whale girl, NIKKE or other model-specific identity/style route.",
+      "description": "Fast Anima-based anime workflow for generic illustrations and portraits at a low step count. Anima Turbo v1.1 is the default anime route; this one is picked by naming it (domain 'moody anima mix') or by workflow id.",
       "family": "anima",
       "resident_group": "anima-moody-anima-mix",
       "tags": [
@@ -2510,8 +2510,7 @@
         "best_for": [
           "anime character tags",
           "NIKKE/Rapi",
-          "SDXL LoRA composition",
-          "mature content where lawful and appropriate"
+          "SDXL LoRA composition"
         ],
         "not_for": [
           "Flux.2/Klein graphs",

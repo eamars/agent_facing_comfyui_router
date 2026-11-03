@@ -12,7 +12,7 @@
 - **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
 - **人物参考**：通过 IPAdapter 参考人物外观。
 - **姿势**：同一个 `pose` 参数接受姿势库编号或上传的图片，服务提取骨架后按模型家族接入控制；目前 SDXL / Illustrious、Anima、Qwen-Image 文生图和 Moody Desire（Flux.2 Klein）路由已支持。
-- **自动选路**：根据题材、内容模式、风格和输入方式，从可用工作流中选择合适的模型组合。
+- **自动选路**：根据题材、画风和输入方式，从可用工作流中选择合适的模型组合。
 - **队列与热切换**：串行处理生成任务，同一工作流复用模型缓存，切换工作流时自动释放并加载所需模型。
 - **Agent 接入**：提供能力发现、参数说明、图片上传、任务状态和结果下载接口，也保留原生 ComfyUI 接口。
 
@@ -25,7 +25,7 @@
 | 模型 / 组合 | 主要用途 | 支持方式 | 工作流 ID |
 | --- | --- | --- | --- |
 | Qwen-Image-2.1 · Uncensored GGUF Q4_K_M | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
-| MOSS-Image-SFT · 官方 BF16 | 布局 JSON 精确排版、长提示词、图中中英文文字 | 文生图（自然语言 / 标签 / 布局 JSON），SFW | `moss-image-sft-t2i` |
+| MOSS-Image-SFT · 官方 BF16 | 布局 JSON 精确排版、长提示词、图中中英文文字 | 文生图（自然语言 / 标签 / 布局 JSON） | `moss-image-sft-t2i` |
 | Anima Turbo v1.1 · 官方 BF16 | 通用动漫、人物与插画 | 文生图、图生图 | `anima-turbo-v1-1` |
 | Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
 | Moody Desire Mix v3.0 · Flux.2/Klein | 写实人像为主（擅长成人写实图），也能画动漫 | 文生图、图生图 | `moody-desire-v30` |
@@ -42,7 +42,7 @@
 
 路由不区分 SFW 与 NSFW：画面内容由提示词决定，除 MOSS-Image（未测试）外各路由都能生成成人内容，路由按题材和画风选择。旧的选路参数 `content_mode`、`input_type` 和 `prompt_granularity` 仍被接受但不起作用，响应中会返回 `deprecated_selector` 警告。
 
-### 局部重绘、人物参考与姿态控制
+### 局部重绘与人物参考
 
 | 工作流 ID | 模型 / 组件 | 用途 | 除提示词外的必需输入 |
 | --- | --- | --- | --- |
@@ -57,7 +57,7 @@
 
 姿势不是单独的工作流，而是各路由共用的可选参数 `pose`：
 
-- **姿势库编号**：`GET /project/poses?q=跪&people=1&angle=side` 按中英文名称搜索 196 个姿势，每个姿势有正面、斜侧、侧面、俯视、仰视五个视角，返回的视角编号（如 `full_single_P035_side`）直接作为 `pose` 传入。
+- **姿势库编号**：`GET /project/poses?q=跪&people=1&angle=side` 按中英文名称搜索 196 个姿势。每个姿势最多有正面、斜侧、侧面、俯视、仰视五个视角（DWPose 认不出的视角已剔除，五个视角齐全的有 47 个），返回的视角编号（如 `full_single_P035_side`）直接作为 `pose` 传入；只传姿势编号时取正面视角，没有正面时取第一个视角。
 - **上传图片**：照片、插画或线稿均可，服务会复制其中人物的身体姿势。
 
 服务用 DWPose 把输入提取为全身骨架（身体、手、脚和脸部关键点），按内容哈希缓存；找不到人体时以 `pose_not_detected` 拒绝。骨架按输出尺寸等比绘制，画法由模型家族决定；未指定宽高时，输出采用姿势图的宽高比。`pose_strength`（0–1，SDXL 默认 0.8，Anima 默认 1.0；Qwen 和 Klein 无此参数）控制贴合程度。姿势只用于从文字生成（可同时使用人物参考 `face_image`），不能改变 `input_image` 中人物的姿势：编辑、图生图和局部重绘请求带 `pose` 会返回 `pose_unsupported`。响应中的 `pose` 对象给出实际使用的姿势、检测到的人数和 `skeleton_url`（模型实际遵循的骨架图）。人物、服装和背景仍由提示词描述。
@@ -218,6 +218,7 @@ Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取�
 | `GET /project/models`、`GET /project/models/{model_id}` | 查询模型及组件信息 |
 | `GET /project/workflows`、`GET /project/workflows/{workflow_id}` | 查询工作流、参数和就绪状态 |
 | `GET /project/routes`、`POST /project/resolve` | 查询与选择路由 |
+| `GET /project/poses` | 搜索姿势库 |
 | `POST /project/generate` | 提交命名工作流任务 |
 | `GET /project/jobs/{job_id}` | 查询排队、执行状态与输出 |
 | `POST /upload/image`、`GET /project/inputs` | 上传与查看输入图片 |
