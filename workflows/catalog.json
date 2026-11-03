@@ -60,6 +60,7 @@
         "dwpose-pose-extractor"
       ],
       "download_profile": "anima-control-pose",
+      "size_multiple": 16,
       "default_strength": 1.0,
       "measured_fidelity": {
         "metric": "PCK@0.1: share of requested body points DWPose finds within 10% of figure size in the output",
@@ -92,6 +93,35 @@
             "cases": 3
           }
         }
+      }
+    },
+    "qwen-reference-image": {
+      "description": "Gives Qwen-Image 2.1 text-to-image the thin whole-body skeleton as a reference image of its text encoder, with an instruction to take only the body pose from it. No ControlNet.",
+      "families": [
+        "qwen-image-2.1"
+      ],
+      "mechanism": "qwen-reference-image",
+      "render": "wholebody-thin",
+      "instruction": "Use image {image} only as a pose reference: it is a pose skeleton (coloured lines for the limbs, dots for joints, face and hands). Draw the person described below in exactly that body pose. Do not draw the skeleton. ",
+      "model_ids": [
+        "dwpose-pose-extractor"
+      ],
+      "download_profile": "pose",
+      "default_strength": null,
+      "measured_fidelity": {
+        "metric": "PCK@0.1: share of requested body points DWPose finds within 10% of figure size in the output",
+        "date": "2026-11-03",
+        "pose_without_pose_words": {
+          "with_pose": 0.96,
+          "no_pose_baseline": 0.44,
+          "cases": 7,
+          "routes": [
+            "qwen-image-2.1-t2i"
+          ],
+          "subject": "Xiaoman (prompt-only character, no LoRA)"
+        },
+        "observed": "Every tested pose followed, including the kneeling side view, and the character's look stays as prompted. Line art and the skeleton scored the same (0.96) as the reference; the skeleton is used because it also suits uploaded photos. Skeleton marks occasionally show on the hands. The edit route pasted the pose image in instead of re-posing, so edit routes take no pose. Adds about 10 s per image.",
+        "tool": "scripts/verify_pose_fidelity.py --set qwen"
       }
     }
   },

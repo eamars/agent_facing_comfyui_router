@@ -488,7 +488,25 @@ def _attach_anima_control(graph: dict[str, Any], adapter: dict[str, Any], skelet
     sampler["model"] = [apply_id, 0]
 
 
-_MECHANISMS = {"controlnet-openpose": _attach_controlnet, "anima-control-lora": _attach_anima_control}
+def _attach_qwen_reference(graph: dict[str, Any], adapter: dict[str, Any], skeleton_image: str, strength: float | None) -> None:
+    """Qwen-Image 2.1: the skeleton becomes the next reference image of the text encoder, and the prompt says to take
+    only the pose from it."""
+    encoders = [node for node in graph.values() if isinstance(node, dict) and node.get("class_type") == "TextEncodeQwenImage21"]
+    decoders = [node for node in graph.values() if isinstance(node, dict) and node.get("class_type") == "VAEDecode"]
+    if len(encoders) != 1 or not decoders:
+        raise PoseError(500, "Route graph does not have the single Qwen text encoder the pose adapter expects",
+                        "pose_adapter_failed")
+    encoder = encoders[0]["inputs"]
+    slot = 1 + sum(1 for name in encoder if name.startswith("images.image_"))
+    load_id = str(max((int(node_id) for node_id in graph if str(node_id).isdigit()), default=0) + 1)
+    graph[load_id] = {"class_type": "LoadImage", "inputs": {"image": skeleton_image}}
+    encoder[f"images.image_{slot}"] = [load_id, 0]
+    encoder.setdefault("vae", copy.deepcopy(decoders[0]["inputs"]["vae"]))  # reference latents need the VAE
+    encoder["prompt"] = adapter["instruction"].format(image=slot) + encoder["prompt"]
+
+
+_MECHANISMS = {"controlnet-openpose": _attach_controlnet, "anima-control-lora": _attach_anima_control,
+               "qwen-reference-image": _attach_qwen_reference}
 
 
 def attach(graph: dict[str, Any], adapter: dict[str, Any], skeleton_image: str, strength: float) -> None:

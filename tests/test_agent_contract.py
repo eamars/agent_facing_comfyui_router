@@ -411,11 +411,12 @@ class AgentContractTests(unittest.TestCase):
         uses = {use["input_mode"]: use["routes"] for use in api._reference_uses(workflows)}
         self.assertEqual(uses["image-edit"], ["qwen-image-2.1-edit"])
         self.assertEqual(set(uses["face-reference"]), {"sdxl-face-reference-ipadapter", "anima-turbo-face-reference-ipadapter"})
-        pose_families = {"sdxl", "sdxl-illustrious", "sdxl-ipadapter", "anima-turbo", "anima", "anima-ipadapter"}
-        self.assertEqual(set(uses["openpose-control"]), {e["id"] for e in workflows if e["family"] in pose_families})
+        pose_families = {"sdxl", "sdxl-illustrious", "sdxl-ipadapter", "anima-turbo", "anima", "anima-ipadapter", "qwen-image-2.1"}
+        self.assertEqual(set(uses["openpose-control"]), {e["id"] for e in workflows if e["family"] in pose_families
+                                                         and {"text-to-image", "face-reference"} & set(e["capabilities"]["input_modes"])})
         self.assertEqual(set(uses["inpaint"]), {"moody-anima-inpaint", "anima-turbo-inpaint"})
         text_only = [e["id"] for e in workflows if not api._image_inputs(e)]
-        self.assertEqual(text_only, ["qwen-image-2.1-t2i", "moss-image-sft-t2i"])
+        self.assertEqual(text_only, ["moss-image-sft-t2i"])
         for entry in workflows:
             for name in api._image_inputs(entry):
                 if name not in {"input_image", "pose"}:  # pose is attached by its family adapter, not a binding
@@ -436,9 +437,9 @@ class AgentContractTests(unittest.TestCase):
             nsfw = api._resolve_routes(annotated, {"domain": "anime", "content_mode": "nsfw", "input_mode": "openpose-control"})
             self.assertEqual(nsfw["selected_workflow"], "janku-illustrious")
         entry = next(e for e in annotated["workflows"] if e["id"] == "janku-illustrious")
-        qwen = next(e for e in annotated["workflows"] if e["id"] == "qwen-image-2.1-t2i")
+        moss = next(e for e in annotated["workflows"] if e["id"] == "moss-image-sft-t2i")
         with self.assertRaises(api.ApiError) as raised:
-            api._resolve_pose(qwen, {"parameters": {"prompt": "x", "pose": "full_single_P001_front"}})
+            api._resolve_pose(moss, {"parameters": {"prompt": "x", "pose": "full_single_P001_front"}})
         self.assertEqual(raised.exception.code, "pose_unsupported")
         skeleton = {"key": "test", "width": 900, "height": 1200, "people": [{"body": [[0.5, 0.1 + i * 0.04, 0.9] for i in range(18)],
                                                                              "left_hand": None, "right_hand": None}]}
@@ -472,6 +473,27 @@ class AgentContractTests(unittest.TestCase):
                          ("LoraLoaderModelOnly", apply["inputs"]["control_embedder_path"], 1.0))
         self.assertEqual(graph[lora["inputs"]["model"][0]]["class_type"], "ModelSamplingAuraFlow")
         self.assertEqual(graph[encode["inputs"]["pixels"][0]]["inputs"]["image"], "_poses/rendered/test.png")
+        # Qwen: the skeleton becomes reference image 1 and the prompt names it.
+        for route_id, slot in (("qwen-image-2.1-t2i", 1),):
+            qwen = next(e for e in annotated["workflows"] if e["id"] == route_id)
+            graph = api._read_workflow(qwen)
+            encoder = next(node for node in graph.values() if node["class_type"] == "TextEncodeQwenImage21")["inputs"]
+            api.pose_addon.attach(graph, api.pose_addon.adapter_for(annotated, qwen), "_poses/rendered/test.png", None)
+            self.assertEqual(graph[encoder[f"images.image_{slot}"][0]]["inputs"]["image"], "_poses/rendered/test.png", route_id)
+            self.assertTrue(encoder["prompt"].startswith(f"Use image {slot} only as a pose reference"), route_id)
+            self.assertIn("vae", encoder)
+            self.assertNotIn("pose_strength", api._parameter_schema(qwen, api._read_workflow(qwen))["properties"])
+        # Edit and inpaint routes take no pose, and a pose never rides along with input_image.
+        for route_id in ("qwen-image-2.1-edit", "anima-turbo-inpaint", "moody-anima-inpaint"):
+            self.assertFalse(next(e for e in annotated["workflows"] if e["id"] == route_id)["pose"]["supported"], route_id)
+        with self.assertRaises(api.ApiError) as raised:
+            api._resolve_pose(claude, {"parameters": {"prompt": "x", "pose": "full_single_P001_front", "input_image": "a.png"}})
+        self.assertEqual(raised.exception.code, "pose_unsupported")
+        # Anima's control embedder needs sizes in multiples of 16.
+        request = {"skeleton": skeleton, "adapter": api.pose_addon.adapter_for(annotated, claude)}
+        with patch.object(api.pose_addon, "render", return_value="_poses/rendered/test.png") as render,                 patch.object(api, "_resource_request"):
+            api._prepare_graph(claude, {"parameters": {"prompt": "x", "width": 1000, "height": 1208}}, None, request)
+        self.assertEqual(render.call_args.args[1:3], (992, 1200))
 
     def test_janku_versions_split_by_style_and_point_at_each_other(self):
         ready = {"workflows": catalog["workflows"]}

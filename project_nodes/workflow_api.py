@@ -123,11 +123,18 @@ POSE_INPUT_MODES = ("openpose-control", "pose")
 
 
 def _annotate_pose_routes(catalog: dict[str, Any]) -> None:
-    """Give each route its family's pose adapter; generation routes also match input_mode openpose-control."""
+    """Give each route that generates from text its family's pose adapter; text-to-image routes also match
+    input_mode openpose-control.
+
+    Edit and inpaint routes start from an existing image whose composition a pose would fight (Qwen edit pasted
+    the skeleton in instead of re-posing), so they take no pose.
+    """
     for entry in catalog["workflows"]:
         if not isinstance(entry, dict):
             continue
-        adapter = pose_addon.adapter_for(catalog, entry)
+        modes = entry.get("capabilities", {}).get("input_modes", [])
+        generates = "text-to-image" in modes or "face-reference" in modes
+        adapter = pose_addon.adapter_for(catalog, entry) if generates else None
         if adapter is None:
             entry["pose"] = {"supported": False}
             continue
@@ -135,8 +142,7 @@ def _annotate_pose_routes(catalog: dict[str, Any]) -> None:
                          "model_ids": adapter["model_ids"], "default_strength": adapter["default_strength"],
                          "measured_fidelity": adapter.get("measured_fidelity")}
         entry.setdefault("control_ports", {})["controlnet"] = adapter["mechanism"].startswith("controlnet")
-        modes = entry.get("capabilities", {}).get("input_modes", [])
-        if "text-to-image" in modes:  # face-reference and inpaint routes take pose too but keep their own selector
+        if "text-to-image" in modes:  # face-reference routes take pose too but keep their own selector
             modes.extend(mode for mode in POSE_INPUT_MODES if mode not in modes)
             routing_modes = entry.get("routing", {}).get("input_modes")
             if isinstance(routing_modes, list):
@@ -365,7 +371,8 @@ def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str,
             spec["default"] = _binding_value(graph, entry, name)
     if entry.get("pose", {}).get("supported"):
         properties["pose"] = copy.deepcopy(templates["pose"])
-        properties["pose_strength"] = {**copy.deepcopy(templates["pose_strength"]), "default": entry["pose"]["default_strength"]}
+        if entry["pose"]["default_strength"] is not None:  # a reference-image adapter has no strength to set
+            properties["pose_strength"] = {**copy.deepcopy(templates["pose_strength"]), "default": entry["pose"]["default_strength"]}
     if "seed" in properties:
         properties["seed"]["description"] = "Random when omitted; the effective seed is returned in the response."
     if _image_inputs(entry):
@@ -937,8 +944,16 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
             raise ApiError(400, "mask_channel=alpha requires a mask with transparency; transparent pixels are redrawn",
                            code="mask_alpha_missing")
     if pose_request:
+        if pose_strength is not None and entry["pose"]["default_strength"] is None:
+            raise ApiError(400, "Workflow does not expose parameter: pose_strength; this route follows the pose without a strength "
+                                "setting", ["pose_strength"], code="unsupported_parameter")
         strength = entry["pose"]["default_strength"] if pose_strength is None else _as_float("pose_strength", pose_strength, 0.0, 1.0)
         width, height = _binding_value(graph, entry, "width"), _binding_value(graph, entry, "height")
+        multiple = pose_request["adapter"].get("size_multiple", 8)
+        if width % multiple or height % multiple:  # Anima's control embedder patches the latent 2x2
+            width, height = max(multiple, width // multiple * multiple), max(multiple, height // multiple * multiple)
+            _set_binding(graph, entry, "width", width)
+            _set_binding(graph, entry, "height", height)
         skeleton_image = pose_addon.render(pose_request["skeleton"], width, height, pose_request["adapter"].get("render", "openpose"))
         pose_addon.attach(graph, pose_request["adapter"], skeleton_image, strength)
         pose_request.update(strength=strength, skeleton_image=skeleton_image, size=[width, height])
@@ -956,6 +971,10 @@ def _resolve_pose(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any]
     parameters = _request_parameters(body)
     if "pose" not in parameters:
         return None
+    if "input_image" in parameters:
+        raise ApiError(400, "pose works when generating from text (face_image is fine); it cannot re-pose input_image. "
+                            "Leave input_image out, or leave pose out and describe the pose in the prompt",
+                       code="pose_unsupported")
     if not entry.get("pose", {}).get("supported"):
         catalog = _read_catalog()
         routes = [item["id"] for item in catalog["workflows"] if isinstance(item, dict) and item.get("pose", {}).get("supported")
@@ -965,8 +984,9 @@ def _resolve_pose(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any]
     adapter = pose_addon.adapter_for(_read_catalog(), entry)
     public_pose = _public_entry(entry, _read_catalog().get("model_registry", []))["pose"]
     if not public_pose.get("ready"):
-        raise ApiError(409, "Pose dependencies are not installed; run scripts/download_models.ps1 -Profile pose and "
-                            f"-Profile {adapter.get('download_profile', 'pose')}", public_pose, code="pose_unavailable")
+        profiles = " and ".join(f"-Profile {name}" for name in dict.fromkeys(("pose", adapter.get("download_profile", "pose"))))
+        raise ApiError(409, f"Pose dependencies are not installed; run scripts/download_models.ps1 {profiles}", public_pose,
+                       code="pose_unavailable")
     value = _as_text("pose", parameters["pose"], MAX_INPUT_IMAGE_LENGTH).strip()
     found = pose_addon.lookup(value)
     if found:
@@ -1507,7 +1527,10 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "no_match": "If no library pose fits the request, leave pose out and describe the pose in the prompt.",
             "prompt": "Also name the pose in the prompt (e.g. sitting, knee up, hand on chin): on Illustrious and character-LoRA "
                       "routes seated and kneeling poses often stay standing when only the skeleton asks for them.",
-            "pose_strength": "Optional parameters.pose_strength 0-1 (default per route in its parameter schema): how strictly the pose is followed.",
+            "pose_strength": "Optional parameters.pose_strength 0-1 (default per route in its parameter schema): how strictly the pose "
+                             "is followed. Routes whose schema has no pose_strength follow the pose without one.",
+            "applies_to": "Generation from text, with or without face_image. A pose cannot re-pose an input_image "
+                          "(edit, image-to-image, inpaint).",
             "routing": "Not every route takes a pose yet (route_table[].pose). When sending pose, add input_mode "
                        "'openpose-control' to /project/resolve so only routes that take one are chosen. If that drops the "
                        "route the requester asked for (selection.fallback is true), resolve without input_mode, keep that "
@@ -3047,7 +3070,8 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             applied["loras"] = {name: _binding_value(graph, entry, spec["strength_model"]) for name, spec in entry["lora_bindings"].items()}
         if pose_request:
             applied["pose"] = pose_request.get("id") or pose_request.get("file")
-            applied["pose_strength"] = pose_request["strength"]
+            if pose_request["strength"] is not None:
+                applied["pose_strength"] = pose_request["strength"]
         warnings = []
         for record in fit_report:
             original, used, name = record["original_size"], record["used_size"], record["parameter"]
