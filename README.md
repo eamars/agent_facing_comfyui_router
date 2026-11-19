@@ -9,6 +9,7 @@
 - **图像生成**：使用 Qwen-Image、MOSS-Image、Anima、Flux.2/Klein 和 SDXL/Illustrious 系列模型生成写实图像、动漫人物和插画。
 - **布局控制**：通过 MOSS-Image 的布局 JSON 指定文字和物体在画面中的位置与内容。
 - **参考图编辑**：通过 Qwen-Image-2.1 输入一张图片和自然语言指令，修改颜色、服装、场景等内容。
+- **扩图**：同一 Qwen 编辑路由按像素向四周扩展图片，新区域按提示词补全，原图像素保持不变。
 - **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
 - **人物参考**：通过 IPAdapter 参考人物外观。
 - **姿势**：同一个 `pose` 参数接受姿势库编号或上传的图片，服务提取骨架后按模型家族接入控制；目前 SDXL / Illustrious、Anima、Qwen-Image 文生图和 Moody Desire（Flux.2 Klein）路由已支持。
@@ -199,11 +200,26 @@ curl.exe -X POST http://127.0.0.1:8191/upload/image `
 
 Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取整，不接受宽高或批量数量覆盖。
 
+扩图同样使用 `qwen-image-2.1-edit`：加上 `extend`，给出每边要增加的像素（`left`、`top`、`right`、`bottom`，每边最多 4096，可省略），提示词只描述新区域应出现的内容，不需要蒙版或自行填充：
+
+```json
+{
+  "workflow": "qwen-image-2.1-edit",
+  "parameters": {
+    "input_image": "balcony.png",
+    "extend": {"left": 448, "right": 448},
+    "prompt": "more of the balcony railing and the city skyline at dusk"
+  }
+}
+```
+
+服务把原图放在灰色画布上，在提示词前加入"灰色区域是空白画布，请无缝延续画面并保持其余部分不变"的说明，生成后把原图像素贴回。Qwen 会重画整幅画面，有时把原图内容缩小、平移（实测最多缩到 79%、平移 190 像素），因此贴回前先按原图区域做仿射对齐，再在每条新边内侧 64 像素做渐变融合。对不齐时返回模型自己的整幅结果，并在任务的 `warnings` 中报告 `extend_original_not_kept`。输出尺寸为原图加扩展部分；超过约 240 万像素的画布按缩小尺寸生成后放大，新区域会偏软。选路时可用 `input_mode: "extend"`（或 `"outpaint"`）。
+
 参考图过大或为动图时不会被拒绝：默认 `input_fit` 为 `downscale`，服务会按工作流能处理的尺寸等比缩小（不修改原上传文件，缩小后的副本在任务结束时删除），动图取第一帧，并在响应 `warnings` 中以 `input_downscaled`、`input_resized` 或 `input_first_frame` 报告原始尺寸与实际尺寸。传 `input_fit: "none"` 则保持原图；工作流无法处理时以稳定的 `error.code` 拒绝（如 `input_too_large`、`input_animated`、`input_size_unsupported`、`mask_size_mismatch`），完整列表见 agent manifest 的 `error_codes`。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘。
 
 局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，可以是任意一张单人图片：服务用 DWPose 找到图中最大的脸，裁成包含头发和肩膀的方图再交给 IPAdapter（本身已是头像的图片原样使用），并在 `warnings` 中以 `input_cropped` 报告裁剪范围；`input_fit: "none"` 保留整图。Anima 人物参考会编码整张（裁剪后的）参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
 
-参考图有五种用途：按指令修改（`input_mode` 为 `image-edit`，Qwen 编辑）、按模型画风重绘（`image-to-image`，保留构图与配色但不保证人物一致）、局部重绘（`inpaint`）、人物参考（`face-reference`）和姿势（`openpose-control`，参数 `pose`）。agent manifest 的 `input_files.reference_uses` 列出每种用途对应的工作流，`route_table[].image_inputs` 列出各工作流接受的图片参数。
+参考图有六种用途：按指令修改（`input_mode` 为 `image-edit`，Qwen 编辑）、扩图（`extend`，Qwen 编辑加参数 `extend`）、按模型画风重绘（`image-to-image`，保留构图与配色但不保证人物一致）、局部重绘（`inpaint`）、人物参考（`face-reference`）和姿势（`openpose-control`，参数 `pose`）。agent manifest 的 `input_files.reference_uses` 列出每种用途对应的工作流，`route_table[].image_inputs` 列出各工作流接受的图片参数。
 
 生成的 PNG 保留 ComfyUI 的提示词元数据（提示词、种子、模型与参数）便于复现，但其中的输入图片文件名会在任务完成前替换为 `[input image]`，不会泄露上传文件名或路径。
 

@@ -95,6 +95,20 @@ hair to her orange hair and amber eyes; Anima also picked up her sunflower ornam
 A head shot is used as is, `input_fit=none` keeps the whole image, and both face-reference routes
 now list DWPose among their models.
 
+**Extend runs on the Qwen edit route, with an aligned paste-back** (2026-11-20). A waist-up crop of
+the reference, padded below, was continued by four methods (seed 4242): Anima inpaint and Qwen
+text-to-image with a masked latent (with or without the padded image as a reference) all left a
+visible join; Qwen edit, given grey padding and an instruction naming the grey areas, continued
+the dress, hair and feet seamlessly. Qwen edit redraws the whole frame, so the service pastes the
+original pixels back, but a plain blend ghosted on two of three later probes (desk scene grown up
+and right, photo 1.75x wider): Qwen had shrunk the original to 0.79-0.82 and shifted it by 130-190
+px. An affine fit over the original region (ECC, 128 px -> 512 px -> full size) brought the
+difference from 41-51 to 3.8-6.6 out of 255, and the blended seams came out clean on all four
+probes. Above a residual of 15, or when the fit does not cover the canvas, the model's own redraw
+is returned with a job warning. MOSS takes no image; Anima and SDXL would need inpaint-trained
+models. MOSS's graph is a plain loader, sampler and VAE, so a masked latent could run there, but it
+was not tried.
+
 **Contract rules from the 2026-09-17 audit, still in force.**
 - Unknown fields return 400 and an unknown workflow 404, with one error shape: `type`, `message`,
   `route`, `expected` and optional `details`. A missing prompt returns 422.

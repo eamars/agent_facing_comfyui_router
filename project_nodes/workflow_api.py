@@ -29,6 +29,7 @@ import folder_paths
 from comfy_execution.jobs import validate_job_id
 from server import PromptServer
 
+from project_nodes import extend as extend_addon
 from project_nodes import pose as pose_addon
 
 
@@ -51,7 +52,7 @@ PROJECT_JOB_TIMEOUT_SECONDS = 24 * 60 * 60
 # API 1.x fields that no longer steer anything; accepted with a deprecated_selector warning.
 DEPRECATED_SELECTORS = ("content_mode", "content", "safety_mode", "input_type", "input", "prompt_granularity", "granularity")
 RESOLVE_SELECTORS = ["domain", "style", "input_mode", "family", "workflow"]
-INPUT_MODES = ["text-to-image", "image-edit", "image-to-image", "inpaint", "face-reference", "openpose-control"]
+INPUT_MODES = ["text-to-image", "image-edit", "extend", "image-to-image", "inpaint", "face-reference", "openpose-control"]
 
 
 class ApiError(Exception):
@@ -365,6 +366,8 @@ def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str,
     for name, spec in properties.items():
         if name in entry["bindings"] and name not in {"prompt", "seed", "input_image", "mask_image", "face_image"}:
             spec["default"] = _binding_value(graph, entry, name)
+    if entry.get("input_contract", {}).get("image", {}).get("extend", {}).get("supported"):
+        properties["extend"] = copy.deepcopy(templates["extend"])
     if entry.get("pose", {}).get("supported"):
         properties["pose"] = copy.deepcopy(templates["pose"])
         if entry["pose"]["default_strength"] is not None:  # a reference-image adapter has no strength to set
@@ -724,6 +727,21 @@ def _attach_dynamic_image_input(graph: dict[str, Any], entry: dict[str, Any], im
     sampler_nodes[0].setdefault("inputs", {})["latent_image"] = [repeat_id, 0]
 
 
+def _extend_sides(value: Any) -> dict[str, int]:
+    """Pixels to add on each side; every key is optional, at least one must be positive."""
+    if not isinstance(value, dict) or not value or set(value) - set(extend_addon.SIDES):
+        raise ApiError(400, "extend must be an object of pixels to add, with any of left, top, right and bottom",
+                       expected=list(extend_addon.SIDES), code="invalid_parameter")
+    try:
+        sides = {side: _as_int(f"extend.{side}", value.get(side, 0), 0, 4096) for side in extend_addon.SIDES}
+    except ApiError as exc:
+        exc.code = "invalid_parameter"
+        raise
+    if not any(sides.values()):
+        raise ApiError(400, "extend needs at least one side above 0", code="invalid_parameter")
+    return sides
+
+
 def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
     parameters = body.get("parameters", {})
     if parameters is None:
@@ -768,6 +786,7 @@ def _request_parameters(body: dict[str, Any]) -> dict[str, Any]:
         "pose_strength",
         "ipadapter_weight",
         "input_fit",
+        "extend",
         "image",
         "reference_image",
         "source_image",
@@ -816,10 +835,14 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
         allowed.add("input_image")
     if _image_inputs(entry):
         allowed.add("input_fit")
+    extend_contract = image_contract.get("extend", {}) if isinstance(image_contract.get("extend"), dict) else {}
+    if extend_contract.get("supported"):
+        allowed.add("extend")
     unknown = set(parameters) - allowed
     if unknown:
         raise ApiError(400, "Workflow does not expose parameter: " + ", ".join(sorted(unknown)), sorted(unknown),
                        code="unsupported_parameter")
+    extend_sides = _extend_sides(parameters.pop("extend")) if "extend" in parameters else None
     fit_mode = parameters.pop("input_fit", "downscale")
     if fit_mode not in INPUT_FIT_MODES:
         raise ApiError(400, "input_fit must be downscale or none", expected=list(INPUT_FIT_MODES), code="invalid_parameter")
@@ -833,6 +856,23 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
             normalized, path = _resolve_input_file(parameters[name], name)
             parameters[name] = normalized
             image_info[name] = _image_info(path, name)
+    extend_record = None
+    if extend_sides:
+        if "input_image" not in parameters:
+            raise ApiError(422, "extend needs parameters.input_image, the picture to extend", expected=["input_image"])
+        source = image_info["input_image"]
+        canvas_size = (source["width"] + extend_sides["left"] + extend_sides["right"],
+                       source["height"] + extend_sides["top"] + extend_sides["bottom"])
+        if canvas_size[0] * canvas_size[1] > MAX_INPUT_PIXELS:
+            raise ApiError(400, f"The extended picture would be {canvas_size[0]}x{canvas_size[1]}, over the {MAX_INPUT_PIXELS} pixel limit",
+                           {"source_size": [source["width"], source["height"]], "extended_size": list(canvas_size)}, code="input_too_large")
+        _, path = _resolve_input_file(parameters["input_image"], "input_image")
+        canvas_name, _ = extend_addon.write_canvas(path, extend_sides, Path(folder_paths.get_input_directory()), FITTED_INPUT_DIR)
+        extend_record = {"parameter": "input_image", "original_size": [source["width"], source["height"]], "used_size": list(canvas_size),
+                         "first_frame": source["frames"] > 1, "file": canvas_name, "scope": "extend", "sides": extend_sides}
+        fit_report.append(extend_record)
+        parameters["input_image"] = canvas_name
+        image_info["input_image"] = {**source, "width": canvas_size[0], "height": canvas_size[1], "frames": 1, "alpha": False}
     _fit_inputs(entry, parameters, image_info, fit_mode, fit_report)
     if "input_image" in image_info and image_contract.get("mode") == "latent-img2img":
         source = image_info["input_image"]
@@ -963,6 +1003,9 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
         if _binding_value(graph, entry, "mask_channel") == "alpha" and not image_info["mask_image"]["alpha"]:
             raise ApiError(400, "mask_channel=alpha requires a mask with transparency; transparent pixels are redrawn",
                            code="mask_alpha_missing")
+    if extend_record:
+        sides, (width, height) = extend_record["sides"], extend_record["original_size"]
+        extend_addon.attach(graph, extend_contract, extend_record["file"], (sides["left"], sides["top"], width, height))
     if pose_request:
         if pose_strength is not None and entry["pose"]["default_strength"] is None:
             raise ApiError(400, "Workflow does not expose parameter: pose_strength; this route follows the pose without a strength "
@@ -1027,6 +1070,15 @@ def _resolve_pose(entry: dict[str, Any], body: dict[str, Any]) -> dict[str, Any]
     skeleton = pose_addon.skeleton(source_name)
     return {**source, "people_detected": len(skeleton["people"]), "found_by": skeleton["found_by"],
             "skeleton": skeleton, "adapter": adapter}
+
+
+def _extend_summary(fit_report: list[dict[str, Any]]) -> dict[str, Any] | None:
+    records = [record for record in fit_report if record["parameter"] == "input_image"]
+    extended = next((record for record in records if record.get("scope") == "extend"), None)
+    if not extended:
+        return None
+    return {"source_size": extended["original_size"], "added": extended["sides"], "output_size": extended["used_size"],
+            "drawn_at": records[-1]["used_size"]}
 
 
 def _pose_summary(pose_request: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -1285,6 +1337,15 @@ def _resolve_routes(
         selected = None
         selection_status = "ambiguous"
         guidance = "Provide domain or an explicit workflow because multiple model/workflow routes are plausible."
+    routes_for_input_mode = []
+    if selection_status == "no_match" and query.get("input_mode"):
+        mode_only = {"input_mode": query["input_mode"]}
+        routes_for_input_mode = [entry["id"] for entry in catalog["workflows"] if isinstance(entry, dict)
+                                 and _public_entry(entry, model_registry)["ready"] and _route_score(entry, mode_only) is not None]
+        guidance = (f"No ready route matches all the fields sent. Routes that take input_mode {query['input_mode']!r}: "
+                    f"{', '.join(routes_for_input_mode) or 'none'}; resolve again without the other fields, or offer one of these.")
+    if total_matches > limit:
+        guidance += f" {total_matches} routes matched; send limit (up to 20) to see more than {limit}."
     matches = matches[:limit]
     # Sibling routes of one family (e.g. two JANKU versions) differ in house style, not score; surface the hand-off.
     prefer_instead = selected["workflow"].get("selection", {}).get("prefer_instead", []) if selected else []
@@ -1300,6 +1361,7 @@ def _resolve_routes(
             "total_matches": total_matches,
             "guidance": guidance,
             "prefer_instead": prefer_instead,
+            **({"routes_for_input_mode": routes_for_input_mode} if routes_for_input_mode else {}),
         },
         "warnings": _deprecation_warnings(list(deprecated)),
     }
@@ -1338,6 +1400,14 @@ def _reference_uses(workflows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                          for contract in entry.get("input_contract", {}).values())]
         if routes:
             uses.append({"intent": intent, "input_mode": input_mode, "parameter": parameter, "routes": routes, "behaviour": behaviour})
+    extend_routes = [entry["id"] for entry in workflows
+                     if entry.get("input_contract", {}).get("image", {}).get("extend", {}).get("supported")]
+    if extend_routes:
+        uses.append({"intent": "Extend an uploaded image beyond its borders (outpaint, uncrop, change the aspect ratio by adding scenery).",
+                     "input_mode": "extend", "parameter": "input_image + extend", "routes": extend_routes,
+                     "behaviour": "extend gives pixels to add per side, e.g. {\"left\": 256, \"right\": 256}. The prompt describes "
+                                  "only what the new areas should show. Output is the original size plus the extension, with the "
+                                  "original pixels kept; no mask or padding is needed. The response's extend object gives output_size."})
     pose_routes = [entry["id"] for entry in workflows if entry.get("pose", {}).get("supported")]
     if pose_routes:
         uses.append({"intent": "Copy the body pose of a person in an uploaded photo, illustration or sketch.",
@@ -1360,7 +1430,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         "api_version": "2.0.0",
         "service": {
             "description": "Image generation for this ComfyUI server: pick a named route, then generate from text, edit an image "
-                           "by instruction, restyle, inpaint, reuse a face or copy a body pose.",
+                           "by instruction, extend it beyond its borders, restyle, inpaint, reuse a face or copy a body pose.",
             "api_base": "/project",
             "authentication": "none",
             "openapi": "/project/openapi.json",
@@ -1380,7 +1450,8 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "4. POST /project/generate {\"workflow\": id, \"parameters\": {\"prompt\": ...}}, optionally with a "
             "\"client_id\" label. Send only fields in the route's parameter_schema; omitted fields take the route's defaults. "
             "Add \"dry_run\": true to validate without running.",
-            "5. Poll GET /project/jobs/{prompt_id} until state is succeeded or failed, then download outputs[].url.",
+            "5. Poll GET /project/jobs/{prompt_id} until state is succeeded or failed, then download outputs[].url. Pass any "
+            "warnings from the submission and the job on to the requester.",
         ],
         "resolve": {
             "path": "POST /project/resolve",
@@ -1390,6 +1461,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                 "input_mode": INPUT_MODES,
                 "family": "exact route family, to stay within one model family",
                 "workflow": "a route id, to inspect that one route",
+                "limit": "how many matches to return, 1-20 (default 1); selection.total_matches says how many matched",
             },
             "deprecated": "content_mode, input_type and prompt_granularity are accepted but ignored, with a "
                           "deprecated_selector warning.",
@@ -1480,6 +1552,11 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_resized": "An input or the output size was adjusted to the route's size rules.",
             "input_first_frame": "An animated input was reduced to its first frame.",
             "input_cropped": "face_image was cropped to the face it shows; crop_box gives the pixels used.",
+            "extend_drawn_smaller": "The extended picture is larger than the route draws at full size: it is drawn smaller "
+                                    "and scaled back to output_size, so the new areas are softer.",
+            "extend_original_not_kept": "Reported on the job, not the submission: the extended picture is the model's "
+                                        "own redraw because it could not be aligned with the original, so the original "
+                                        "area may differ slightly.",
             "over_pixel_budget": "The request exceeds the route's tested pixel budget; it still runs but may be slow or "
                                  "fail with out_of_memory.",
             "outside_recommended_range": "A sampling value is outside the route's recommended range; it was kept.",
@@ -1996,6 +2073,12 @@ def _openapi_document() -> dict[str, Any]:
                             "maximum": 1,
                             "description": "How strictly the pose is followed.",
                         },
+                        "extend": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "properties": {side: {"type": "integer", "minimum": 0, "maximum": 4096} for side in ("left", "top", "right", "bottom")},
+                            "description": "Grow input_image beyond its borders: pixels to add on each side (omitted sides add 0). The prompt describes what should appear in the new areas; the original pixels are kept. Only routes with extend support accept it.",
+                        },
                         "input_fit": {
                             "type": "string",
                             "enum": list(INPUT_FIT_MODES),
@@ -2125,6 +2208,14 @@ def _output_references(history_entry: dict[str, Any]) -> list[dict[str, Any]]:
     return references
 
 
+def _runtime_warnings(history_entry: dict[str, Any]) -> list[dict[str, Any]]:
+    """Warnings that project nodes report while the job runs (their UI output), e.g. extend_original_not_kept."""
+    outputs = history_entry.get("outputs", {})
+    return [warning for node_output in (outputs.values() if isinstance(outputs, dict) else [])
+            if isinstance(node_output, dict) for warning in node_output.get(extend_addon.WARNING_KEY, []) or []
+            if isinstance(warning, dict)]
+
+
 def _history_error(entry: dict[str, Any]) -> dict[str, Any] | None:
     for event, data in reversed(entry.get("status", {}).get("messages", [])):
         if event in {"execution_error", "execution_interrupted"}:
@@ -2177,6 +2268,7 @@ async def get_project_job(request: web.Request) -> web.Response:
                 "completed": completed or status_str == "error",
                 "status": status_str,
                 "outputs": _output_references(entry),
+                "warnings": _runtime_warnings(entry),
             }
             if isinstance(coordinator_state, dict):
                 result["workflow"] = coordinator_state.get("workflow")
@@ -2194,7 +2286,7 @@ async def get_project_job(request: web.Request) -> web.Response:
                 "status": coordinator_state.get("status"),
                 "outputs": coordinator_state.get("outputs", []),
             }
-            for key in ("phase", "queue_position", "queue_scope", "error"):
+            for key in ("phase", "queue_position", "queue_scope", "error", "warnings"):
                 if key in coordinator_state:
                     result[key] = coordinator_state[key]
             return _job_response(result, coordinator_state)
@@ -2357,6 +2449,7 @@ class ProjectWorkflowCoordinator:
                 status=status_str or "error",
                 phase="complete",
                 outputs=_output_references(history_entry),
+                warnings=_runtime_warnings(history_entry),
                 error=_history_error(history_entry) if not succeeded else None,
             )
             self._active_prompt_id = None
@@ -2474,8 +2567,8 @@ def _project_input_files() -> tuple[bool, list[dict[str, Any]]]:
             # input directory must not be exposed.
             continue
         name = relative.as_posix()
-        if not name or name.startswith("../") or name.startswith(f"{pose_addon.CACHE_DIR}/"):
-            continue  # the pose cache (library sketches, skeletons) is the service's, not the requester's
+        if not name or name.startswith("../") or name.startswith((f"{pose_addon.CACHE_DIR}/", f"{FITTED_INPUT_DIR}/")):
+            continue  # the pose cache and per-job fitted copies are the service's, not the requester's
         files.append(
             {
                 "name": name,
@@ -2766,8 +2859,23 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             if pose_request["strength"] is not None:
                 applied["pose_strength"] = pose_request["strength"]
         warnings = _deprecation_warnings([name for name in ("prompt_granularity",) if name in body])
+        extended = next((record for record in fit_report if record.get("scope") == "extend"), None)
         for record in fit_report:
             original, used, name = record["original_size"], record["used_size"], record["parameter"]
+            if extended and record is not extended and name == "input_image":
+                warnings.append({"code": "extend_drawn_smaller", "parameter": "extend", "original_size": original, "used_size": used,
+                                 "output_size": original,
+                                 "message": f"The extended picture is {original[0]}x{original[1]}, above what {workflow_id} draws at full "
+                                            f"size: the model draws it at {used[0]}x{used[1]} and the result is scaled back, so the "
+                                            f"output is still {original[0]}x{original[1]} with the original pixels kept, but the new "
+                                            "areas are softer. input_fit=none draws it at full size instead (over the tested pixel "
+                                            "budget: slower and may run out of memory)."})
+                continue
+            if record.get("scope") == "extend":
+                if record["first_frame"]:
+                    warnings.append({"code": "input_first_frame", "parameter": name,
+                                     "message": f"{name} is animated; only its first frame was extended."})
+                continue
             if record["first_frame"]:
                 warnings.append({"code": "input_first_frame", "parameter": name,
                                  "message": f"{name} is animated; only its first frame was used."})
@@ -2809,6 +2917,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
                     "resources": resources,
                     "warnings": warnings,
                     "pose": _pose_summary(pose_request),
+                    "extend": _extend_summary(fit_report),
                     "prompt": graph,
                 }
             )
@@ -2824,6 +2933,7 @@ async def post_project_prompt(request: web.Request) -> web.Response:
         result["resources"] = resources
         result["warnings"] = warnings
         result["pose"] = _pose_summary(pose_request)
+        result["extend"] = _extend_summary(fit_report)
         return web.json_response(result)
     except pose_addon.PoseError as exc:
         return _json_error(ApiError(exc.status, exc.message, exc.details, code=exc.code,
@@ -2890,8 +3000,7 @@ def _register_routes() -> None:
 
 _register_routes()
 
-# ComfyUI requires this mapping for a V1 custom-node module.  This extension
-# intentionally contributes routes only and does not add nodes to the graph.
-NODE_CLASS_MAPPINGS: dict[str, Any] = {}
-NODE_DISPLAY_NAME_MAPPINGS: dict[str, str] = {}
+# ComfyUI loads this module as a V1 custom node: the routes above plus the extend add-on's paste node.
+NODE_CLASS_MAPPINGS: dict[str, Any] = {"ProjectExtendPaste": extend_addon.ProjectExtendPaste}
+NODE_DISPLAY_NAME_MAPPINGS: dict[str, str] = {"ProjectExtendPaste": "Project: extend paste-back"}
 WEB_DIRECTORY = None

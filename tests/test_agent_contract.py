@@ -249,6 +249,45 @@ class AgentContractTests(unittest.TestCase):
             fit("qwen-image-2.1-t2i", input_image="big.png")
         self.assertEqual(caught.exception.code, "unsupported_parameter")
 
+    def test_extend_pads_the_source_and_pastes_the_original_back(self):
+        entries = {e["id"]: e for e in catalog["workflows"]}
+        report = []
+        graph = api._prepare_graph(entries["qwen-image-2.1-edit"], {"parameters": {
+            "prompt": "more sky", "input_image": "source.png", "extend": {"top": 100, "right": 40}}}, report)
+        self.assertEqual((report[0]["scope"], report[0]["used_size"]), ("extend", [360, 484]))
+        with Image.open(self.root / "input" / report[0]["file"]) as canvas:
+            self.assertEqual((canvas.getpixel((0, 0)), canvas.getpixel((0, 100))), ((128, 128, 128), (0, 0, 128)))
+        paste_id, paste = next((k, n) for k, n in graph.items() if n["class_type"] == "ProjectExtendPaste")
+        self.assertEqual([paste["inputs"][k] for k in ("left", "top", "width", "height")], [0, 100, 320, 384])
+        self.assertTrue(any(n.get("inputs", {}).get("images") == [paste_id, 0] for n in graph.values()))
+        prompt = next(n for n in graph.values() if n["class_type"] == "TextEncodeQwenImage21")["inputs"]["prompt"]
+        self.assertTrue(prompt.startswith("The flat grey areas") and prompt.endswith("more sky"))
+        for bad in ({}, {"middle": 5}, {"left": 0}, {"left": -1}):
+            with self.assertRaises(api.ApiError) as caught:
+                api._prepare_graph(entries["qwen-image-2.1-edit"], {"parameters": {"prompt": "", "input_image": "source.png", "extend": bad}})
+            self.assertIn(caught.exception.code, {"invalid_parameter", None})
+        with self.assertRaises(api.ApiError) as caught:
+            self.graph(input_image="source.png", extend={"left": 64})
+        self.assertEqual(caught.exception.code, "unsupported_parameter")
+
+    def test_extend_paste_aligns_a_zoomed_redraw(self):
+        import cv2
+        import numpy as np
+        from project_nodes import extend
+        rng = np.random.default_rng(0)
+        canvas = cv2.GaussianBlur(rng.random((300, 400, 3), np.float32), (0, 0), 8)
+        canvas = (canvas - canvas.min()) / (canvas.max() - canvas.min())
+        region = (100, 0, 200, 300)
+        # Like Qwen: the redraw shrinks the original to 0.8 and shifts it.
+        zoom = np.float32([[0.8, 0, 50], [0, 0.8, 25]])
+        redraw = cv2.warpAffine(canvas, zoom, (400, 300), borderMode=cv2.BORDER_REFLECT)
+        redraw = np.dstack([redraw, np.ones((300, 400), np.float32)])  # the Qwen-Image 2.1 VAE decodes RGBA
+        result, report = extend.align_and_paste(redraw, canvas, region)
+        self.assertTrue(report["aligned"], report)
+        np.testing.assert_allclose(result[:, 170:230], canvas[:, 170:230], atol=1e-6)  # inside the feather band: original pixels
+        _, report = extend.align_and_paste(rng.random((300, 400, 3), np.float32), canvas, region)
+        self.assertFalse(report["aligned"])
+
     def test_route_scope_and_exact_capabilities(self):
         entries = {e["id"]: e for e in catalog["workflows"]}
         self.assertIsNone(api._route_score(entries["chatgpt-girl-anima-turbo"], {"domain": "anime"}))

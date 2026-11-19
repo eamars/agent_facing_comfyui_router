@@ -435,7 +435,7 @@
     {
       "id": "qwen-image-2.1-edit",
       "name": "Qwen-Image-2.1 Uncensored Q4_K_M Image Edit",
-      "description": "Uncensored Q4_K_M reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32.",
+      "description": "Uncensored Q4_K_M reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32. With extend it grows the image beyond its borders instead and keeps the original pixels.",
       "family": "qwen-image-2.1",
       "resident_group": "qwen-image-2.1-edit",
       "tags": [
@@ -488,7 +488,9 @@
           "image"
         ],
         "input_modes": [
-          "image-edit"
+          "image-edit",
+          "extend",
+          "outpaint"
         ],
         "output_types": [
           "image"
@@ -517,7 +519,14 @@
             "http-upload"
           ],
           "processing": "Official TextEncodeQwenImage21 with resolution=0; reference conditioning plus source-sized empty latent. One reference exposed by this named route.",
-          "use_for": "Instruction-based edit of an uploaded photo or illustration: the prompt says what to change (colour, object, material, background, text) and the rest of the image is kept. Not a style transfer and not a face-identity reference."
+          "use_for": "Instruction-based edit of an uploaded photo or illustration: the prompt says what to change (colour, object, material, background, text) and the rest of the image is kept. Not a style transfer and not a face-identity reference.",
+        "extend": {
+          "supported": true,
+          "instruction": "The flat grey areas at the edges are empty canvas. Fill them so the picture continues seamlessly beyond its original borders, matching its style, lighting and perspective. Keep the rest of the picture unchanged. The new areas show: ",
+          "feather": 64,
+          "max_residual": 15.0,
+          "basis": "2026-11-20 probes: grey padding plus this instruction continued a waist-up crop to full body, a balcony scene 2x sideways, a desk scene up and right, and a photo 1.75x wider. Qwen shrank and shifted the original by up to 21% and 190 px, so the paste-back aligns before blending."
+        }
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -604,6 +613,7 @@
         "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1. denoise is fixed at 1 and not a parameter: sampling starts from an empty latent and the source enters only as a reference, so lower denoise returns a flat texture instead of an edit.",
         "negative_prompt": "Inactive at CFG 1.",
         "input_image": "Required relative uploaded filename. Reference size determines output size, rounded to multiples of 32; batch is one.",
+        "extend": "To extend, send extend with pixels per side and describe only what the new areas should show, e.g. extend {\"left\": 448, \"right\": 448} with prompt \"more of the balcony railing and the city skyline at dusk\". The service pads, instructs the model and pastes the original back; output is the source size plus the extension. Extended canvases above about 2.4 MP are drawn smaller and scaled up, so the new areas are softer.",
         "prompt_scope": "Write the edit as a direct instruction, e.g. 'Change the teapot to cobalt blue. Keep everything else the same.' Name what must stay unchanged when it matters."
       },
       "prompting": {
@@ -658,7 +668,7 @@
       },
       "selection": {
         "best_for": [
-          "instruction-based edits of an uploaded image that keep everything else (colour, object, material, background or text changes)",
+          "instruction-based edits of an uploaded image (colour, object, material, background or text changes); the whole picture is redrawn from the source, so small unrequested details can shift: name what must stay unchanged",
           "photos, renders and illustrations alike",
           "adding or replacing legible text in an existing image"
         ],
