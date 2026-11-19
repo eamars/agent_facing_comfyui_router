@@ -219,7 +219,7 @@ Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取�
 
 参考图过大或为动图时不会被拒绝：默认 `input_fit` 为 `downscale`，服务会按工作流能处理的尺寸等比缩小（不修改原上传文件，缩小后的副本在任务结束时删除），动图取第一帧，并在响应 `warnings` 中以 `input_downscaled`、`input_resized` 或 `input_first_frame` 报告原始尺寸与实际尺寸。传 `input_fit: "none"` 则保持原图；工作流无法处理时以稳定的 `error.code` 拒绝（如 `input_too_large`、`input_animated`、`input_size_unsupported`、`mask_size_mismatch`），完整列表见 agent manifest 的 `error_codes`。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘；只给 `width` 或 `height` 时保持原图比例，两者都给且比例不同时取原图中央部分（`input_cropped` 警告），不会拉伸。
 
-局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，可以是任意一张单人图片：服务用 DWPose 找到图中最大的脸，裁成包含头发和肩膀的方图再交给 IPAdapter（本身已是头像的图片原样使用），并在 `warnings` 中以 `input_cropped` 报告裁剪范围；`input_fit: "none"` 保留整图。Anima 人物参考会编码整张（裁剪后的）参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
+局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。原图大于工作流能绘制的尺寸时，只截取蒙版周围的区域（含部分上下文）按模型尺寸重绘，再贴回原图：输出保持原图尺寸，蒙版外的像素完全不变，并给出 `inpaint_region` 警告。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，可以是任意一张单人图片：服务用 DWPose 找到图中最大的脸，裁成包含头发和肩膀的方图再交给 IPAdapter（本身已是头像的图片原样使用），并在 `warnings` 中以 `input_cropped` 报告裁剪范围；`input_fit: "none"` 保留整图。Anima 人物参考会编码整张（裁剪后的）参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
 
 参考图有六种用途：按指令修改（`input_mode` 为 `image-edit`，Qwen 编辑）、扩图（`extend`，Qwen 编辑加参数 `extend`）、按模型画风重绘（`image-to-image`，保留构图与配色但不保证人物一致）、局部重绘（`inpaint`）、人物参考（`face-reference`）和姿势（`openpose-control`，参数 `pose`）。agent manifest 的 `input_files.reference_uses` 列出每种用途对应的工作流，`route_table[].image_inputs` 列出各工作流接受的图片参数。
 

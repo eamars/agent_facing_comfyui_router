@@ -585,6 +585,18 @@ def _fit_inputs(entry: dict[str, Any], parameters: dict[str, Any], image_info: d
         size = (info["width"], info["height"])
         if image_mode == "inpaint-source" and name == "input_image":
             target = _fit_size(*size, max_pixels=budget, max_side=2048, multiple=8, min_side=64)
+            region = None
+            if fit_mode != "none" and "mask_image" in image_info and (size[0] * size[1] > budget or max(size) > 2048):
+                region = _inpaint_region(entry, parameters, image_info, size, budget)
+            if region:
+                box, work = region
+                record = {"parameter": name, "original_size": list(size), "used_size": list(work), "first_frame": info["frames"] > 1,
+                          "file": None, "crop_box": list(box), "crop_reason": "inpaint"}
+                if info["frames"] > 1:  # LoadImage would read every frame; keep the full size, first frame only
+                    _, path = _resolve_input_file(parameters[name], name)
+                    record["file"] = parameters[name] = _write_fitted_input(path, size, mask=False)
+                report.append(record)
+                continue
         elif image_mode == "inpaint-source" and name == "mask_image":
             source = image_info["input_image"]
             original = next((r["original_size"] for r in report if r["parameter"] == "input_image"), (source["width"], source["height"]))
@@ -643,7 +655,11 @@ def _binding_value(graph: dict[str, Any], entry: dict[str, Any], name: str) -> A
 
 
 def _resource_request(graph: dict[str, Any], entry: dict[str, Any]) -> dict[str, Any]:
-    if "width" in entry["bindings"]:
+    working = [node for node in graph.values() if isinstance(node, dict)
+               and node.get("_meta", {}).get("title") == "project inpaint working size"]
+    if working:
+        width, height, batch = working[0]["inputs"]["width"], working[0]["inputs"]["height"], 1
+    elif "width" in entry["bindings"]:
         width, height, batch = (_binding_value(graph, entry, name) for name in ("width", "height", "batch_size"))
     else:
         _, path = _resolve_input_file(_binding_value(graph, entry, "input_image"), "input_image")
@@ -681,6 +697,78 @@ def _centre_crop_box(source: tuple[int, int], output: tuple[int, int]) -> list[i
     if 2 * x < 0.01 * width and 2 * y < 0.01 * height:
         return None
     return [x, y, width - x, height - y]
+
+
+# Context kept around the mask when inpainting a region of a large picture, as a share of the mask's longer side.
+INPAINT_CONTEXT = 0.4
+INPAINT_NATIVE_PIXELS = 1_048_576
+
+
+def _inpaint_region(entry: dict[str, Any], parameters: dict[str, Any], image_info: dict[str, dict[str, Any]],
+                    size: tuple[int, int], budget: int) -> tuple[tuple[int, int, int, int], tuple[int, int]] | None:
+    """Box around the mask (with context) on a source too large for the route, and the size the model draws it at.
+
+    None when the mask is empty, so the caller falls back to shrinking the whole picture.
+    """
+    import numpy as np
+    channel = str(parameters.get("mask_channel") or _binding_value(_read_workflow(entry), entry, "mask_channel")).strip().lower()
+    _, mask_path = _resolve_input_file(parameters["mask_image"], "mask_image")
+    with Image.open(mask_path) as mask_file:
+        mask_file.seek(0)
+        mask = ImageOps.exif_transpose(mask_file)
+        if channel == "alpha":
+            values = 255 - np.asarray(mask.convert("RGBA"))[..., 3]  # LoadImageMask redraws transparent pixels
+        else:
+            values = np.asarray(mask.convert("RGB"))[..., {"red": 0, "green": 1, "blue": 2}.get(channel, 0)]
+    rows, cols = np.nonzero(values > 127)
+    if not len(rows):
+        return None
+    scale_x, scale_y = size[0] / values.shape[1], size[1] / values.shape[0]
+    x0, x1, y0, y1 = cols.min() * scale_x, (cols.max() + 1) * scale_x, rows.min() * scale_y, (rows.max() + 1) * scale_y
+    pad = max(64.0, INPAINT_CONTEXT * max(x1 - x0, y1 - y0))
+    box = (max(0, int(x0 - pad)), max(0, int(y0 - pad)), min(size[0], math.ceil(x1 + pad)), min(size[1], math.ceil(y1 + pad)))
+    width, height = box[2] - box[0], box[3] - box[1]
+    # Draw small regions at about the model's native size (more detail), large ones within the budget.
+    factor = math.sqrt(min(budget, max(width * height, INPAINT_NATIVE_PIXELS)) / (width * height))
+    work = _fit_size(max(8, round(width * factor)), max(8, round(height * factor)), max_pixels=budget, max_side=2048, multiple=8, min_side=64)
+    return box, work
+
+
+def _attach_inpaint_region(graph: dict[str, Any], entry: dict[str, Any], box: list[int], work: list[int]) -> None:
+    """Draw only the region: crop source and mask to box, scale them to work, then paste the result into the full source.
+
+    The paste uses the full-resolution mask, so every pixel outside it stays exactly as uploaded.
+    """
+    image_id, mask_id = entry["bindings"]["input_image"]["node"], entry["bindings"]["mask_image"]["node"]
+    savers = [node for node in graph.values() if isinstance(node, dict) and str(node.get("class_type", "")).startswith("SaveImage")]
+    if len(savers) != 1:
+        raise ApiError(500, f"Workflow {entry['id']} does not have the single save node the inpaint region expects")
+    x, y, width, height = box[0], box[1], box[2] - box[0], box[3] - box[1]
+    first = max(int(node_id) for node_id in graph if str(node_id).isdigit()) + 1
+    ids = [str(first + offset) for offset in range(9)]
+    crop, scaled, mask_crop, mask_image, mask_scaled, mask_back, result_scaled, paste = ids[:8]
+    added = {
+        crop: {"class_type": "ImageCrop", "inputs": {"image": [image_id, 0], "width": width, "height": height, "x": x, "y": y}},
+        scaled: {"class_type": "ImageScale", "_meta": {"title": "project inpaint working size"},
+                 "inputs": {"image": [crop, 0], "upscale_method": "lanczos", "crop": "disabled", "width": work[0], "height": work[1]}},
+        mask_crop: {"class_type": "CropMask", "inputs": {"mask": [mask_id, 0], "x": x, "y": y, "width": width, "height": height}},
+        mask_image: {"class_type": "MaskToImage", "inputs": {"mask": [mask_crop, 0]}},
+        mask_scaled: {"class_type": "ImageScale", "inputs": {"image": [mask_image, 0], "upscale_method": "bilinear", "crop": "disabled",
+                                                             "width": work[0], "height": work[1]}},
+        mask_back: {"class_type": "ImageToMask", "inputs": {"image": [mask_scaled, 0], "channel": "red"}},
+    }
+    for node in graph.values():  # everything that read the full source or mask now reads the working region
+        for key, value in node.get("inputs", {}).items():
+            if value == [image_id, 0]:
+                node["inputs"][key] = [scaled, 0]
+            elif value == [mask_id, 0]:
+                node["inputs"][key] = [mask_back, 0]
+    graph.update(added)
+    graph[result_scaled] = {"class_type": "ImageScale", "inputs": {"image": savers[0]["inputs"]["images"], "upscale_method": "lanczos",
+                                                                  "crop": "disabled", "width": width, "height": height}}
+    graph[paste] = {"class_type": "ImageCompositeMasked", "inputs": {"destination": [image_id, 0], "source": [result_scaled, 0],
+                                                                     "x": x, "y": y, "resize_source": False, "mask": [mask_crop, 0]}}
+    savers[0]["inputs"]["images"] = [paste, 0]
 
 
 def _attach_dynamic_image_input(graph: dict[str, Any], entry: dict[str, Any], image_name: str) -> None:
@@ -1022,6 +1110,9 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
         if _binding_value(graph, entry, "mask_channel") == "alpha" and not image_info["mask_image"]["alpha"]:
             raise ApiError(400, "mask_channel=alpha requires a mask with transparency; transparent pixels are redrawn",
                            code="mask_alpha_missing")
+    region = next((record for record in fit_report if record.get("crop_reason") == "inpaint"), None)
+    if region:
+        _attach_inpaint_region(graph, entry, region["crop_box"], region["used_size"])
     if extend_record:
         sides, (width, height) = extend_record["sides"], extend_record["original_size"]
         extend_addon.attach(graph, extend_contract, extend_record["file"], (sides["left"], sides["top"], width, height))
@@ -1405,7 +1496,8 @@ _REFERENCE_USES = (
      "Width or height alone keeps the source's shape; both of another shape crop the centre (warning input_cropped), never stretch."),
     ("inpaint-source", "inpaint", "input_image + mask_image",
      "Repaint only a masked region of an uploaded image.",
-     "Mask must have the source's aspect ratio (it is resized with the source when fitted). denoise 1.0 replaces the region; lower keeps more of the original. Unmasked pixels are composited back unchanged."),
+     "Mask must have the source's aspect ratio. denoise 1.0 replaces the region; lower keeps more of the original. Unmasked pixels are composited back unchanged. "
+     "On a picture larger than the route draws, only the region around the mask is drawn and pasted back (warning inpaint_region), so the output keeps the upload's size."),
     ("face-reference", "face-reference", "face_image",
      "Put the same face/character into a new scene described by the prompt.",
      "IPAdapter conditioning, not FaceID. Outfit, pose and background come from the prompt at the default weight; on the Anima route weights of 0.8-1.0 copy the reference's outfit and background."),
@@ -1607,6 +1699,8 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_downscaled": "An input was shrunk to fit the route; original_size and used_size say how.",
             "input_resized": "An input or the output size was adjusted to the route's size rules.",
             "input_first_frame": "An animated input was reduced to its first frame.",
+            "inpaint_region": "Inpaint on a picture larger than the route draws: only the region around the mask was "
+                              "drawn and pasted back; the output keeps the upload's size and unmasked pixels.",
             "input_cropped": "An input was cropped: face_image to head and shoulders around its face, or input_image to the "
                              "centre when width and height ask for another shape (image-to-image never stretches); crop_box "
                              "gives the pixels used.",
@@ -3179,6 +3273,14 @@ async def post_project_prompt(request: web.Request) -> web.Response:
                                  "message": f"The output {used[0]}x{used[1]} has another shape than {name} ({original[0]}x{original[1]}), "
                                             f"so the centre {record['crop_box']} (x0, y0, x1, y1) was used instead of stretching. "
                                             "Send only width or only height to keep the whole picture."})
+            elif record.get("crop_reason") == "inpaint":
+                box = record["crop_box"]
+                warnings.append({"code": "inpaint_region", "parameter": name, "original_size": original, "crop_box": box,
+                                 "used_size": used,
+                                 "message": f"{name} ({original[0]}x{original[1]}) is larger than {workflow_id} draws, so only the region "
+                                            f"around the mask {box} (x0, y0, x1, y1) was drawn, at {used[0]}x{used[1]}, and pasted "
+                                            f"back. The output keeps {original[0]}x{original[1]} and every pixel outside the mask is "
+                                            "unchanged."})
             elif record.get("crop_box"):
                 warnings.append({"code": "input_cropped", "parameter": name, "original_size": original, "crop_box": record["crop_box"],
                                  "used_size": used,

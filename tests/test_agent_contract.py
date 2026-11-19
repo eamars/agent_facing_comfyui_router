@@ -11,9 +11,10 @@ import unittest
 from unittest.mock import patch
 import uuid
 
+import numpy  # noqa: F401  loaded once here: patch.dict(sys.modules) would drop it, and its C extension cannot load twice
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT =Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 # Only ComfyUI server registration is substituted here. Graph construction,
@@ -248,6 +249,27 @@ class AgentContractTests(unittest.TestCase):
         with self.assertRaises(api.ApiError) as caught:
             fit("qwen-image-2.1-t2i", input_image="big.png")
         self.assertEqual(caught.exception.code, "unsupported_parameter")
+
+    def test_inpaint_on_a_large_picture_draws_the_mask_region_and_pastes_it_back(self):
+        entries = {e["id"]: e for e in catalog["workflows"]}
+        Image.new("RGB", (3000, 4000), "navy").save(self.root / "input/big.png")
+        mask = Image.new("RGB", (3000, 4000), "black"); mask.paste((255, 255, 255), (1000, 1000, 1200, 1300)); mask.save(self.root / "input/small_mask.png")
+        Image.new("RGB", (3000, 4000), "black").save(self.root / "input/empty_mask.png")
+        report = []
+        entry = entries["anima-turbo-inpaint"]
+        graph = api._prepare_graph(entry, {"parameters": {"prompt": "x", "input_image": "big.png", "mask_image": "small_mask.png"}}, report)
+        region = report[0]
+        self.assertEqual((region["crop_reason"], region["crop_box"]), ("inpaint", [880, 880, 1320, 1420]))  # mask plus 120 px context
+        self.assertTrue(all(v % 8 == 0 for v in region["used_size"]) and region["used_size"][0] * region["used_size"][1] >= 900_000)
+        image_id = entry["bindings"]["input_image"]["node"]
+        self.assertEqual(graph[image_id]["inputs"]["image"], "big.png")  # the full upload, not a shrunk copy
+        save = next(n for n in graph.values() if n["class_type"] == "SaveImage")
+        paste = graph[save["inputs"]["images"][0]]
+        self.assertEqual((paste["class_type"], paste["inputs"]["destination"], paste["inputs"]["x"]), ("ImageCompositeMasked", [image_id, 0], 880))
+        self.assertEqual(api._resource_request(graph, entry)["total_pixels"], region["used_size"][0] * region["used_size"][1])
+        report = []
+        api._prepare_graph(entry, {"parameters": {"prompt": "x", "input_image": "big.png", "mask_image": "empty_mask.png"}}, report)
+        self.assertNotIn("crop_reason", report[0])  # nothing to redraw: the old whole-picture fit
 
     def test_img2img_crops_the_centre_instead_of_stretching(self):
         report = []
