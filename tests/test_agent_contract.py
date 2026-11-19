@@ -663,6 +663,13 @@ class WorkerGuardTests(unittest.TestCase):
             for label, data in [("native-1", {}), ("named-1", named), ("named-2", named), ("native-2", {}), ("failure", named), ("recovered", named)]:
                 instance.execute({}, label, data, [])
         self.assertEqual(events, ["native-1", "reset", "release", "named-1", "named-2", "reset", "release", "native-2", "reset", "release", "failure", "reset", "release", "reset", "release", "recovered"])
+        # A light job (the upscaler) keeps the resident model on both sides of it.
+        events.clear()
+        light = {"project_workflow": "image-upscale", "project_light": True, "project_resources": {}}
+        with patch.object(runtime_guard, "release_models", side_effect=lambda: events.append("release")):
+            for label, data in [("named-3", named), ("upscale", light), ("named-4", named)]:
+                instance.execute({}, label, data, [])
+        self.assertEqual(events, ["named-3", "upscale", "named-4"])
 
     def test_real_memory_failures_are_reported_as_out_of_memory(self):
         failures = [

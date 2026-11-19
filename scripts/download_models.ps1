@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'anima-control-pose', 'pose', 'moss-image-sft', 'all')]
+    [ValidateSet('qwen-image-2.1', 'moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'anima-control-pose', 'pose', 'upscale', 'moss-image-sft', 'all')]
     [string]$Profile = 'moody-desire-v30'
 )
 
@@ -295,6 +295,23 @@ $AssetSets = @{
             Sha256 = 'C10FA11628E9B1BF16DFE095AC5C6DC4DDD9AE77D7FE023D0A1857F7E29C516F'
         }
     )
+    # Upscaler tool (POST /project/images/upscale): one model for anime and painted pictures, one for photos.
+    'upscale' = @(
+        [pscustomobject]@{
+            Name = '4x-AnimeSharp upscaler (Kim2091, CC BY-NC-SA 4.0)'
+            Url = 'https://huggingface.co/Kim2091/AnimeSharp/resolve/main/4x-AnimeSharp.pth?download=true'
+            Path = (Join-Path $Comfy 'models\upscale_models\4x-AnimeSharp.pth')
+            Bytes = [int64]67010245
+            Sha256 = 'E7A7DE2DAFD7331C1992862BBBCD9E9712A9F9F8E6303F0AAA59B4341D359BAB'
+        },
+        [pscustomobject]@{
+            Name = 'Real-ESRGAN x4plus upscaler (xinntao, BSD-3-Clause)'
+            Url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth'
+            Path = (Join-Path $Comfy 'models\upscale_models\RealESRGAN_x4plus.pth')
+            Bytes = [int64]67040989
+            Sha256 = '4FA0D38905F75AC06EB49A7951B426670021BE3018265FD191D2125DF9D682F1'
+        }
+    )
     # Pose add-on: DWPose turns every pose input (library sketch or upload) into the canonical skeleton.
     'pose' = @(
         [pscustomobject]@{
@@ -334,7 +351,7 @@ function Download-Verified($Asset) {
     Write-Host ("[verified] {0}  {1:N2} GB  SHA256 {2}" -f $Asset.Path, ($size / 1GB), $actual)
 }
 
-$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'anima-control-pose', 'pose', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
+$profiles = if ($Profile -eq 'all') { @('moody-desire-v30', 'moody-anima-mix', 'anima-turbo', 'animagine-xl-3.1-nsfw', 'janku-illustrious', 'janku-v5-illustrious', 'one-obsession', 'deepseek-whale-girl', 'ai-agent-girls', 'ipadapter-face-sdxl', 'controlnet-openpose-sdxl', 'anima-control-pose', 'pose', 'upscale', 'qwen-image-2.1', 'moss-image-sft') } else { @($Profile) }
 foreach ($profile in $profiles) {
     Write-Host "=== model profile: $profile ==="
     foreach ($asset in $AssetSets[$profile]) { Download-Verified $asset }

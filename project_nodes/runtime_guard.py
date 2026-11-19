@@ -82,8 +82,11 @@ def install(execution_module: Any, notify_phase: Any, validate_inputs: Any) -> N
             timing["started_monotonic"] = time.monotonic()
             timing["queued_ms"] = max(0, round((timing["started_monotonic"] - timing["submitted_monotonic"]) * 1000))
         previous = getattr(executor, "_project_previous_workflow", None)
+        # A light job (the upscaler: one small model, no diffusion) runs beside whatever is resident and leaves it
+        # resident; ComfyUI's own memory management makes room if the small model needs it.
+        light = bool(extra_data.get("project_light"))
         try:
-            if workflow != previous and (workflow is not None or previous is not None):
+            if not light and workflow != previous and (workflow is not None or previous is not None):
                 notify_phase(prompt_id, "model_switch")
                 executor.reset()
                 release_models()
@@ -105,7 +108,10 @@ def install(execution_module: Any, notify_phase: Any, validate_inputs: Any) -> N
                 "traceback": [], "executed": [], "current_inputs": {}, "current_outputs": [],
             }, broadcast=False)
         finally:
-            executor._project_previous_workflow = workflow if executor.success else None
+            if not executor.success:
+                executor._project_previous_workflow = None
+            elif not light:
+                executor._project_previous_workflow = workflow
             if not executor.success:
                 # reset() resets status; retain the failure for native history.
                 messages, history = executor.status_messages, executor.history_result

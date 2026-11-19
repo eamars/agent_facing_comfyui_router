@@ -124,6 +124,18 @@ brow-to-chin box with the head centred (1.6x cut the hair), head-and-shoulders 3
 body 4.5x with the head 30% down. The response reports face_box so an agent that cannot see the
 picture can check the framing.
 
+**Upscaling is a light tool with two models; Qwen redraw stays an alternative** (2026-11-20).
+`POST /project/images/upscale` runs ComfyUI's upscale nodes through the serial worker, marked light
+so runtime_guard does not reset caches or unload models around it. ComfyUI's own memory manager still
+moves Qwen out of VRAM for the upscaler's tiles: the next Qwen job took 28.1 s against 25.6 s warm.
+Models came from an A/B of four candidates (4x from a quarter-size copy against the original, and 2x
+on full-size pictures): 4x-AnimeSharp for anime and painted pictures (RealESRGAN_x4plus_anime_6B
+redrew faces), RealESRGAN_x4plus for photos (4x-UltraSharp broke up on a small source). Against a
+Qwen edit redraw at 2x (768 to 1536): the upscaler took 2.5 s and changed the picture least (mean
+difference after shrinking back 4.1 photo, 1.5 anime); the redraw took 134-143 s and changed more
+(9.3, 4.9) but gave a photo wall natural texture that the upscaler smoothed away, and it cannot go
+past Qwen's 2.4 MP. The manifest offers the redraw as the photo alternative.
+
 **Contract rules from the 2026-09-17 audit, still in force.**
 - Unknown fields return 400 and an unknown workflow 404, with one error shape: `type`, `message`,
   `route`, `expected` and optional `details`. A missing prompt returns 422.

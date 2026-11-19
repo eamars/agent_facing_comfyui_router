@@ -1522,7 +1522,23 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "result": "A new input file: name (use it as any image parameter), url (download), size and the operations "
                       "applied (a face crop also reports face_box, the face it framed). It persists like an upload; DELETE /project/inputs/{name} when done.",
             "not_for": "Growing the canvas with new content (use extend on the Qwen edit route), changing what the "
-                       "picture shows, or sharp enlargement: there is no model upscaler yet.",
+                       "picture shows, or sharp enlargement (use upscale).",
+            "upscale": "POST /project/images/upscale enlarges with an upscaler model (super-resolution: sharper than "
+                       "transform's interpolation). Body: {\"image\": as for transform, \"scale\": 2} or width and/or "
+                       "height (more than 1x, up to 4x, output at most 16.7 MP such as 4096x4096; both of another shape "
+                       "centre-crop first), optional \"look\": anime "
+                       "(also illustration and painted pictures) or photo, and dry_run. It is queued like generation: poll "
+                       "job_url, then download outputs[].url. About 3 s; it causes no model switch (the next generation job "
+                       "reloads its model from RAM, a few seconds). Without "
+                       "look, a job output takes the look of the route that made it, and an upload uses photo (warning "
+                       "upscale_look_default). The response's upscale object gives output_size, look and model. The "
+                       "upscaler keeps the picture as it is; it smooths fine photo texture such as walls or skin.",
+            "redraw_instead": "For a photo whose output fits in about 2.4 MP (e.g. up to 1536x1536), redrawing gives more "
+                              "natural texture: transform with resize scale 2, then qwen-image-2.1-edit on the result with a "
+                              "prompt such as 'Keep this picture exactly as it is; only restore crisp fine detail and "
+                              "sharpness at this higher resolution.' It takes about 140 s instead of 3 s, reloads models, and "
+                              "small details change. Use the upscaler when the picture must stay as it is, when it is "
+                              "larger, or when speed matters.",
         },
         "poses": {
             "parameter": "parameters.pose",
@@ -1575,8 +1591,10 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_resized": "An input or the output size was adjusted to the route's size rules.",
             "input_first_frame": "An animated input was reduced to its first frame.",
             "input_cropped": "face_image was cropped to head and shoulders around the face it shows; crop_box gives the pixels used.",
-            "upscaled_without_model": "images/transform enlarged the image by interpolation: bigger, but soft; there is no "
-                                      "model upscaler yet.",
+            "upscaled_without_model": "images/transform enlarged the image by interpolation: bigger, but soft; "
+                                      "POST /project/images/upscale enlarges with a model.",
+            "upscale_look_default": "images/upscale did not know whether the picture is anime or a photo and used the "
+                                    "photo model; send look to choose.",
             "extend_drawn_smaller": "The extended picture is larger than the route draws at full size: it is drawn smaller "
                                     "and scaled back to output_size, so the new areas are softer.",
             "extend_original_not_kept": "Reported on the job, not the submission: the extended picture is the model's "
@@ -1596,6 +1614,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_animated": "Animated input with input_fit=none; send a still image or use input_fit=downscale.",
             "input_size_unsupported": "With input_fit=none the image size cannot run on this route (e.g. inpaint needs 64-2048 px, multiples of 8).",
             "crop_out_of_bounds": "images/transform: the crop box reaches outside the image; details gives the image size.",
+            "upscale_unavailable": "images/upscale: the upscaler model is not installed; details names the file.",
             "face_not_found": "images/transform: no face was found to crop around; crop by pixels or by aspect and anchor.",
             "mask_size_mismatch": "mask_image has a different aspect ratio from input_image (or a different size with input_fit=none).",
             "mask_alpha_missing": "mask_channel=alpha was requested but the mask has no transparency.",
@@ -1633,6 +1652,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             {"method": "POST", "path": "/upload/image", "description": "Upload a reference image (multipart: image, type=input, optional overwrite, subfolder)."},
             {"method": "DELETE", "path": "/project/inputs/{name}", "description": "Delete one input file."},
             {"method": "POST", "path": "/project/images/transform", "description": "Crop and/or resize an input or job output without a model; returns a new input file."},
+            {"method": "POST", "path": "/project/images/upscale", "description": "Enlarge an input or job output 1-4x with an upscaler model; queued, poll job_url."},
             {"method": "POST", "path": "/project/generate", "description": "Queue a named route (alias: /project/prompt), or validate it with dry_run."},
             {"method": "GET", "path": "/project/jobs/{prompt_id}", "description": "Job state and output download URLs."},
             {"method": "GET", "path": "/project/resources", "description": "Advisory device memory snapshot and queue/input limits."},
@@ -1789,6 +1809,27 @@ def _openapi_document() -> dict[str, Any]:
                         "200": {"description": "name (new input file), url, size, source_size, operations, warnings"},
                         "400": {"description": "Invalid crop or resize (invalid_parameter, crop_out_of_bounds, input_too_large) or source"},
                         "422": {"description": "face_not_found: a crop around the face found none"},
+                    },
+                }
+            },
+            "/project/images/upscale": {
+                "post": {
+                    "operationId": "upscaleImage",
+                    "summary": "Enlarge an image with an upscaler model (super-resolution)",
+                    "description": "Queued like generation (poll job_url) but keeps the resident generation model loaded.",
+                    "requestBody": {"required": True, "content": {"application/json": {"schema": {
+                        "type": "object", "additionalProperties": False, "required": ["image"],
+                        "properties": {
+                            "image": {"type": "string", "description": "An input file name, or a /view URL of an input or a job output."},
+                            "scale": {"type": "number", "exclusiveMinimum": 1, "maximum": 4},
+                            "width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1},
+                            "look": {"type": "string", "enum": ["anime", "photo"], "description": "Default: the source route's look for a job output, else photo."},
+                            "client_id": {"type": "string"}, "dry_run": {"type": "boolean"},
+                        }}}}},
+                    "responses": {
+                        "200": {"description": "prompt_id, job_url, upscale {source_size, output_size, look, look_from, model}, warnings; dry_run returns validated and upscale"},
+                        "400": {"description": "invalid_parameter (outside 1-4x) or input_too_large"},
+                        "409": {"description": "upscale_unavailable"},
                     },
                 }
             },
@@ -2562,7 +2603,8 @@ async def _validate_graph(server: PromptServer, graph: dict[str, Any], client_id
     return graph, valid
 
 
-async def _enqueue(server: PromptServer, graph: dict[str, Any], client_id: str, workflow_id: str, resources: dict[str, Any], valid: Any) -> dict[str, Any]:
+async def _enqueue(server: PromptServer, graph: dict[str, Any], client_id: str, workflow_id: str, resources: dict[str, Any], valid: Any,
+                   *, light: bool = False) -> dict[str, Any]:
     number = server.number
     server.number += 1
     prompt_id = str(uuid.uuid4())
@@ -2570,6 +2612,8 @@ async def _enqueue(server: PromptServer, graph: dict[str, Any], client_id: str, 
     extra_data: dict[str, Any] = {"client_id": client_id, "create_time": int(time.time() * 1000),
                                   "project_workflow": workflow_id, "project_resources": resources,
                                   "project_timing": {"submitted_monotonic": time.monotonic()}}
+    if light:
+        extra_data["project_light"] = True  # runtime_guard keeps the resident model
     sensitive: dict[str, Any] = {}
     for sensitive_key in execution.SENSITIVE_EXTRA_DATA_KEYS:
         if sensitive_key in extra_data:
@@ -2717,6 +2761,119 @@ async def transform_image(request: web.Request) -> web.Response:
         return _json_error(ApiError(exc.status, exc.message, exc.details, code=exc.code))
     except ApiError as error:
         return _json_error(error)
+
+
+UPSCALE_WORKFLOW = "image-upscale"
+# The model's 4x intermediate image; above this it would not fit comfortably in memory.
+MAX_UPSCALE_INTERMEDIATE_PIXELS = 67_108_864
+
+
+def _upscale_look(source_name: str, requested: Any, config: dict[str, Any]) -> tuple[str, str]:
+    """anime or photo, and where that came from: the request, the route that made a job output, or the default."""
+    if requested is not None:
+        if requested not in config["looks"]:
+            raise ApiError(400, f"look must be one of {', '.join(config['looks'])}", code="invalid_parameter", expected=list(config["looks"]))
+        return requested, "request"
+    match = re.fullmatch(r"(?:.*/)?(.+?)_\d{5}_\.png", source_name)
+    if match:
+        for entry in _read_catalog()["workflows"]:
+            if entry.get("bindings", {}).get("filename_prefix") and \
+                    _binding_value(_read_workflow(entry), entry, "filename_prefix") == match.group(1):
+                return ("photo" if entry["family"] in config["photo_families"] else "anime"), f"route {entry['id']}"
+    return "photo", "default (send look to choose)"
+
+
+async def upscale_image(request: web.Request) -> web.Response:
+    """Super-resolution with a small upscaler model, queued like generation but keeping the resident model."""
+    fitted: list[str] = []
+    queued = False
+    try:
+        body = await _read_json(request)
+        allowed = {"image", "scale", "width", "height", "look", "client_id", "dry_run"}
+        unknown = set(body) - allowed
+        if unknown:
+            raise ApiError(400, "Unknown request fields", sorted(unknown), expected=sorted(allowed))
+        if "image" not in body:
+            raise ApiError(422, "image is required: an input file name or a job output URL", expected=["image"])
+        config = _read_catalog()["image_tools"]["upscale"]
+        source_name, path = _tool_source(body["image"])
+        info = _image_info(path, "image")
+        look, look_from = _upscale_look(source_name, body.get("look"), config)
+        model = config["looks"][look]["model"]
+        if model not in folder_paths.get_filename_list("upscale_models"):
+            raise ApiError(409, f"The {look} upscaler is not installed; run scripts/download_models.ps1 -Profile {config['download_profile']}",
+                           {"missing": f"models/upscale_models/{model}"}, code="upscale_unavailable")
+        sizing = {key: body[key] for key in ("scale", "width", "height") if key in body}
+        if not sizing:
+            raise ApiError(422, "Send scale (above 1, up to 4) or width and/or height", expected=["scale", "width", "height"],
+                           code="invalid_parameter")
+        try:
+            if "scale" in sizing and len(sizing) > 1:
+                raise image_tools.ToolError("Send scale, or width and/or height, not both")
+            target, cover = image_tools.resize_target((info["width"], info["height"]), sizing)
+        except image_tools.ToolError as exc:
+            raise ApiError(400, exc.message, exc.details, code=exc.code) from exc
+        crop = list(cover) if cover else None
+        base = (cover[2] - cover[0], cover[3] - cover[1]) if cover else (info["width"], info["height"])
+        factor = max(target[0] / base[0], target[1] / base[1])
+        if factor <= 1 or factor > config["model_scale"] + 1e-6:
+            raise ApiError(400, f"The upscaler enlarges by more than 1x and up to {config['model_scale']}x; this asks for {factor:.2f}x. "
+                                "The output is at most 16.7 MP (e.g. 4096x4096). Use POST /project/images/transform to shrink.",
+                           {"source_size": [info["width"], info["height"]], "target_size": list(target)}, code="invalid_parameter")
+        if target[0] * target[1] > MAX_INPUT_PIXELS or base[0] * base[1] * config["model_scale"] ** 2 > MAX_UPSCALE_INTERMEDIATE_PIXELS:
+            raise ApiError(400, f"{target[0]}x{target[1]} from {base[0]}x{base[1]} is too large to upscale; crop first with "
+                                "POST /project/images/transform", {"target_size": list(target), "max_pixels": MAX_INPUT_PIXELS},
+                           code="input_too_large")
+        # The worker loads inputs from the input directory: a job output, an animated or a cropped source gets a copy.
+        input_root = Path(folder_paths.get_input_directory()).resolve()
+        if crop or info["frames"] > 1 or not path.resolve().is_relative_to(input_root):
+            def copy() -> str:
+                with Image.open(path) as source:
+                    source.seek(0)
+                    image = ImageOps.exif_transpose(source)
+                    if crop:
+                        image = image.crop(crop)
+                    name = f"{FITTED_INPUT_DIR}/{uuid.uuid4().hex}.png"
+                    (input_root / FITTED_INPUT_DIR).mkdir(parents=True, exist_ok=True)
+                    image.save(input_root / name, "PNG")
+                return name
+            load_name = await asyncio.to_thread(copy)
+            fitted.append(load_name)
+        else:
+            load_name = path.resolve().relative_to(input_root).as_posix()
+        graph = {
+            "1": {"class_type": "LoadImage", "inputs": {"image": load_name}},
+            "2": {"class_type": "UpscaleModelLoader", "inputs": {"model_name": model}},
+            "3": {"class_type": "ImageUpscaleWithModel", "inputs": {"upscale_model": ["2", 0], "image": ["1", 0]}},
+            "4": {"class_type": "ImageScale", "inputs": {"image": ["3", 0], "upscale_method": "lanczos", "crop": "disabled",
+                                                         "width": target[0], "height": target[1]}},
+            "5": {"class_type": "SaveImage", "inputs": {"images": ["4", 0], "filename_prefix": f"upscale_{look}"}},
+        }
+        client_id = _as_text("client_id", body.get("client_id", "project-image-upscale"), 256)
+        graph, valid = await _validate_graph(PromptServer.instance, graph, client_id, str(uuid.uuid4()))
+        stat = (input_root / load_name).stat()
+        resources = {"input_files": {load_name: {"size_bytes": stat.st_size, "modified_ns": stat.st_mtime_ns}}, "fitted_inputs": fitted}
+        warnings = []
+        if info["frames"] > 1:
+            warnings.append({"code": "input_first_frame", "message": "The image is animated; only its first frame was upscaled."})
+        if look_from.startswith("default"):
+            warnings.append({"code": "upscale_look_default", "message": "The look was not known, so the photo upscaler was used; "
+                                                                        "send look anime for anime, illustration or painted pictures."})
+        summary = {"source_size": [info["width"], info["height"]], "output_size": list(target), "look": look, "look_from": look_from,
+                   "model": model}
+        if crop:
+            summary.update(crop=crop, crop_reason="centre crop to the requested width:height, so nothing is stretched")
+        if body.get("dry_run") is True:
+            return web.json_response({"workflow": UPSCALE_WORKFLOW, "validated": True, "upscale": summary, "warnings": warnings})
+        result = await _enqueue(PromptServer.instance, graph, client_id, UPSCALE_WORKFLOW, resources, valid, light=True)
+        queued = True  # the job now owns its fitted copy and deletes it when it ends
+        result.update(workflow=UPSCALE_WORKFLOW, job_url=f"/project/jobs/{result['prompt_id']}", upscale=summary, warnings=warnings)
+        return web.json_response(result)
+    except ApiError as error:
+        return _json_error(error)
+    finally:
+        if not queued and fitted:
+            _delete_fitted_inputs(fitted)
 
 
 async def delete_project_input(request: web.Request) -> web.Response:
@@ -3100,6 +3257,7 @@ def _register_routes() -> None:
     routes.get("/project/poses")(list_poses)
     routes.delete("/project/inputs/{name:.*}")(delete_project_input)
     routes.post("/project/images/transform")(transform_image)
+    routes.post("/project/images/upscale")(upscale_image)
     routes.post("/project/resolve")(resolve_route)
     routes.get("/project/models")(list_models)
     routes.get("/project/models/{model_id}")(get_model)

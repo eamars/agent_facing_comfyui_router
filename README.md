@@ -11,6 +11,7 @@
 - **参考图编辑**：通过 Qwen-Image-2.1 输入一张图片和自然语言指令，修改颜色、服装、场景等内容。
 - **扩图**：同一 Qwen 编辑路由按像素向四周扩展图片，新区域按提示词补全，原图像素保持不变。
 - **裁剪与缩放**：不经模型、不进队列，即时裁剪或缩放上传图片和生成结果，结果可直接作为下一次输入。
+- **超分辨率放大**：用放大模型把图片放大到 1–4 倍（动漫与照片各一个模型），约 3 秒，不触发模型切换。
 - **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
 - **人物参考**：通过 IPAdapter 参考人物外观。
 - **姿势**：同一个 `pose` 参数接受姿势库编号或上传的图片，服务提取骨架后按模型家族接入控制；目前 SDXL / Illustrious、Anima、Qwen-Image 文生图和 Moody Desire（Flux.2 Klein）路由已支持。
@@ -241,7 +242,20 @@ Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取�
 - `image`：已上传的输入文件名，或任务结果中的 `outputs[].url`。
 - `crop`：像素框 `{"x", "y", "width", "height"}`；或 `{"aspect": "16:9", "anchor": "center"}` 取该比例的最大区域（anchor 可为 center、top、bottom、left、right 或 top-left 等四角）；或 `{"around": "face"}` 用 DWPose 找到图中最大的脸并取景，可选 `framing`（`head`、`head-and-shoulders`（默认）、`upper-body`）和 `aspect`（默认 1:1），找不到脸时返回 `face_not_found`。
 - `resize`：只给 `width` 或 `height` 时保持比例；同时给出且比例不同时先居中裁剪再缩放，不会拉伸；也可用 `scale` 或 `max_side`（只缩小）。先裁剪后缩放。
-- 结果保存为新的输入文件（`transformed/` 下），响应给出 `name`、下载 `url`、尺寸和实际执行的操作；与上传文件一样保留到被删除。放大只做插值（Lanczos），不增加细节，响应会给出 `upscaled_without_model` 警告；目前没有模型超分辨率。除 `around: "face"` 外不识别主体：`anchor: "top"` 适合保留站立人物的头部，`center` 适合场景。
+- 结果保存为新的输入文件（`transformed/` 下），响应给出 `name`、下载 `url`、尺寸和实际执行的操作；与上传文件一样保留到被删除。放大只做插值（Lanczos），不增加细节，响应会给出 `upscaled_without_model` 警告；需要清晰放大时用下面的超分辨率接口。除 `around: "face"` 外不识别主体：`anchor: "top"` 适合保留站立人物的头部，`center` 适合场景。
+
+### 超分辨率放大
+
+`POST /project/images/upscale` 用放大模型把图片放大到 1–4 倍，和生成任务一样排队（轮询 `job_url` 后下载 `outputs[].url`），但不触发模型切换：每张约 3 秒，下一次生成任务从内存重新载入模型，多花几秒。
+
+```json
+{"image": "/view?filename=anima_turbo_v1_1_00007_.png&subfolder=&type=output", "scale": 2}
+```
+
+- `image` 与裁剪缩放接口相同；`scale`（大于 1，最多 4），或 `width`/`height`（同时给出且比例不同时先居中裁剪）。
+- `look`：`anime`（动漫、插画、绘画，使用 4x-AnimeSharp，CC BY-NC-SA 4.0，非商用）或 `photo`（照片与写实渲染，使用 Real-ESRGAN x4plus，BSD-3）。不传时，任务结果按生成它的路由选择，上传图片用 `photo` 并给出 `upscale_look_default` 警告。
+- 模型由 `scripts/download_models.ps1 -Profile upscale` 下载并校验。
+- 放大模型保持画面原样，但会抹平照片的细微纹理（墙面、皮肤）。照片输出不超过约 240 万像素（如 1536×1536）时，先用裁剪缩放接口放大 2 倍，再交给 `qwen-image-2.1-edit` 并要求"保持画面不变，只恢复细节和清晰度"，纹理更自然，但耗时约 140 秒、会切换模型，细节也会改变。
 
 ### 常用接口
 

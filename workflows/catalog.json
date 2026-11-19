@@ -159,6 +159,26 @@
       }
     }
   },
+  "image_tools": {
+    "upscale": {
+      "model_scale": 4,
+      "looks": {
+        "anime": {
+          "model": "4x-AnimeSharp.pth",
+          "for": "anime, illustration, painted and line art",
+          "licence": "CC BY-NC-SA 4.0 (Kim2091); non-commercial"
+        },
+        "photo": {
+          "model": "RealESRGAN_x4plus.pth",
+          "for": "photographs and realistic renders",
+          "licence": "BSD-3-Clause (xinntao/Real-ESRGAN)"
+        }
+      },
+      "photo_families": ["qwen-image-2.1", "moss-image", "flux2-klein"],
+      "download_profile": "upscale",
+      "basis": "2026-11-20 A/B on four test pictures, 4x from a quarter-size copy against the original and 2x on full-size pictures: 4x-AnimeSharp was the most faithful on anime and painted pictures (RealESRGAN_x4plus_anime_6B redrew faces); RealESRGAN_x4plus held up best on a photo (4x-UltraSharp broke up when the source was small)."
+    }
+  },
   "workflows": [
     {
       "id": "qwen-image-2.1-t2i",
