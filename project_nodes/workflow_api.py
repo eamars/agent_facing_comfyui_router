@@ -42,6 +42,8 @@ MAX_INPUT_IMAGE_LENGTH = 512
 MAX_INPUT_PIXELS = 16_777_216
 INPUT_FIT_MODES = ("downscale", "none")
 FITTED_INPUT_DIR = "_fitted"
+# Face crop side as a multiple of the DWPose face box (brows to chin): head, hair and shoulders.
+FACE_CROP_SCALE = 2.4
 MAX_PROJECT_QUEUE = 32
 MAX_PROJECT_JOB_STATES = 1000
 PROJECT_QUEUE_POLL_SECONDS = 0.2
@@ -372,8 +374,9 @@ def _parameter_schema(entry: dict[str, Any], graph: dict[str, Any]) -> dict[str,
     if _image_inputs(entry):
         properties["input_fit"] = {
             "type": "string", "enum": list(INPUT_FIT_MODES), "default": "downscale",
-            "description": "downscale: shrink oversized image inputs to what this route can run and use the first frame of animated "
-                           "input; each change is reported as an input_downscaled/input_resized/input_first_frame warning. "
+            "description": "downscale: shrink oversized image inputs to what this route can run, use the first frame of animated "
+                           "input and crop face_image to the face it shows; each change is reported as an "
+                           "input_downscaled/input_resized/input_first_frame/input_cropped warning. "
                            "none: keep the upload unchanged; inputs the route cannot run are refused with a stable error code.",
         }
     if entry.get("lora_bindings"):
@@ -520,11 +523,26 @@ def _fit_size(width: int, height: int, *, max_pixels: int, max_side: int | None 
     return tuple(max(min_side, int(value * scale) // multiple * multiple) for value in (width, height))
 
 
-def _write_fitted_input(path: Path, size: tuple[int, int], *, mask: bool) -> str:
-    """Write a first-frame, orientation-applied, resized PNG copy; the original upload is never changed."""
+def _face_crop(size: tuple[int, int], box: tuple[float, float, float, float]) -> tuple[int, int, int, int] | None:
+    """Square pixel box around a normalised face box, kept inside the image; None when the image is already a head shot."""
+    width, height = size
+    x0, y0, x1, y1 = box[0] * width, box[1] * height, box[2] * width, box[3] * height
+    side = round(FACE_CROP_SCALE * max(x1 - x0, y1 - y0))
+    if side >= min(width, height):
+        return None
+    centre_x, centre_y = (x0 + x1) / 2, (y0 + y1) / 2 - 0.15 * (y1 - y0)  # face points start at the brows
+    left = min(max(round(centre_x - side / 2), 0), width - side)
+    top = min(max(round(centre_y - side / 2), 0), height - side)
+    return left, top, left + side, top + side
+
+
+def _write_fitted_input(path: Path, size: tuple[int, int], *, mask: bool, crop: tuple[int, int, int, int] | None = None) -> str:
+    """Write a first-frame, orientation-applied, cropped and resized PNG copy; the original upload is never changed."""
     with Image.open(path) as source:
         source.seek(0)
         image = ImageOps.exif_transpose(source)
+        if crop:
+            image = image.crop(crop)
         if image.mode not in {"RGB", "RGBA", "L", "LA"}:
             image = image.convert("RGBA" if "transparency" in source.info or "A" in image.getbands() else "RGB")
         if image.size != size:
@@ -575,8 +593,16 @@ def _fit_inputs(entry: dict[str, Any], parameters: dict[str, Any], image_info: d
             target = _fit_size(*size, max_pixels=budget, multiple=32) if size[0] * size[1] > budget else size
         else:
             target = _fit_size(*size, max_pixels=MAX_INPUT_PIXELS)
+        crop = None
+        if name == "face_image" and fit_mode != "none":
+            # Both face adapters see the whole frame (SDXL: a centre square; Anima: letterboxed), so a full-body
+            # reference reaches them without a usable face. Crop to the head DWPose finds.
+            box = pose_addon.face_box(parameters[name])
+            crop = _face_crop(size, box) if box else None
+            if crop:
+                target = _fit_size(crop[2] - crop[0], crop[3] - crop[1], max_pixels=MAX_INPUT_PIXELS)
         animated = info["frames"] > 1
-        if target == size and not animated:
+        if target == size and not animated and not crop:
             continue
         if fit_mode == "none":
             if animated:
@@ -590,11 +616,11 @@ def _fit_inputs(entry: dict[str, Any], parameters: dict[str, Any], image_info: d
                                code="input_too_large")
             continue
         _, path = _resolve_input_file(parameters[name], name)
-        fitted = _write_fitted_input(path, target, mask=name == "mask_image")
+        fitted = _write_fitted_input(path, target, mask=name == "mask_image", crop=crop)
         parameters[name] = fitted
         image_info[name] = {**info, "width": target[0], "height": target[1], "frames": 1}
         report.append({"parameter": name, "original_size": list(size), "used_size": list(target), "first_frame": animated,
-                       "file": fitted})
+                       "file": fitted, **({"crop_box": list(crop)} if crop else {})})
 
 
 def _resource_limits(entry: dict[str, Any]) -> dict[str, Any]:
@@ -1395,9 +1421,10 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
                               "with fields image (the file) and type=input; join the response's subfolder and name with '/' "
                               "and pass that as the image parameter. Only names inside the input directory work, never a "
                               "host path or URL. Use a unique basename per upload.",
-            "input_fit": "Inputs are fitted automatically (parameters.input_fit=downscale): oversized images shrink and "
-                         "animated ones use their first frame, reported as input_downscaled, input_resized or "
-                         "input_first_frame warnings with original_size and used_size; tell the requester. input_fit=none "
+            "input_fit": "Inputs are fitted automatically (parameters.input_fit=downscale): oversized images shrink, "
+                         "animated ones use their first frame and face_image is cropped to the largest face it shows, "
+                         "reported as input_downscaled, input_resized, input_first_frame or input_cropped warnings with "
+                         "original_size and used_size; tell the requester. input_fit=none "
                          "keeps the upload unchanged and refuses what the route cannot run.",
             "lifecycle": "Inputs persist until DELETE /project/inputs/{name}; delete only files you uploaded and no job "
                          "still uses.",
@@ -1438,7 +1465,9 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "For inpaint, send a source image and a mask with the same aspect ratio (normally the same size). White or red "
             "mask pixels are redrawn, or transparent ones with mask_channel=alpha. denoise 1.0 (default) replaces the "
             "masked region; lower keeps more of the original. Unmasked pixels are composited back unchanged.",
-            "For face-reference, send a head-and-shoulders crop as face_image; it is IPAdapter conditioning, not FaceID. "
+            "For face-reference, face_image can be any picture of the character: the service crops it to the largest face "
+            "it finds (a head shot is used as is), leaving out the body and outfit; send input_fit=none to reference the "
+            "outfit too. It is IPAdapter conditioning, not FaceID. "
             "The Anima route encodes the whole reference: keep ipadapter_weight at its 0.6 default unless likeness matters "
             "more than the prompted outfit and scene, since 0.8-1.0 copies the reference's outfit and background.",
             "Warnings never block a job; see warning_codes. If a job fails with error.code out_of_memory, report it with "
@@ -1450,6 +1479,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_downscaled": "An input was shrunk to fit the route; original_size and used_size say how.",
             "input_resized": "An input or the output size was adjusted to the route's size rules.",
             "input_first_frame": "An animated input was reduced to its first frame.",
+            "input_cropped": "face_image was cropped to the face it shows; crop_box gives the pixels used.",
             "over_pixel_budget": "The request exceeds the route's tested pixel budget; it still runs but may be slow or "
                                  "fail with out_of_memory.",
             "outside_recommended_range": "A sampling value is outside the route's recommended range; it was kept.",
@@ -1953,7 +1983,7 @@ def _openapi_document() -> dict[str, Any]:
                         "face_image": {
                             "type": "string",
                             "maxLength": MAX_INPUT_IMAGE_LENGTH,
-                            "description": "Relative input filename for a face-centric IPAdapter reference; it is not a job-output reference.",
+                            "description": "Relative input filename for a face-centric IPAdapter reference; it is not a job-output reference. It is cropped to the largest face it shows unless input_fit is none.",
                         },
                         "pose": {
                             "type": "string",
@@ -1970,7 +2000,7 @@ def _openapi_document() -> dict[str, Any]:
                             "type": "string",
                             "enum": list(INPUT_FIT_MODES),
                             "default": "downscale",
-                            "description": "Only on routes with image inputs. downscale shrinks oversized inputs and takes the first frame of animated ones, reporting each change as a warning; none keeps the upload unchanged and refuses what the route cannot run.",
+                            "description": "Only on routes with image inputs. downscale shrinks oversized inputs, takes the first frame of animated ones and crops face_image to its face, reporting each change as a warning; none keeps the upload unchanged and refuses what the route cannot run.",
                         },
                         "ipadapter_weight": {
                             "type": "number",
@@ -2709,7 +2739,8 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             raise ApiError(400, "workflow and workflow_id disagree")
         entry = _find_workflow(workflow_id)
         pose_request = await asyncio.to_thread(_resolve_pose, entry, body)
-        graph = _prepare_graph(entry, body, fit_report, pose_request)
+        # Off the event loop: preparing a face reference can run DWPose on the CPU.
+        graph = await asyncio.to_thread(_prepare_graph, entry, body, fit_report, pose_request)
         public = _public_entry(entry, _read_catalog().get("model_registry", []))
         client_id = body.get("client_id", "project-workflow-api")
         client_id = _as_text("client_id", client_id, 256)
@@ -2740,7 +2771,13 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             if record["first_frame"]:
                 warnings.append({"code": "input_first_frame", "parameter": name,
                                  "message": f"{name} is animated; only its first frame was used."})
-            if used != original:
+            if record.get("crop_box"):
+                warnings.append({"code": "input_cropped", "parameter": name, "original_size": original, "crop_box": record["crop_box"],
+                                 "used_size": used,
+                                 "message": f"{name} was cropped to the face found at {record['crop_box']} (x0, y0, x1, y1) so the "
+                                            "face-reference adapter sees the face; the body and outfit are left out. To reference the outfit too, send "
+                                            "input_fit=none (the whole image is used)."})
+            elif used != original:
                 code = "input_downscaled" if used[0] * used[1] < original[0] * original[1] else "input_resized"
                 target = "the output size" if record.get("scope") == "output size" else name
                 warnings.append({"code": code, "parameter": name, "original_size": original, "used_size": used,

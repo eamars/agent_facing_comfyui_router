@@ -37,6 +37,8 @@ MIN_HAND_SCORE = 0.4
 EXTRACTOR_VERSION = "dwpose-l384-filled-3"
 # DWPose's own cut-off for a visible keypoint; whole-body points below it are not stored.
 MIN_POINT_SCORE = 0.3
+# A face counts when at least this many of its 68 points are visible.
+MIN_FACE_POINTS = 40
 MAX_FETCH_BYTES = 8_000_000
 FETCH_TIMEOUT_SECONDS = 20
 ANGLES = {"front": "front", "diag": "three-quarter", "side": "side", "high": "from above", "low": "from below"}
@@ -426,6 +428,26 @@ def render(pose: dict[str, Any], width: int, height: int, style: str = "openpose
     Image.fromarray(canvas).save(buffer, "PNG")
     _write_atomic(target, buffer.getvalue())
     return name
+
+
+def face_box(source_name: str) -> tuple[float, float, float, float] | None:
+    """Normalised (x0, y0, x1, y1) around the largest face DWPose finds in an input image, or None without one.
+
+    Uses the same cached whole-body skeleton as pose requests; COCO-WholeBody points 23-90 are the 68 face points.
+    """
+    try:
+        result = skeleton(source_name)
+    except PoseError as exc:
+        if exc.code == "pose_not_detected":
+            return None
+        raise
+    boxes = []
+    for person in result["people"]:
+        face = [point for point in (person.get("wholebody") or [])[23:91] if point]
+        if len(face) >= MIN_FACE_POINTS:
+            xs, ys = [point[0] for point in face], [point[1] for point in face]
+            boxes.append((min(xs), min(ys), max(xs), max(ys)))
+    return max(boxes, key=lambda box: (box[2] - box[0]) * (box[3] - box[1]), default=None)
 
 
 def output_size(pose: dict[str, Any], pixels: int, multiple: int = 64) -> tuple[int, int]:

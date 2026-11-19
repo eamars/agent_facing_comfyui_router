@@ -228,8 +228,19 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(report[0]["scope"], "output size")
         self.assertLessEqual(api._binding_value(graph, entries["janku-illustrious"], "width") * api._binding_value(graph, entries["janku-illustrious"], "height"), 2_359_296)
 
-        # face reference: only the decode limit applies
-        _, report = fit("anima-turbo-face-reference-ipadapter", face_image="huge.png")
+        # face reference: a full-body image is cropped to the face DWPose finds; without a face only the decode limit applies
+        with patch.object(api.pose_addon, "face_box", return_value=(0.445, 0.083, 0.579, 0.152)):  # reference_character's face
+            _, report = fit("sdxl-face-reference-ipadapter", face_image="reference.webp")
+            x0, y0, x1, y1 = report[0]["crop_box"]
+            self.assertTrue(x1 - x0 == y1 - y0 and 0 <= y0 < 0.083 * 2000 and x0 < 0.445 * 1116 and x1 > 0.579 * 1116)
+            self.assertEqual(report[0]["used_size"], [x1 - x0, y1 - y0])
+            _, report = fit("sdxl-face-reference-ipadapter", face_image="reference.webp", input_fit="none")
+            self.assertEqual(report, [])
+        with patch.object(api.pose_addon, "face_box", return_value=(0.2, 0.2, 0.8, 0.8)):  # already a head shot
+            _, report = fit("sdxl-face-reference-ipadapter", face_image="reference.webp")
+            self.assertEqual(report, [])
+        with patch.object(api.pose_addon, "face_box", return_value=None):
+            _, report = fit("anima-turbo-face-reference-ipadapter", face_image="huge.png")
         self.assertLessEqual(report[0]["used_size"][0] * report[0]["used_size"][1], api.MAX_INPUT_PIXELS)
         with self.assertRaises(api.ApiError) as caught:
             fit("anima-turbo-face-reference-ipadapter", face_image="huge.png", input_fit="none")

@@ -85,6 +85,16 @@ tasks (a local LLM through tool calls, and a Haiku client that only saw the HTTP
 had every request accepted on the first try afterwards; the local model managed 10 of 12 before,
 and Haiku went from eight partial manifest fetches to one full read.
 
+**Face references are cropped to the face** (2026-11-20). Neither face adapter looks for a face:
+IPAdapter Plus Face (SDXL) centre-crops a 224 px square, which on the full-body reference
+(1116×2000) holds the dress and no head, and the Anima adapter letterboxes the whole frame into
+512 px, leaving the face about 35 px wide. `face_image` is now cropped to a square 2.4 times the
+DWPose face box, from the same cached skeleton the pose add-on uses, so agents can send any
+picture of the character. Same seed, prompt without hair or eye colour: SDXL went from beige-grey
+hair to her orange hair and amber eyes; Anima also picked up her sunflower ornament and ribbon.
+A head shot is used as is, `input_fit=none` keeps the whole image, and both face-reference routes
+now list DWPose among their models.
+
 **Contract rules from the 2026-09-17 audit, still in force.**
 - Unknown fields return 400 and an unknown workflow 404, with one error shape: `type`, `message`,
   `route`, `expected` and optional `details`. A missing prompt returns 422.

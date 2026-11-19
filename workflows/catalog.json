@@ -1691,7 +1691,8 @@
       "model_ids": [
         "animagine-xl-3.1-checkpoint",
         "ipadapter-plus-face-sdxl-vith",
-        "clip-vision-vit-h-ipadapter"
+        "clip-vision-vit-h-ipadapter",
+        "dwpose-pose-extractor"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -1801,7 +1802,7 @@
             "comfyui-input",
             "http-upload"
           ],
-          "format": "Prefer a clear single-person face or portrait reference. A character sheet or multi-view sheet is a weak face reference and can introduce duplicate subjects.",
+          "format": "Any clear picture of one person: the service crops it to the largest face DWPose finds (a head shot is used as is; input_fit=none keeps the whole image, which the adapter centre-crops). A character sheet or multi-view sheet is a weak face reference and can introduce duplicate subjects.",
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -1882,7 +1883,7 @@
           "steps",
           "cfg"
         ],
-        "face_image": "Use a clear single-person face/portrait file. This input is not the same as input_image and is not copied from a previous job automatically.",
+        "face_image": "Use a clear picture of one person; it is cropped to the face. This input is not the same as input_image and is not copied from a previous job automatically.",
         "ipadapter_weight": "Start around 0.65-0.85. Higher values increase face-reference influence but can reduce prompt control; this is an IPAdapter Plus Face route, not FaceID.",
         "negative_prompt": "supported; keep it focused on duplicate subjects, multiple views, anatomy, text and watermark",
         "avoid": [
@@ -5927,7 +5928,8 @@
         "qwen-3-0-6b-anima-text-encoder",
         "qwen-image-vae-anima",
         "anima-ipadapter-character-reference-v10",
-        "siglip2-base-patch16-512-anima-ipadapter"
+        "siglip2-base-patch16-512-anima-ipadapter",
+        "dwpose-pose-extractor"
       ],
       "required_files": [
         "custom_nodes/ComfyUI-Anima_IP-Adapter/__init__.py",
@@ -6052,7 +6054,7 @@
             "comfyui-input",
             "http-upload"
           ],
-          "format": "Prefer a tightly framed, clear single-person face or portrait. The implementation encodes the supplied image as a whole reference; it does not automatically crop a face or run FaceID.",
+          "format": "Any clear picture of one person: the service crops it to the largest face DWPose finds (a head shot is used as is; input_fit=none keeps the whole image). The cropped image is encoded as one whole reference; this is not FaceID.",
           "upload": {
             "endpoint": "/upload/image",
             "method": "POST",
@@ -6065,7 +6067,7 @@
           },
           "job_output_reference": false,
           "processing": "LoadImage -> AnimaIPAdapterApply(ref_image) -> patched Anima DiT cross-attention",
-          "use_for": "Same face/character in a new scene. The whole reference image is encoded: at weight 0.8-1.0 its outfit, background, props and framing carry over and override the prompt. The default 0.6 keeps the face while the prompt sets outfit and scene. Use a head-and-shoulders crop."
+          "use_for": "Same face/character in a new scene. The whole reference image is encoded: at weight 0.8-1.0 its outfit, background, props and framing carry over and override the prompt. The default 0.6 keeps the face while the prompt sets outfit and scene. face_image is cropped to head and shoulders automatically, which leaves out the body and outfit; to copy the outfit too, send input_fit=none with a weight of 0.8-1.0 (the reference background then carries over as well)."
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -6136,7 +6138,7 @@
           "steps",
           "cfg"
         ],
-        "face_image": "Upload a clear single-person portrait and pass its returned relative filename as face_image. Do not pass input_image for this route.",
+        "face_image": "Upload a clear picture of one person (it is cropped to the face) and pass its returned relative filename as face_image. Do not pass input_image for this route.",
         "ipadapter_weight": "Default 0.6. Raise toward 0.8 only when likeness matters more than the prompted outfit and scene; at 1.0 the reference scene is copied.",
         "negative_prompt": "Accepted as a parameter, but ineffective at the default CFG 1. Guidance above 1 activates negative conditioning and changes distilled-model behavior.",
         "strict_face_only_alternative": "For a stricter SDXL face-centric IPAdapter route, use sdxl-face-reference-ipadapter explicitly; it is a separate architecture and is retained alongside this Anima route.",
@@ -6188,7 +6190,7 @@
           "height": 1152,
           "steps": 12,
           "cfg": 1.0,
-          "ipadapter_weight": 1.0,
+          "ipadapter_weight": 0.6,
           "sampler_name": "er_sde",
           "scheduler": "simple"
         },

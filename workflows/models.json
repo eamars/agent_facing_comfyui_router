@@ -1477,7 +1477,7 @@
       "tensor_dtypes": [
         "F32"
       ],
-      "description": "Turns every pose input (library sketch, photo or illustration) into the canonical OpenPose-18 skeleton with hands. Runs on CPU in the API process and caches the skeleton by content hash.",
+      "description": "Turns every pose input (library sketch, photo or illustration) into the canonical OpenPose-18 skeleton with hands, and finds the face that face-reference routes crop face_image to. Runs on CPU in the API process and caches the skeleton by content hash.",
       "capabilities": {
         "input_types": [
           "image"
