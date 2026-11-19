@@ -626,7 +626,7 @@ def _fit_inputs(entry: dict[str, Any], parameters: dict[str, Any], image_info: d
         parameters[name] = fitted
         image_info[name] = {**info, "width": target[0], "height": target[1], "frames": 1}
         report.append({"parameter": name, "original_size": list(size), "used_size": list(target), "first_frame": animated,
-                       "file": fitted, **({"crop_box": list(crop)} if crop else {})})
+                       "file": fitted, **({"crop_box": list(crop), "crop_reason": "face"} if crop else {})})
 
 
 def _resource_limits(entry: dict[str, Any]) -> dict[str, Any]:
@@ -670,6 +670,17 @@ def _validate_queued_inputs(resources: dict[str, Any]) -> None:
         stat = path.stat()
         if {"size_bytes": stat.st_size, "modified_ns": stat.st_mtime_ns} != expected:
             raise RuntimeError(f"Input file changed after submission: {name}; resubmit to validate the replacement")
+
+
+def _centre_crop_box(source: tuple[int, int], output: tuple[int, int]) -> list[int] | None:
+    """The box ComfyUI's ImageScale keeps with crop=center (comfy.utils.common_upscale), or None when it trims under 1%."""
+    width, height = source
+    old_aspect, new_aspect = width / height, output[0] / output[1]
+    x = round((width - width * (new_aspect / old_aspect)) / 2) if old_aspect > new_aspect else 0
+    y = round((height - height * (old_aspect / new_aspect)) / 2) if old_aspect < new_aspect else 0
+    if 2 * x < 0.01 * width and 2 * y < 0.01 * height:
+        return None
+    return [x, y, width - x, height - y]
 
 
 def _attach_dynamic_image_input(graph: dict[str, Any], entry: dict[str, Any], image_name: str) -> None:
@@ -716,7 +727,7 @@ def _attach_dynamic_image_input(graph: dict[str, Any], entry: dict[str, Any], im
     }
     graph[resize_id] = {
         "class_type": "ImageScale",
-        "inputs": {"image": [load_id, 0], "upscale_method": "lanczos", "crop": "disabled",
+        "inputs": {"image": [load_id, 0], "upscale_method": "lanczos", "crop": "center",
                    "width": _binding_value(graph, entry, "width"), "height": _binding_value(graph, entry, "height")},
     }
     graph[encode_id] = {
@@ -901,6 +912,11 @@ def _prepare_graph(entry: dict[str, Any], body: dict[str, Any], fit_report: list
             height = round(source["height"] * width / source["width"])
         parameters.setdefault("width", max(64, width // 8 * 8))
         parameters.setdefault("height", max(64, height // 8 * 8))
+        crop = _centre_crop_box((source["width"], source["height"]), (parameters["width"], parameters["height"]))
+        if crop:
+            fit_report.append({"parameter": "input_image", "original_size": [source["width"], source["height"]],
+                               "used_size": [parameters["width"], parameters["height"]], "first_frame": False, "file": None,
+                               "scope": "output size", "crop_box": crop, "crop_reason": "aspect"})
     elif pose_request and "width" in entry.get("bindings", {}) and "width" not in parameters and "height" not in parameters:
         # Without a requested size the output takes the pose image's aspect at the route's default pixel count.
         default_pixels = _binding_value(graph, entry, "width") * _binding_value(graph, entry, "height")
@@ -1385,7 +1401,8 @@ _REFERENCE_USES = (
      "Output keeps the source size (rounded to multiples of 32). The prompt is the edit instruction."),
     ("latent-img2img", "image-to-image", "input_image",
      "Redraw or vary an uploaded image in the route's model style.",
-     "Composition and colours carry over; character identity is not guaranteed. denoise defaults to 0.65; lower keeps more of the source."),
+     "Composition and colours carry over; character identity is not guaranteed. denoise defaults to 0.65; lower keeps more of the source. "
+     "Width or height alone keeps the source's shape; both of another shape crop the centre (warning input_cropped), never stretch."),
     ("inpaint-source", "inpaint", "input_image + mask_image",
      "Repaint only a masked region of an uploaded image.",
      "Mask must have the source's aspect ratio (it is resized with the source when fitted). denoise 1.0 replaces the region; lower keeps more of the original. Unmasked pixels are composited back unchanged."),
@@ -1590,7 +1607,9 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_downscaled": "An input was shrunk to fit the route; original_size and used_size say how.",
             "input_resized": "An input or the output size was adjusted to the route's size rules.",
             "input_first_frame": "An animated input was reduced to its first frame.",
-            "input_cropped": "face_image was cropped to head and shoulders around the face it shows; crop_box gives the pixels used.",
+            "input_cropped": "An input was cropped: face_image to head and shoulders around its face, or input_image to the "
+                             "centre when width and height ask for another shape (image-to-image never stretches); crop_box "
+                             "gives the pixels used.",
             "upscaled_without_model": "images/transform enlarged the image by interpolation: bigger, but soft; "
                                       "POST /project/images/upscale enlarges with a model.",
             "upscale_look_default": "images/upscale did not know whether the picture is anime or a photo and used the "
@@ -3154,7 +3173,13 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             if record["first_frame"]:
                 warnings.append({"code": "input_first_frame", "parameter": name,
                                  "message": f"{name} is animated; only its first frame was used."})
-            if record.get("crop_box"):
+            if record.get("crop_box") and record.get("crop_reason") == "aspect":
+                warnings.append({"code": "input_cropped", "parameter": name, "original_size": original, "crop_box": record["crop_box"],
+                                 "used_size": used,
+                                 "message": f"The output {used[0]}x{used[1]} has another shape than {name} ({original[0]}x{original[1]}), "
+                                            f"so the centre {record['crop_box']} (x0, y0, x1, y1) was used instead of stretching. "
+                                            "Send only width or only height to keep the whole picture."})
+            elif record.get("crop_box"):
                 warnings.append({"code": "input_cropped", "parameter": name, "original_size": original, "crop_box": record["crop_box"],
                                  "used_size": used,
                                  "message": f"{name} was cropped to head and shoulders around the face it shows (crop_box "

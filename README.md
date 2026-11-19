@@ -217,7 +217,7 @@ Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取�
 
 服务把原图放在灰色画布上，在提示词前加入"灰色区域是空白画布，请无缝延续画面并保持其余部分不变"的说明，生成后把原图像素贴回。Qwen 会重画整幅画面，有时把原图内容缩小、平移（实测最多缩到 79%、平移 190 像素），因此贴回前先按原图区域做仿射对齐，再在每条新边内侧 64 像素做渐变融合。对不齐时返回模型自己的整幅结果，并在任务的 `warnings` 中报告 `extend_original_not_kept`。输出尺寸为原图加扩展部分；超过约 240 万像素的画布按缩小尺寸生成后放大，新区域会偏软。选路时可用 `input_mode: "extend"`（或 `"outpaint"`）。
 
-参考图过大或为动图时不会被拒绝：默认 `input_fit` 为 `downscale`，服务会按工作流能处理的尺寸等比缩小（不修改原上传文件，缩小后的副本在任务结束时删除），动图取第一帧，并在响应 `warnings` 中以 `input_downscaled`、`input_resized` 或 `input_first_frame` 报告原始尺寸与实际尺寸。传 `input_fit: "none"` 则保持原图；工作流无法处理时以稳定的 `error.code` 拒绝（如 `input_too_large`、`input_animated`、`input_size_unsupported`、`mask_size_mismatch`），完整列表见 agent manifest 的 `error_codes`。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘。
+参考图过大或为动图时不会被拒绝：默认 `input_fit` 为 `downscale`，服务会按工作流能处理的尺寸等比缩小（不修改原上传文件，缩小后的副本在任务结束时删除），动图取第一帧，并在响应 `warnings` 中以 `input_downscaled`、`input_resized` 或 `input_first_frame` 报告原始尺寸与实际尺寸。传 `input_fit: "none"` 则保持原图；工作流无法处理时以稳定的 `error.code` 拒绝（如 `input_too_large`、`input_animated`、`input_size_unsupported`、`mask_size_mismatch`），完整列表见 agent manifest 的 `error_codes`。其他支持图生图的工作流使用 `input_image` 和 `denoise` 控制参考图重绘；只给 `width` 或 `height` 时保持原图比例，两者都给且比例不同时取原图中央部分（`input_cropped` 警告），不会拉伸。
 
 局部重绘需要原图和宽高比相同（通常同尺寸）的蒙版；尺寸不是 8 的倍数时会自动调整。默认读取蒙版红色通道：白色区域重绘、黑色区域保留；默认 `denoise` 1.0 完全重绘蒙版区域，调低则保留更多原图结构。人物参考使用 `face_image`，可以是任意一张单人图片：服务用 DWPose 找到图中最大的脸，裁成包含头发和肩膀的方图再交给 IPAdapter（本身已是头像的图片原样使用），并在 `warnings` 中以 `input_cropped` 报告裁剪范围；`input_fit: "none"` 保留整图。Anima 人物参考会编码整张（裁剪后的）参考图，`ipadapter_weight` 默认 0.6；调到 0.8–1.0 会连同服装和背景一起照搬。
 

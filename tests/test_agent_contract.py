@@ -249,6 +249,16 @@ class AgentContractTests(unittest.TestCase):
             fit("qwen-image-2.1-t2i", input_image="big.png")
         self.assertEqual(caught.exception.code, "unsupported_parameter")
 
+    def test_img2img_crops_the_centre_instead_of_stretching(self):
+        report = []
+        graph = api._prepare_graph(self.entry, {"parameters": {"prompt": "x", "input_image": "source.png", "width": 512, "height": 512}}, report)
+        scale = next(n for n in graph.values() if n["class_type"] == "ImageScale")
+        self.assertEqual(scale["inputs"]["crop"], "center")
+        self.assertEqual(report[-1]["crop_box"], [0, 32, 320, 352])  # 320x384 source, square output
+        report = []
+        api._prepare_graph(self.entry, {"parameters": {"prompt": "x", "input_image": "source.png", "width": 640}}, report)
+        self.assertFalse(any(r.get("crop_box") for r in report))  # one side keeps the shape
+
     def test_extend_pads_the_source_and_pastes_the_original_back(self):
         entries = {e["id"]: e for e in catalog["workflows"]}
         report = []
