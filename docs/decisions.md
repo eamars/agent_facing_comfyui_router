@@ -109,6 +109,21 @@ is returned with a job warning. MOSS takes no image; Anima and SDXL would need i
 models. MOSS's graph is a plain loader, sampler and VAE, so a masked latent could run there, but it
 was not tried.
 
+**Crop and resize are a synchronous tool, not a route** (2026-11-20). Agents often have no image
+library, so the service crops and resizes for them (`POST /project/images/transform`, Pillow in the
+API process, 30-450 ms). A queued route would have been more uniform, but the worker unloads every
+model when the route changes, so cropping one picture would have cost the next job a full model
+reload. Only super-resolution needs a model; it would be a queued route, and none exists yet. Resizing to a width and
+height of another shape crops the centre instead of stretching; enlarging is Lanczos only and warns
+`upscaled_without_model`. Job outputs are accepted as sources by their `/view` URL, which removes the
+download and re-upload step. `crop {"around": "face"}` frames the largest face DWPose finds: a blind Haiku client, with no way
+to locate the head, had read the face box out of a face-reference dry run's warning instead.
+Framings were set by eye on an anime full figure, a seated figure and a photo: head 1.9x the
+brow-to-chin box with the head centred (1.6x cut the hair), head-and-shoulders 3x with the head
+40% down (2.4x, the face-reference crop, showed no shoulders, which Haiku also flagged), upper
+body 4.5x with the head 30% down. The response reports face_box so an agent that cannot see the
+picture can check the framing.
+
 **Contract rules from the 2026-09-17 audit, still in force.**
 - Unknown fields return 400 and an unknown workflow 404, with one error shape: `type`, `message`,
   `route`, `expected` and optional `details`. A missing prompt returns 422.

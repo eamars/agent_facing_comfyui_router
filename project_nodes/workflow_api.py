@@ -19,7 +19,7 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlencode
 
 from aiohttp import web
 from PIL import Image, ImageOps, UnidentifiedImageError
@@ -30,6 +30,7 @@ from comfy_execution.jobs import validate_job_id
 from server import PromptServer
 
 from project_nodes import extend as extend_addon
+from project_nodes import image_tools
 from project_nodes import pose as pose_addon
 
 
@@ -43,6 +44,8 @@ MAX_INPUT_IMAGE_LENGTH = 512
 MAX_INPUT_PIXELS = 16_777_216
 INPUT_FIT_MODES = ("downscale", "none")
 FITTED_INPUT_DIR = "_fitted"
+# Results of POST /project/images/transform: the requester's files, listed and deleted like uploads.
+TRANSFORMED_INPUT_DIR = "transformed"
 # Face crop side as a multiple of the DWPose face box (brows to chin): head, hair and shoulders.
 FACE_CROP_SCALE = 2.4
 MAX_PROJECT_QUEUE = 32
@@ -1501,6 +1504,26 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "lifecycle": "Inputs persist until DELETE /project/inputs/{name}; delete only files you uploaded and no job "
                          "still uses.",
         },
+        "image_tools": {
+            "transform": "POST /project/images/transform crops and/or resizes an image instantly, without a model or the "
+                         "job queue, so you need no image library. Body: {\"image\": an input file name, or any /view "
+                         "URL of an input or job output (as in outputs[].url), \"crop\": ..., \"resize\": ...}; send "
+                         "crop, resize or both (crop runs first).",
+            "crop": "{\"x\", \"y\", \"width\", \"height\"} in pixels of the image as displayed, or {\"aspect\": \"16:9\", "
+                    "\"anchor\": \"center\"} for the largest box of that shape (anchor: center, top, bottom, left, right or "
+                    "a corner such as top-left), or {\"around\": \"face\"} to frame the largest face it finds, with "
+                    "optional framing (head, head-and-shoulders (default) or upper-body, about waist up) and aspect "
+                    "(default 1:1). Only the "
+                    "face crop finds a subject: anchor top keeps a standing figure's head, center suits scenes. Without a "
+                    "face the request fails with face_not_found.",
+            "resize": "{\"width\"} or {\"height\"} keeps the shape; both together give that exact size, centre-cropping first "
+                      "if the shape differs, so nothing is stretched. Or {\"scale\": 0.5} or {\"max_side\": 1024} (shrinks "
+                      "only). Enlarging uses interpolation and adds no detail (warning upscaled_without_model).",
+            "result": "A new input file: name (use it as any image parameter), url (download), size and the operations "
+                      "applied (a face crop also reports face_box, the face it framed). It persists like an upload; DELETE /project/inputs/{name} when done.",
+            "not_for": "Growing the canvas with new content (use extend on the Qwen edit route), changing what the "
+                       "picture shows, or sharp enlargement: there is no model upscaler yet.",
+        },
         "poses": {
             "parameter": "parameters.pose",
             "when": "Send pose when the requester asks for a specific body pose or hand gesture, or gives a pose image. "
@@ -1551,7 +1574,9 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_downscaled": "An input was shrunk to fit the route; original_size and used_size say how.",
             "input_resized": "An input or the output size was adjusted to the route's size rules.",
             "input_first_frame": "An animated input was reduced to its first frame.",
-            "input_cropped": "face_image was cropped to the face it shows; crop_box gives the pixels used.",
+            "input_cropped": "face_image was cropped to head and shoulders around the face it shows; crop_box gives the pixels used.",
+            "upscaled_without_model": "images/transform enlarged the image by interpolation: bigger, but soft; there is no "
+                                      "model upscaler yet.",
             "extend_drawn_smaller": "The extended picture is larger than the route draws at full size: it is drawn smaller "
                                     "and scaled back to output_size, so the new areas are softer.",
             "extend_original_not_kept": "Reported on the job, not the submission: the extended picture is the model's "
@@ -1570,6 +1595,8 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             "input_too_large": "The image cannot be decoded safely, or exceeds max_input_pixels with input_fit=none.",
             "input_animated": "Animated input with input_fit=none; send a still image or use input_fit=downscale.",
             "input_size_unsupported": "With input_fit=none the image size cannot run on this route (e.g. inpaint needs 64-2048 px, multiples of 8).",
+            "crop_out_of_bounds": "images/transform: the crop box reaches outside the image; details gives the image size.",
+            "face_not_found": "images/transform: no face was found to crop around; crop by pixels or by aspect and anchor.",
             "mask_size_mismatch": "mask_image has a different aspect ratio from input_image (or a different size with input_fit=none).",
             "mask_alpha_missing": "mask_channel=alpha was requested but the mask has no transparency.",
             "unsupported_parameter": "The route does not expose this parameter (for example an image sent to a text-only route).",
@@ -1605,6 +1632,7 @@ def _agent_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
             {"method": "GET", "path": "/project/inputs", "description": "List files in ComfyUI's input directory."},
             {"method": "POST", "path": "/upload/image", "description": "Upload a reference image (multipart: image, type=input, optional overwrite, subfolder)."},
             {"method": "DELETE", "path": "/project/inputs/{name}", "description": "Delete one input file."},
+            {"method": "POST", "path": "/project/images/transform", "description": "Crop and/or resize an input or job output without a model; returns a new input file."},
             {"method": "POST", "path": "/project/generate", "description": "Queue a named route (alias: /project/prompt), or validate it with dry_run."},
             {"method": "GET", "path": "/project/jobs/{prompt_id}", "description": "Job state and output download URLs."},
             {"method": "GET", "path": "/project/resources", "description": "Advisory device memory snapshot and queue/input limits."},
@@ -1730,6 +1758,37 @@ def _openapi_document() -> dict[str, Any]:
                         "200": {"description": "Deleted input file"},
                         "400": {"description": "Unsafe or invalid relative filename"},
                         "404": {"description": "Input file not found"},
+                    },
+                }
+            },
+            "/project/images/transform": {
+                "post": {
+                    "operationId": "transformImage",
+                    "summary": "Crop and/or resize an image without a model",
+                    "description": "Runs instantly in the API process (no job queue). The result is saved as a new input file.",
+                    "requestBody": {"required": True, "content": {"application/json": {"schema": {
+                        "type": "object", "additionalProperties": False, "required": ["image"],
+                        "properties": {
+                            "image": {"type": "string", "description": "An input file name, or a /view URL of an input or a job output (outputs[].url)."},
+                            "crop": {"oneOf": [
+                                {"type": "object", "additionalProperties": False, "required": ["x", "y", "width", "height"],
+                                 "properties": {name: {"type": "integer", "minimum": 0} for name in ("x", "y", "width", "height")}},
+                                {"type": "object", "additionalProperties": False, "required": ["aspect"],
+                                 "properties": {"aspect": {"type": ["string", "number"], "description": "'16:9', '1:1' or width/height"},
+                                                "anchor": {"type": "string", "enum": list(image_tools.ANCHORS), "default": "center"}}},
+                                {"type": "object", "additionalProperties": False, "required": ["around"],
+                                 "properties": {"around": {"const": "face"},
+                                                "framing": {"type": "string", "enum": list(image_tools.FRAMINGS), "default": "head-and-shoulders"},
+                                                "aspect": {"type": ["string", "number"], "default": "1:1"}}}]},
+                            "resize": {"type": "object", "additionalProperties": False, "description": "width and/or height, or scale, or max_side",
+                                       "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1},
+                                                      "scale": {"type": "number", "minimum": 0.01, "maximum": 8},
+                                                      "max_side": {"type": "integer", "minimum": 1}}},
+                        }}}}},
+                    "responses": {
+                        "200": {"description": "name (new input file), url, size, source_size, operations, warnings"},
+                        "400": {"description": "Invalid crop or resize (invalid_parameter, crop_out_of_bounds, input_too_large) or source"},
+                        "422": {"description": "face_not_found: a crop around the face found none"},
                     },
                 }
             },
@@ -2601,6 +2660,65 @@ async def list_project_inputs(request: web.Request) -> web.Response:
         return _json_error(ApiError(500, "Project input listing failed", str(exc)))
 
 
+def _tool_source(value: Any) -> tuple[str, Path]:
+    """An uploaded input name, or a /view URL of an input or a job output, as returned in outputs[].url."""
+    text = _as_text("image", value, 1024).strip()
+    if "?" not in text:
+        return _resolve_input_file(text, "image")
+    query = parse_qs(text.split("?", 1)[1])
+    filename, subfolder, kind = (query.get(key, [""])[0] for key in ("filename", "subfolder", "type"))
+    if kind == "input":
+        return _resolve_input_file(f"{subfolder}/{filename}" if subfolder else filename, "image")
+    if kind != "output" or not filename:
+        raise ApiError(400, "image must be an input file name or a /view URL with type=input or type=output", code="input_invalid_path")
+    root = Path(folder_paths.get_output_directory()).resolve()
+    path = (root / subfolder / filename).resolve()
+    try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise ApiError(400, "image must stay inside the output directory", code="input_invalid_path") from exc
+    if not path.is_file():
+        raise ApiError(400, f"Job output was not found: {filename}", code="input_not_found")
+    return f"{subfolder}/{filename}" if subfolder else filename, path
+
+
+async def transform_image(request: web.Request) -> web.Response:
+    """Crop and/or resize an image without a model; the result is saved as a new input file."""
+    try:
+        body = await _read_json(request)
+        unknown = set(body) - {"image", "crop", "resize"}
+        if unknown:
+            raise ApiError(400, "Unknown request fields", sorted(unknown), expected=["image", "crop", "resize"])
+        if "image" not in body:
+            raise ApiError(422, "image is required: an input file name or a job output URL", expected=["image"])
+        source_name, path = _tool_source(body["image"])
+        info = _image_info(path, "image")
+
+        def work() -> dict[str, Any]:
+            with Image.open(path) as source:
+                # DWPose reads the same file; it runs only for a crop around the face.
+                image, operations, warnings = image_tools.transform(source, body.get("crop"), body.get("resize"),
+                                                                    max_pixels=MAX_INPUT_PIXELS,
+                                                                    find_face=lambda: pose_addon.face_box(str(path)))
+            name = f"{TRANSFORMED_INPUT_DIR}/{image_tools.output_name(source_name, image.size, uuid.uuid4().hex[:8])}"
+            target = Path(folder_paths.get_input_directory()) / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            image.save(target, "PNG")
+            return {"name": name, "url": "/view?" + urlencode({"filename": target.name, "subfolder": TRANSFORMED_INPUT_DIR, "type": "input"}),
+                    "size": list(image.size), "source_size": [info["width"], info["height"]], "operations": operations,
+                    "warnings": warnings,
+                    "next": "Pass name as any image parameter (input_image, face_image, mask_image or pose), or download url. "
+                            "It persists like an upload: DELETE /project/inputs/{name} when done."}
+
+        return web.json_response(await asyncio.to_thread(work))
+    except image_tools.ToolError as exc:
+        return _json_error(ApiError(422 if exc.code == "face_not_found" else 400, exc.message, exc.details, code=exc.code))
+    except pose_addon.PoseError as exc:
+        return _json_error(ApiError(exc.status, exc.message, exc.details, code=exc.code))
+    except ApiError as error:
+        return _json_error(error)
+
+
 async def delete_project_input(request: web.Request) -> web.Response:
     """Delete one file from ComfyUI's input directory without path escape."""
     try:
@@ -2882,8 +3000,9 @@ async def post_project_prompt(request: web.Request) -> web.Response:
             if record.get("crop_box"):
                 warnings.append({"code": "input_cropped", "parameter": name, "original_size": original, "crop_box": record["crop_box"],
                                  "used_size": used,
-                                 "message": f"{name} was cropped to the face found at {record['crop_box']} (x0, y0, x1, y1) so the "
-                                            "face-reference adapter sees the face; the body and outfit are left out. To reference the outfit too, send "
+                                 "message": f"{name} was cropped to head and shoulders around the face it shows (crop_box "
+                                            f"{record['crop_box']}, x0, y0, x1, y1) so the face-reference adapter sees the face; "
+                                            "the rest of the body and the outfit are left out. To reference the outfit too, send "
                                             "input_fit=none (the whole image is used)."})
             elif used != original:
                 code = "input_downscaled" if used[0] * used[1] < original[0] * original[1] else "input_resized"
@@ -2980,6 +3099,7 @@ def _register_routes() -> None:
     routes.get("/project/inputs")(list_project_inputs)
     routes.get("/project/poses")(list_poses)
     routes.delete("/project/inputs/{name:.*}")(delete_project_input)
+    routes.post("/project/images/transform")(transform_image)
     routes.post("/project/resolve")(resolve_route)
     routes.get("/project/models")(list_models)
     routes.get("/project/models/{model_id}")(get_model)

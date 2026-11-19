@@ -10,6 +10,7 @@
 - **布局控制**：通过 MOSS-Image 的布局 JSON 指定文字和物体在画面中的位置与内容。
 - **参考图编辑**：通过 Qwen-Image-2.1 输入一张图片和自然语言指令，修改颜色、服装、场景等内容。
 - **扩图**：同一 Qwen 编辑路由按像素向四周扩展图片，新区域按提示词补全，原图像素保持不变。
+- **裁剪与缩放**：不经模型、不进队列，即时裁剪或缩放上传图片和生成结果，结果可直接作为下一次输入。
 - **图生图与局部重绘**：使用参考图生成变体，或提供蒙版重绘指定区域并保留蒙版外的原图像素。
 - **人物参考**：通过 IPAdapter 参考人物外观。
 - **姿势**：同一个 `pose` 参数接受姿势库编号或上传的图片，服务提取骨架后按模型家族接入控制；目前 SDXL / Illustrious、Anima、Qwen-Image 文生图和 Moody Desire（Flux.2 Klein）路由已支持。
@@ -223,7 +224,24 @@ Qwen 编辑接口支持单张参考图，输出尺寸随原图按 32 像素取�
 
 生成的 PNG 保留 ComfyUI 的提示词元数据（提示词、种子、模型与参数）便于复现，但其中的输入图片文件名会在任务完成前替换为 `[input image]`，不会泄露上传文件名或路径。
 
-图片参数接受已上传的相对文件名，不接受主机绝对路径或 URL。上传图片跨重启保留，可通过输入列表查询并按文件名删除；生成结果如需作为下一次输入，需要重新上传。
+图片参数接受已上传的相对文件名，不接受主机绝对路径或 URL。上传图片跨重启保留，可通过输入列表查询并按文件名删除；生成结果可以重新上传，或经下面的裁剪缩放接口直接转为输入文件。
+
+### 裁剪与缩放
+
+`POST /project/images/transform` 在 API 进程内用 Pillow 即时处理，不加载模型、不进入任务队列（排队任务会触发模型切换并卸载当前模型），调用方不需要任何图像库：
+
+```json
+{
+  "image": "/view?filename=qwen_image_2_1_00012_.png&subfolder=&type=output",
+  "crop": {"aspect": "1:1", "anchor": "top"},
+  "resize": {"width": 1024}
+}
+```
+
+- `image`：已上传的输入文件名，或任务结果中的 `outputs[].url`。
+- `crop`：像素框 `{"x", "y", "width", "height"}`；或 `{"aspect": "16:9", "anchor": "center"}` 取该比例的最大区域（anchor 可为 center、top、bottom、left、right 或 top-left 等四角）；或 `{"around": "face"}` 用 DWPose 找到图中最大的脸并取景，可选 `framing`（`head`、`head-and-shoulders`（默认）、`upper-body`）和 `aspect`（默认 1:1），找不到脸时返回 `face_not_found`。
+- `resize`：只给 `width` 或 `height` 时保持比例；同时给出且比例不同时先居中裁剪再缩放，不会拉伸；也可用 `scale` 或 `max_side`（只缩小）。先裁剪后缩放。
+- 结果保存为新的输入文件（`transformed/` 下），响应给出 `name`、下载 `url`、尺寸和实际执行的操作；与上传文件一样保留到被删除。放大只做插值（Lanczos），不增加细节，响应会给出 `upscaled_without_model` 警告；目前没有模型超分辨率。除 `around: "face"` 外不识别主体：`anchor: "top"` 适合保留站立人物的头部，`center` 适合场景。
 
 ### 常用接口
 

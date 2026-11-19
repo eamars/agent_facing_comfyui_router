@@ -288,6 +288,32 @@ class AgentContractTests(unittest.TestCase):
         _, report = extend.align_and_paste(rng.random((300, 400, 3), np.float32), canvas, region)
         self.assertFalse(report["aligned"])
 
+    def test_image_tools_crop_and_resize_never_stretch(self):
+        from project_nodes import image_tools as tools
+        image = Image.new("RGB", (1000, 500), "navy")
+        self.assertEqual(tools.crop_box(image.size, {"aspect": "1:1", "anchor": "right"}), (500, 0, 1000, 500))
+        with self.assertRaises(tools.ToolError) as caught:
+            tools.crop_box(image.size, {"x": 900, "y": 0, "width": 200, "height": 10})
+        self.assertEqual(caught.exception.code, "crop_out_of_bounds")
+        result, operations, warnings = tools.transform(image, resize={"width": 300, "height": 300}, max_pixels=16_777_216)
+        self.assertEqual((result.size, operations[0]["crop"]), ((300, 300), [250, 0, 750, 500]))  # centre crop, not stretch
+        result, _, warnings = tools.transform(image, resize={"max_side": 4000}, max_pixels=16_777_216)
+        self.assertEqual((result.size, warnings), ((1000, 500), []))  # max_side only shrinks
+        face = lambda: (0.445, 0.083, 0.579, 0.152)  # reference_character's face, on a 1116x2000 picture
+        x0, y0, x1, y1 = tools.crop_box((1116, 2000), {"around": "face", "framing": "head"}, face)
+        self.assertTrue(x1 - x0 == y1 - y0 and y0 < 0.083 * 2000 and x0 < 0.445 * 1116 and x1 > 0.579 * 1116)
+        x0, y0, x1, y1 = tools.crop_box((1116, 2000), {"around": "face", "framing": "upper-body", "aspect": "4:5"}, face)
+        self.assertTrue(abs((x1 - x0) / (y1 - y0) - 0.8) < 0.01 and x1 <= 1116 and y0 >= 0)
+        # A whole-pixel 4:5 face crop came out 537x672; one given side follows the requested shape, not that rounding.
+        self.assertEqual(tools.resize_target((537, 672), {"width": 1080}, 0.8), ((1080, 1350), None))
+        result, operations, _ = tools.transform(Image.new("RGB", (1116, 2000)), {"around": "face"}, None, max_pixels=16_777_216, find_face=face)
+        self.assertEqual(operations[0]["face_box"], [497, 166, 646, 304])
+        with self.assertRaises(tools.ToolError) as caught:
+            tools.crop_box((1116, 2000), {"around": "face"}, lambda: None)
+        self.assertEqual(caught.exception.code, "face_not_found")
+        result, _, warnings = tools.transform(image, resize={"scale": 2}, max_pixels=16_777_216)
+        self.assertEqual((result.size, [w["code"] for w in warnings]), ((2000, 1000), ["upscaled_without_model"]))
+
     def test_route_scope_and_exact_capabilities(self):
         entries = {e["id"]: e for e in catalog["workflows"]}
         self.assertIsNone(api._route_score(entries["chatgpt-girl-anima-turbo"], {"domain": "anime"}))
