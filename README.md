@@ -27,7 +27,7 @@
 
 | 模型 / 组合 | 主要用途 | 支持方式 | 工作流 ID |
 | --- | --- | --- | --- |
-| Qwen-Image-2.1 · Uncensored GGUF Q4_K_M | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
+| Qwen-Image-2.1 Turbo · 官方 BF16 | 自然语言生成、图中文字、参考图指令编辑 | 文生图、单图编辑 | `qwen-image-2.1-t2i`、`qwen-image-2.1-edit` |
 | MOSS-Image-SFT · 官方 BF16 | 布局 JSON 精确排版、长提示词、图中中英文文字 | 文生图（自然语言 / 标签 / 布局 JSON） | `moss-image-sft-t2i` |
 | Anima Turbo v1.1 · 官方 BF16 | 通用动漫、人物与插画 | 文生图、图生图 | `anima-turbo-v1-1` |
 | Moody Anima Mix v1.0 | 低步数动漫生成 | 文生图、图生图 | `moody-anima-mix` |
@@ -100,7 +100,7 @@ MOSS-Image 不接受任何图片输入，无法接入姿势。向不支持姿势
 
 | 所需模型 / 功能 | 下载 Profile |
 | --- | --- |
-| Qwen-Image-2.1 Uncensored GGUF Q4_K_M 生成与编辑 | `qwen-image-2.1` |
+| Qwen-Image-2.1 Turbo 生成与编辑 | `qwen-image-2.1` |
 | MOSS-Image-SFT 文生图与布局生成（约 27 GB） | `moss-image-sft` |
 | Anima Turbo、局部重绘与 Anima 人物参考 | `anima-turbo` |
 | Moody Anima Mix 与局部重绘 | `moody-anima-mix` |
@@ -118,7 +118,7 @@ MOSS-Image 不接受任何图片输入，无法接入姿势。向不支持姿势
 
 SDXL 人物参考还需要 Animagine XL 3.1 基础模型，可通过 `animagine-xl-3.1-nsfw` Profile 安装。
 
-Qwen-Image-2.1 使用 abenzerps 发布的 Uncensored Q4_K_M GGUF 扩散模型，叠加同一发布者的 uncensored LoRA（默认强度 1.0，可通过 `loras.uncensored` 调整或设为 0 关闭），并配套 Qwen3VL INT8 文本编码器与 BF16 VAE。`setup_comfyui.ps1` 会安装固定版本的 ComfyUI-GGUF 节点；目标模型及配套文件由 Qwen profile 下载并校验。原官方 INT8 扩散文件保留在本地作回滚，不再被命名工作流加载。替换的原因与依据见 [设计决定](docs/decisions.md)。
+Qwen-Image-2.1 的两条路由使用官方 Qwen-Image-2.1-Turbo BF16 扩散模型（Comfy-Org 重新打包，8 步、CFG 1、模板中的固定采样表），配套 Qwen3VL INT8 文本编码器与 BF16 VAE（来自 SHA-256 一致的 puzhen 镜像）。基础模型本身可以生成成人内容，因此不再叠加 uncensored LoRA，也不再接受 `loras`、`steps`、`sampler_name` 和 `scheduler` 参数。4090 上 1024×1024 文生图约 33 秒，其中采样约 3 秒，其余为文本编码、CPU VAE 解码和模型搬运。原 Q4_K_M GGUF 与 LoRA 保留在本地作回滚，不再被命名工作流加载。替换的原因与依据见 [设计决定](docs/decisions.md)。
 
 MOSS-Image-SFT 使用 OpenMOSS 发布的 5B DiT、Qwen3.5 9B 文本编码器和 FLUX.2 小解码器 VAE，按 Hugging Face 目录原样存放在 `ComfyUI/models/moss-image/MOSS-Image-SFT/`，由 `setup_comfyui.ps1` 固定版本安装的官方 MOSS-Image 节点直接读取。默认 1024×1024、50 步、Euler/sgm_uniform、CFG 3、shift 5，并在负向分支跳过第 22 层；每步计算两次；4090 上 1024×1024 约 55 秒，与 Qwen 文生图相当。
 
@@ -149,7 +149,7 @@ MOSS-Image-SFT 使用 OpenMOSS 发布的 5B DiT、Qwen3.5 9B 文本编码器和 
 }
 ```
 
-Qwen 文生图默认使用 1024×1024、25 步、Euler/simple、CFG 1。各工作流均提供自己的默认参数，可通过工作流详情中的 `parameter_schema` 查询允许调整的字段。省略 `seed` 时会随机生成，并在响应中返回实际值。
+Qwen 文生图默认使用 1024×1024、8 步（Turbo 固定采样表）、Euler、CFG 1。各工作流均提供自己的默认参数，可通过工作流详情中的 `parameter_schema` 查询允许调整的字段。省略 `seed` 时会随机生成，并在响应中返回实际值。
 
 如果希望自动选路，先调用 `POST /project/resolve`：
 

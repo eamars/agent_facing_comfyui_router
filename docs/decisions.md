@@ -30,12 +30,27 @@ the launcher exposes only the RTX 4090's UUID and refuses device-override argume
 
 ## Models and routing
 
-**Qwen-Image 2.1 runs the uncensored Q4_K_M GGUF** (2026-09-26, `ad14afc`). It replaced the
+**Qwen-Image 2.1 ran the uncensored Q4_K_M GGUF** (2026-09-26, `ad14afc`; replaced by Turbo, below). It replaced the
 official INT8 ConvRot diffusion model with the same graphs and API contract (Hugging Face revision
 `40319fb15542f0ad22921e0124a191a8a935a60a`, SHA-256 `e79c8a00…41b41`). The INT8 file stays on disk
 as a rollback copy and no route loads it. The publisher's uncensored LoRA was added later
 (`861b066`, default strength 1.0). On the 4090 a 1024² text-to-image job takes about 52 s and a
 single-reference edit about 63 s; edit output follows the source size, rounded to 32 px.
+
+**Qwen-Image 2.1 runs the official Turbo checkpoint** (2026-11-20). abenzerps turned the pinned
+repo into a Turbo-only one and dropped the uncensored LoRA, so the remaining files were repinned
+to a SHA-256-identical mirror and the alternatives were tested at 1024² with fixed seeds (photo,
+text poster, anime, two nudes, two explicit scenes). The "UC" GGUF is the official base weights,
+and the base is not censored: plain BF16 without any LoRA drew the nude and explicit prompts, and
+the uncensored LoRA changed almost nothing (Q4 + LoRA, BF16 + LoRA and plain BF16 were near
+identical). Official Qwen-Image-2.1-Turbo (8 steps, the template's ManualSigmas, CFG 1) was the
+best overall: correct text, good photo and anime, the best adherence and anatomy on the adult
+prompts, and 3 s of sampling against 17 s for the Q4 GGUF. ChatR's Omni LoRA at CFG 5 took 33 s
+to sample and exaggerated anatomy; Omni plus its Turbo LoRA came close to official Turbo but adds
+two third-party LoRAs. The INT8 text encoder matched BF16. A whole 1024² job is about 33 s (was
+about 45 s), most of it text encoding, the CPU VAE decode and model moves. The Fusal anime LoRA
+was tested too: more anime polish than plain Qwen but below JANKU and One Obsession, and it needs
+the non-Turbo base and its own 17.5 GB text encoder, so no route uses it.
 
 **Qwen for real-world images, MOSS for layouts** (2026-10-16, `8eff134`). Twelve shared prompts
 at seed 4242, plus layout JSON for MOSS:

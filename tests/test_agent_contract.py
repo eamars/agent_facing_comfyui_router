@@ -68,9 +68,12 @@ class AgentContractTests(unittest.TestCase):
     def test_qwen_sampling_and_edit_reference_size(self):
         self.entry = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-t2i")
         graph = self.graph()
-        self.assertEqual([api._binding_value(graph, self.entry, key) for key in
-                          ("width", "height", "batch_size", "steps", "cfg", "sampler_name", "scheduler", "denoise")],
-                         [1024, 1024, 1, 25, 1, "euler", "simple", 1])
+        self.assertEqual([api._binding_value(graph, self.entry, key) for key in ("width", "height", "batch_size", "cfg")], [1024, 1024, 1, 1])
+        # Turbo: 8 steps on the template's fixed sigma schedule; steps, sampler, scheduler and LoRA strength are not parameters.
+        sigmas = next(n for n in graph.values() if n["class_type"] == "ManualSigmas")["inputs"]["sigmas"]
+        self.assertEqual(len(sigmas.split(",")), 9)
+        for bad in ({"steps": 30}, {"sampler_name": "euler"}, {"scheduler": "simple"}, {"loras": {"uncensored": 1.0}}):
+            self.assertBad(**bad)
         self.assertBad(input_image="source.png")
         self.entry = next(e for e in catalog["workflows"] if e["id"] == "qwen-image-2.1-edit")
         with self.assertRaises(api.ApiError) as caught:
@@ -83,8 +86,7 @@ class AgentContractTests(unittest.TestCase):
         self.assertEqual(graph["452"]["inputs"]["resolution"], 0)
         self.assertEqual(graph["458"]["inputs"]["latent_image"], ["452", 2])
         self.assertEqual(graph["452"]["inputs"]["images.image_1"], ["470", 0])
-        # Sampling starts from an empty latent, so denoise below 1 collapsed every edit to a flat texture.
-        self.assertEqual(graph["458"]["inputs"]["denoise"], 1)
+        # Sampling starts from the encoder's empty latent; a denoise below 1 had collapsed every edit to a flat texture.
         self.assertBad(input_image="source.png", denoise=0.3)
         self.assertBad(input_image="source.png", width=1024)
         self.assertBad(input_image="source.png", batch_size=2)

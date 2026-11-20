@@ -15,34 +15,29 @@ $MossImageRoot = Join-Path $ModelRoot 'moss-image\MOSS-Image-SFT'
 $MossImageRevision = 'daf706d2e1c7a6369c17b6d1658671aee6db1ebe'
 
 $AssetSets = @{
+    # Turbo transformer from Comfy-Org; text encoder and VAE from the puzhen mirror, SHA-256-identical to the original
+    # abenzerps files (that repo became Turbo-only on 2026-11-15).
     'qwen-image-2.1' = @(
         [pscustomobject]@{
-            Name = 'Qwen-Image-2.1 Uncensored GGUF Q4_K_M diffusion model'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/qwen-image-2.1-UC-Q4_K_M.gguf?download=true'
-            Path = (Join-Path $ModelRoot 'diffusion_models\qwen-image-2.1-UC-Q4_K_M.gguf')
-            Bytes = [int64]4604558112
-            Sha256 = 'E79C8A009F2ECBDB6C70FD663D9AEA9EE304A0D91F347E4169A756B8AD141B41'
+            Name = 'Qwen-Image-2.1-Turbo BF16 diffusion model (official, Comfy-Org repack)'
+            Url = 'https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/aacf31a6d48e707f352ecba714cee0680da3479b/diffusion_models/qwen_image_2.1_turbo_bf16.safetensors?download=true'
+            Path = (Join-Path $ModelRoot 'diffusion_models\qwen_image_2.1_turbo_bf16.safetensors')
+            Bytes = [int64]14230280616
+            Sha256 = '8B74237A7F505773E2C66726FA696444B4C704585C93A347CFF9044937F7914A'
         },
         [pscustomobject]@{
             Name = 'Qwen-Image-2.1 Qwen3VL 8B INT8 ConvRot text encoder'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/text_encoders/qwen3vl_8b_int8_convrot.safetensors?download=true'
+            Url = 'https://huggingface.co/puzhen/Qwen-Image-2.1-Uncensored-Quantized/resolve/33327e2076be3cc325c259a13523ecc198a3c632/text_encoders/qwen3vl_8b_int8_convrot.safetensors?download=true'
             Path = (Join-Path $ModelRoot 'text_encoders\qwen3vl_8b_int8_convrot.safetensors')
             Bytes = [int64]9350798360
             Sha256 = '8BFD0F6E12ABF2D2D697ECC888E5E90B0D6741D6708F05799F53AFA560452E8F'
         },
         [pscustomobject]@{
             Name = 'Qwen-Image-2.1 BF16 VAE'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/40319fb15542f0ad22921e0124a191a8a935a60a/vae/qwen_image_2.1_vae_bf16.safetensors?download=true'
+            Url = 'https://huggingface.co/puzhen/Qwen-Image-2.1-Uncensored-Quantized/resolve/33327e2076be3cc325c259a13523ecc198a3c632/vae/qwen_image_2.1_vae_bf16.safetensors?download=true'
             Path = (Join-Path $ModelRoot 'vae\qwen_image_2.1_vae_bf16.safetensors')
             Bytes = [int64]675509688
             Sha256 = 'BB21F7473051E1AC368515DD3F2E15CD44D7A11748EE8823E1DDCA3E4876B7C9'
-        },
-        [pscustomobject]@{
-            Name = 'Qwen-Image-2.1 uncensored LoRA (rank 16, attention only)'
-            Url = 'https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-Quantized/resolve/7959e658915f52274897fb573ffeda49de8dc16b/qwen-image-2.1-uncensored-lora.safetensors?download=true'
-            Path = (Join-Path $ModelRoot 'loras\qwen-image-2.1-uncensored-lora.safetensors')
-            Bytes = [int64]33586704
-            Sha256 = '00EE2CB7F00A37B097640C1880ED0D17E368E30599F34BB348FEE0E8C2CC4CA1'
         }
     )
     'moss-image-sft' = @(

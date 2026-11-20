@@ -1,8 +1,9 @@
 {
   "451": {
-    "class_type": "UnetLoaderGGUF",
+    "class_type": "UNETLoader",
     "inputs": {
-      "unet_name": "qwen-image-2.1-UC-Q4_K_M.gguf"
+      "unet_name": "qwen_image_2.1_turbo_bf16.safetensors",
+      "weight_dtype": "default"
     }
   },
   "452": {
@@ -53,10 +54,41 @@
     }
   },
   "458": {
-    "class_type": "KSampler",
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "459",
+        0
+      ],
+      "guider": [
+        "460",
+        0
+      ],
+      "sampler": [
+        "462",
+        0
+      ],
+      "sigmas": [
+        "463",
+        0
+      ],
+      "latent_image": [
+        "456",
+        0
+      ]
+    }
+  },
+  "459": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 0
+    }
+  },
+  "460": {
+    "class_type": "CFGGuider",
     "inputs": {
       "model": [
-        "471",
+        "469",
         0
       ],
       "positive": [
@@ -67,16 +99,7 @@
         "452",
         1
       ],
-      "latent_image": [
-        "456",
-        0
-      ],
-      "seed": 0,
-      "steps": 25,
-      "cfg": 1,
-      "sampler_name": "euler",
-      "scheduler": "simple",
-      "denoise": 1
+      "cfg": 1.0
     }
   },
   "461": {
@@ -92,15 +115,27 @@
       "format.input_color_space": "sRGB"
     }
   },
-  "471": {
-    "class_type": "LoraLoaderModelOnly",
+  "462": {
+    "class_type": "KSamplerSelect",
     "inputs": {
-      "lora_name": "qwen-image-2.1-uncensored-lora.safetensors",
-      "strength_model": 1.0,
+      "sampler_name": "euler"
+    }
+  },
+  "463": {
+    "class_type": "ManualSigmas",
+    "inputs": {
+      "sigmas": "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0"
+    }
+  },
+  "469": {
+    "class_type": "QwenImage21Cache",
+    "inputs": {
       "model": [
         "451",
         0
-      ]
+      ],
+      "device": "auto",
+      "dtype": "default"
     }
   }
 }

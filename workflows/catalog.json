@@ -174,7 +174,11 @@
           "licence": "BSD-3-Clause (xinntao/Real-ESRGAN)"
         }
       },
-      "photo_families": ["qwen-image-2.1", "moss-image", "flux2-klein"],
+      "photo_families": [
+        "qwen-image-2.1",
+        "moss-image",
+        "flux2-klein"
+      ],
       "download_profile": "upscale",
       "basis": "2026-11-20 A/B on four test pictures, 4x from a quarter-size copy against the original and 2x on full-size pictures: 4x-AnimeSharp was the most faithful on anime and painted pictures (RealESRGAN_x4plus_anime_6B redrew faces); RealESRGAN_x4plus held up best on a photo (4x-UltraSharp broke up when the source was small)."
     }
@@ -182,8 +186,8 @@
   "workflows": [
     {
       "id": "qwen-image-2.1-t2i",
-      "name": "Qwen-Image-2.1 Uncensored Q4_K_M Text to Image",
-      "description": "Qwen-Image-2.1 Uncensored Q4_K_M GGUF transformer, 1024 square, 25 Euler/simple steps and CFG 1.",
+      "name": "Qwen-Image-2.1 Turbo Text to Image",
+      "description": "Official Qwen-Image-2.1-Turbo BF16 transformer, 1024 square, 8 steps and CFG 1. Draws adult content unaided.",
       "family": "qwen-image-2.1",
       "resident_group": "qwen-image-2.1-t2i",
       "tags": [
@@ -194,16 +198,14 @@
       ],
       "file": "qwen_image_2_1_t2i.json",
       "model_ids": [
-        "qwen-image-2.1-diffusion",
+        "qwen-image-2.1-turbo-diffusion",
         "qwen-image-2.1-text-encoder",
-        "qwen-image-2.1-vae",
-        "qwen-image-2.1-uncensored-lora"
+        "qwen-image-2.1-vae"
       ],
       "required_files": [
-        "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
+        "models/diffusion_models/qwen_image_2.1_turbo_bf16.safetensors",
         "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
-        "models/vae/qwen_image_2.1_vae_bf16.safetensors",
-        "models/loras/qwen-image-2.1-uncensored-lora.safetensors"
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -289,28 +291,12 @@
           "input": "negative_prompt"
         },
         "seed": {
-          "node": "458",
-          "input": "seed"
-        },
-        "steps": {
-          "node": "458",
-          "input": "steps"
+          "node": "459",
+          "input": "noise_seed"
         },
         "cfg": {
-          "node": "458",
+          "node": "460",
           "input": "cfg"
-        },
-        "denoise": {
-          "node": "458",
-          "input": "denoise"
-        },
-        "sampler_name": {
-          "node": "458",
-          "input": "sampler_name"
-        },
-        "scheduler": {
-          "node": "458",
-          "input": "scheduler"
         },
         "filename_prefix": {
           "node": "461",
@@ -327,25 +313,14 @@
         "batch_size": {
           "node": "456",
           "input": "batch_size"
-        },
-        "uncensored_strength_model": {
-          "node": "471",
-          "input": "strength_model"
         }
       },
       "defaults": {
         "width": 1024,
         "height": 1024,
         "batch_size": 1,
-        "steps": 25,
         "cfg": 1,
-        "denoise": 1,
-        "sampler_name": "euler",
-        "scheduler": "simple",
-        "filename_prefix": "qwen_image_2_1",
-        "loras": {
-          "uncensored": 1.0
-        }
+        "filename_prefix": "qwen_image_2_1"
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
@@ -359,75 +334,36 @@
       },
       "agent_hints": {
         "recommended": {
-          "steps": [
-            25,
-            50
-          ],
           "cfg": [
             1,
             1
           ]
         },
         "recommendations_are_advisory": true,
-        "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1, denoise 1.",
+        "sampling": "Official Qwen-Image-2.1-Turbo: 8 steps on the template's fixed sigma schedule, Euler, CFG 1; steps, sampler and scheduler are not parameters.",
         "negative_prompt": "Inactive at CFG 1."
       },
       "prompting": {
         "style": "natural-language",
         "recommended": {
-          "steps": 25,
-          "cfg": 1,
-          "sampler_name": "euler",
-          "scheduler": "simple"
+          "cfg": 1
         },
         "negative_prompt_effective_at_default": false
       },
       "compatibility_notes": [
-        "Uses the uncensored Qwen-Image-2.1 Q4_K_M GGUF transformer with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs.",
         "Shares the existing named-job coordinator and worker model-unload boundary.",
-        "The route applies the publisher's qwen-image-2.1-uncensored-lora (rank 16, attention only, model-only) on top of the UC GGUF at strength 1.0; callers can set loras.uncensored from -2 to 2, or 0 to disable it."
+        "Uses the official Qwen-Image-2.1-Turbo BF16 transformer (8 steps) with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs and with LoRAs trained for the non-Turbo 2.1 base.",
+        "No uncensored LoRA: the base draws adult content unaided, and the old rank-16 LoRA changed images by about 1/255."
       ],
       "source": {
-        "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_t2i.json",
-        "model_url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
-        "revision": "40319fb15542f0ad22921e0124a191a8a935a60a"
+        "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_turbo_t2i.json",
+        "model_url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "aacf31a6d48e707f352ecba714cee0680da3479b"
       },
       "validation": {
         "status": "verified-by-runtime-probe",
-        "scope": "RTX 4090 named API; Q4_K_M 1024x1024 25-step T2I and NSFW Qwen route selection.",
-        "date": "2026-09-26",
-        "job_id": "bf18c760-0da4-4e8b-a1bb-f3745f03c843",
-        "elapsed_ms": 51907,
-        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json",
-        "probes": [
-          {
-            "mode": "text-to-image-lora",
-            "status": "success",
-            "prompt_class": "sfw",
-            "date": "2026-10-15",
-            "resolution": "1024x1024",
-            "seed": 4242,
-            "elapsed_ms": 56360,
-            "output": "qwen_image_2_1_00008.png",
-            "scope": "uncensored LoRA 1.0 vs 0.0 at the same seed: mean absolute pixel difference 1.05/255, 2.1% of pixels changed by more than 10. All LoRA keys loaded."
-          },
-          {
-            "mode": "head-to-head",
-            "status": "success",
-            "date": "2026-10-16",
-            "seed": 4242,
-            "scope": "12 shared prompts vs moss-image-sft-t2i plus one layout-JSON prompt, all 25 jobs succeeded. MOSS won UI mock-up, long 12-detail scene and layout JSON; Qwen won short prompt, real-place landscape, Chinese poster (MOSS invented a garbled subtitle) and 2 MP macro realism; portrait, product label, menu text, composition, anime and natural-language layout tied. Mean 1 MP time: MOSS 50.0 s, Qwen 47.5 s; 1456 square: MOSS 109.8 s, Qwen 87.3 s.",
-            "report": "docs/decisions.md"
-          }
-        ]
-      },
-      "lora_bindings": {
-        "uncensored": {
-          "file": "qwen-image-2.1-uncensored-lora.safetensors",
-          "triggers": [],
-          "default": 1.0,
-          "strength_model": "uncensored_strength_model"
-        }
+        "date": "2026-11-20",
+        "scope": "Turbo BF16 on RTX 4090 through the named API: 1024x1024 text-to-image about 38 s (3 s of it sampling); pose fidelity PCK@0.1 0.96 with pose against 0.44 without (scripts/verify_pose_fidelity.py --set qwen), unchanged from the GGUF route."
       },
       "selection": {
         "best_for": [
@@ -454,8 +390,8 @@
     },
     {
       "id": "qwen-image-2.1-edit",
-      "name": "Qwen-Image-2.1 Uncensored Q4_K_M Image Edit",
-      "description": "Uncensored Q4_K_M reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32. With extend it grows the image beyond its borders instead and keeps the original pixels.",
+      "name": "Qwen-Image-2.1 Turbo Image Edit",
+      "description": "Qwen-Image-2.1-Turbo reference-conditioned editing, using one uploaded image and an instruction. Output follows the source size rounded to multiples of 32. With extend it grows the image beyond its borders instead and keeps the original pixels.",
       "family": "qwen-image-2.1",
       "resident_group": "qwen-image-2.1-edit",
       "tags": [
@@ -466,16 +402,14 @@
       ],
       "file": "qwen_image_2_1_edit.json",
       "model_ids": [
-        "qwen-image-2.1-diffusion",
+        "qwen-image-2.1-turbo-diffusion",
         "qwen-image-2.1-text-encoder",
-        "qwen-image-2.1-vae",
-        "qwen-image-2.1-uncensored-lora"
+        "qwen-image-2.1-vae"
       ],
       "required_files": [
-        "models/diffusion_models/qwen-image-2.1-UC-Q4_K_M.gguf",
+        "models/diffusion_models/qwen_image_2.1_turbo_bf16.safetensors",
         "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
-        "models/vae/qwen_image_2.1_vae_bf16.safetensors",
-        "models/loras/qwen-image-2.1-uncensored-lora.safetensors"
+        "models/vae/qwen_image_2.1_vae_bf16.safetensors"
       ],
       "routing": {
         "selector_scope": "workflow-model",
@@ -540,13 +474,13 @@
           ],
           "processing": "Official TextEncodeQwenImage21 with resolution=0; reference conditioning plus source-sized empty latent. One reference exposed by this named route.",
           "use_for": "Instruction-based edit of an uploaded photo or illustration: the prompt says what to change (colour, object, material, background, text) and the rest of the image is kept. Not a style transfer and not a face-identity reference.",
-        "extend": {
-          "supported": true,
-          "instruction": "The flat grey areas at the edges are empty canvas. Fill them so the picture continues seamlessly beyond its original borders, matching its style, lighting and perspective. Keep the rest of the picture unchanged. The new areas show: ",
-          "feather": 64,
-          "max_residual": 15.0,
-          "basis": "2026-11-20 probes: grey padding plus this instruction continued a waist-up crop to full body, a balcony scene 2x sideways, a desk scene up and right, and a photo 1.75x wider. Qwen shrank and shifted the original by up to 21% and 190 px, so the paste-back aligns before blending."
-        }
+          "extend": {
+            "supported": true,
+            "instruction": "The flat grey areas at the edges are empty canvas. Fill them so the picture continues seamlessly beyond its original borders, matching its style, lighting and perspective. Keep the rest of the picture unchanged. The new areas show: ",
+            "feather": 64,
+            "max_residual": 15.0,
+            "basis": "2026-11-20 probes: grey padding plus this instruction continued a waist-up crop to full body, a balcony scene 2x sideways, a desk scene up and right, and a photo 1.75x wider. Qwen shrank and shifted the original by up to 21% and 190 px, so the paste-back aligns before blending."
+          }
         },
         "parameter_aliases": {
           "subject": "prompt"
@@ -566,24 +500,12 @@
           "input": "negative_prompt"
         },
         "seed": {
-          "node": "458",
-          "input": "seed"
-        },
-        "steps": {
-          "node": "458",
-          "input": "steps"
+          "node": "459",
+          "input": "noise_seed"
         },
         "cfg": {
-          "node": "458",
+          "node": "460",
           "input": "cfg"
-        },
-        "sampler_name": {
-          "node": "458",
-          "input": "sampler_name"
-        },
-        "scheduler": {
-          "node": "458",
-          "input": "scheduler"
         },
         "filename_prefix": {
           "node": "461",
@@ -592,21 +514,11 @@
         "input_image": {
           "node": "470",
           "input": "image"
-        },
-        "uncensored_strength_model": {
-          "node": "471",
-          "input": "strength_model"
         }
       },
       "defaults": {
-        "steps": 25,
         "cfg": 1,
-        "sampler_name": "euler",
-        "scheduler": "simple",
-        "filename_prefix": "qwen_image_2_1_edit",
-        "loras": {
-          "uncensored": 1.0
-        }
+        "filename_prefix": "qwen_image_2_1_edit"
       },
       "resource_limits": {
         "max_total_pixels": 2359296,
@@ -620,17 +532,13 @@
       },
       "agent_hints": {
         "recommended": {
-          "steps": [
-            25,
-            50
-          ],
           "cfg": [
             1,
             1
           ]
         },
         "recommendations_are_advisory": true,
-        "sampling": "Official ComfyUI template defaults: 25 steps, Euler/simple, CFG 1. denoise is fixed at 1 and not a parameter: sampling starts from an empty latent and the source enters only as a reference, so lower denoise returns a flat texture instead of an edit.",
+        "sampling": "Official Qwen-Image-2.1-Turbo: 8 steps on the template's fixed sigma schedule, Euler, CFG 1; steps, sampler and scheduler are not parameters. The source enters only as a reference; there is no denoise.",
         "negative_prompt": "Inactive at CFG 1.",
         "input_image": "Required relative uploaded filename. Reference size determines output size, rounded to multiples of 32; batch is one.",
         "extend": "To extend, send extend with pixels per side and describe only what the new areas should show, e.g. extend {\"left\": 448, \"right\": 448} with prompt \"more of the balcony railing and the city skyline at dusk\". The service pads, instructs the model and pastes the original back; output is the source size plus the extension. Extended canvases above about 2.4 MP are drawn smaller and scaled up, so the new areas are softer.",
@@ -639,52 +547,25 @@
       "prompting": {
         "style": "natural-language",
         "recommended": {
-          "steps": 25,
-          "cfg": 1,
-          "sampler_name": "euler",
-          "scheduler": "simple"
+          "cfg": 1
         },
         "negative_prompt_effective_at_default": false
       },
       "compatibility_notes": [
-        "Uses the uncensored Qwen-Image-2.1 Q4_K_M GGUF transformer with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs.",
         "Shares the existing named-job coordinator and worker model-unload boundary.",
         "The official editable-size switch is fixed to false, and reference resolution is 0 as in the template. The named route currently exposes one reference.",
-        "The route applies the publisher's qwen-image-2.1-uncensored-lora (rank 16, attention only, model-only) on top of the UC GGUF at strength 1.0; callers can set loras.uncensored from -2 to 2, or 0 to disable it."
+        "Uses the official Qwen-Image-2.1-Turbo BF16 transformer (8 steps) with the Qwen3VL INT8 encoder and BF16 VAE; incompatible with older Qwen-Image/2511 LoRAs and with LoRAs trained for the non-Turbo 2.1 base.",
+        "No uncensored LoRA: the base draws adult content unaided, and the old rank-16 LoRA changed images by about 1/255."
       ],
       "source": {
-        "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_image_edit.json",
-        "model_url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
-        "revision": "40319fb15542f0ad22921e0124a191a8a935a60a"
+        "workflow_url": "https://github.com/Comfy-Org/workflow_templates/blob/main/templates/image_qwen_image_2_1_turbo_image_edit.json",
+        "model_url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+        "revision": "aacf31a6d48e707f352ecba714cee0680da3479b"
       },
       "validation": {
         "status": "verified-by-runtime-probe",
-        "scope": "RTX 4090 named API; Q4_K_M reference edit using the T2I result at 1024x1024.",
-        "date": "2026-09-26",
-        "job_id": "1c4ff487-8f1e-4f52-b35f-188c81582e43",
-        "elapsed_ms": 63922,
-        "report": "ComfyUI/.codex-runtime/qwen21-gguf-probe.json",
-        "probes": [
-          {
-            "mode": "image-edit-lora",
-            "status": "success",
-            "prompt_class": "sfw",
-            "date": "2026-10-15",
-            "resolution": "1024x1024",
-            "seed": 7,
-            "elapsed_ms": 79032,
-            "output": "qwen_image_2_1_edit_00001.png",
-            "scope": "Red-to-cobalt teapot edit preserved composition; LoRA 1.0 vs 0.0 mean absolute pixel difference 0.17/255."
-          }
-        ]
-      },
-      "lora_bindings": {
-        "uncensored": {
-          "file": "qwen-image-2.1-uncensored-lora.safetensors",
-          "triggers": [],
-          "default": 1.0,
-          "strength_model": "uncensored_strength_model"
-        }
+        "date": "2026-11-20",
+        "scope": "Turbo BF16 on RTX 4090 through the named API: a dress-colour edit of the 1116x2000 reference kept face, hair, pose and background (93 s including a model switch); extend 896x1152 to 1792x1152 aligned and pasted the original back without a warning (94 s)."
       },
       "selection": {
         "best_for": [
